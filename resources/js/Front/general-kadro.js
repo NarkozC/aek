@@ -323,7 +323,7 @@ function GetKadroHtml() {
                     var counter = 0;
                     var length = data.length;
                     var sLength;
-                    var html = '<div class="container wow ' + HeaderAnimation + '" data-wow-delay="' + wowDelay + '">' +
+                    var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
                         '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
@@ -382,7 +382,7 @@ function GetKadroHtml() {
 
                             html += '<section id="' + curContent.SubSectionID + '"' +
                                 '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-                                '<div class="col-lg-12 page-header text-center wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">' +
+                                '<div class="col-lg-12 page-header text-center wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                                 '<h3>' + curContent.Ad + '</h3>' +
                                 '</div>' +
                                 '<div class="LGMCWOS">';
@@ -413,11 +413,11 @@ function GetKadroHtml() {
                                 }
 
                                 if (break_on == 4) {
-                                    html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                                    html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                                 } else if (break_on == 3) {
-                                    html += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                                    html += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                                 } else if (break_on == 2) {
-                                    html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                                    html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                                 }
                                 html += '<div class="hvr-float-shadow thumbnail">' +
                                     '<a class="LGM" href="' + imagesDir + curData[0] + '" data-sub-html="<strong>' + curData[1] + '<br><small>' + curData[2] + '<br>' + curData[3] + '</small></strong>">' +
@@ -516,7 +516,7 @@ function GetYonetimKurulu() {
                     var i;
                     var counter = 0;
                     var length = data.length;
-                    var html = '<div class="container wow ' + HeaderAnimation + '" data-wow-delay="' + wowDelay + '">' +
+                    var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
                         '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
@@ -563,11 +563,11 @@ function GetYonetimKurulu() {
                         }
 
                         if (break_on == 4) {
-                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         } else if (break_on == 3) {
-                            html += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                            html += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         } else if (break_on == 2) {
-                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         }
                         html += '<div class="hvr-float-shadow thumbnail">' +
                             '<a class="LGM" href="' + imagesDir + curData.Resim + '" data-sub-html="<strong>' + curData.AdSoyad + '<br><small>' + curData.UzunAciklama + '</small></strong>">' +
@@ -673,7 +673,7 @@ function GetOkulAileBirligi() {
                     var i;
                     var counter = 0;
                     var length = data.length;
-                    var html = '<div class="container wow ' + HeaderAnimation + '" data-wow-delay="' + wowDelay + '">' +
+                    var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
                         '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
@@ -719,11 +719,11 @@ function GetOkulAileBirligi() {
                         }
 
                         if (break_on == 4) {
-                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         } else if (break_on == 3) {
-                            html += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                            html += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         } else if (break_on == 2) {
-                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">';
+                            html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         }
                         html += '<div class="hvr-float-shadow thumbnail">' +
                             '<a class="LGM" href="' + imagesDir + curData.Resim + '" data-sub-html="<strong>' + curData.AdSoyad + '<br><small>' + curData.Aciklama + '</small></strong>">' +

@@ -1142,45 +1142,6 @@ class General_Model extends CI_Model
 	*/
 	public function GetHaberler()
 	{
-		// $query = $this->db
-		// ->order_by('Tarih','desc')
-		// ->get('general_haberler')
-		// ->result();
-
-		// $i = 1;
-		// foreach ($query as $item) {
-		// 	$okulKodu = '';
-		// 	$tr_okul = explode(',', $item->Okullar);
-		// 	$okul_kodu = explode(',', $item->Okul_Kodu);
-		// 	for ($k=0; $k < sizeof($tr_okul); $k++) { 
-		// 		if ($tr_okul[$k] == "Tüm Anaokulu") {
-		// 			$okulKodu = $okulKodu."0,";
-		// 		}
-		// 		if ($tr_okul[$k] == "Tüm İlkokul") {
-		// 			$okulKodu = $okulKodu."1,";
-		// 		}
-		// 		if ($tr_okul[$k] == "Tüm Ortaokul") {
-		// 			$okulKodu = $okulKodu."2,";
-		// 		}
-		// 		if ($tr_okul[$k] == "Tüm Lise") {
-		// 			$okulKodu = $okulKodu."3,";
-		// 		}
-		// 	}
-
-		// 	for ($k=0; $k < sizeof($okul_kodu); $k++) {
-		// 		if ($okul_kodu[$k] == "") {
-		// 			$okulKodu = "0,1,2,3,";
-		// 		}
-		// 	}
-		// 	$okulKodu = preg_replace('/,[^,]*$/', '', $okulKodu);
-		//   	$field = array(
-		// 			  'Okul_Kodu'   =>$okulKodu,
-		// 			);
-		// 	$this->db->where('No', $item->No);
-		// 	$this->db->update('general_haberler', $field);
-		// 	$i++;
-		// }
-
 		return $this->db
 		->order_by('Tarih','desc')
 		->get('general_haberler')
@@ -1296,6 +1257,7 @@ class General_Model extends CI_Model
 		}
 	}
 
+
 	
 
 
@@ -1310,6 +1272,22 @@ class General_Model extends CI_Model
 		->order_by('No','asc')
 		->get('general_sinavbasvurusu')
 		->result();
+	}
+
+	public function GetSinavBasvurusuByTarihAndTc($tarih, $tc)
+	{
+		$where = array('Tc' => $tc, 'SinavTarihi' => $tarih);
+		$query = $this->db
+		->order_by('No','asc')
+		->where($where)
+		->get('general_sinavbasvurusu');
+
+		if ($query->num_rows() > 0) {
+		    return true;
+		} 
+		else {
+		    return false;
+		}
 	}
 
 	public function GetSinavBasvurusuNum()
@@ -1331,8 +1309,10 @@ class General_Model extends CI_Model
 			'Bolum'				=>$this->input->post('Bolum'),
 			'AnneAd'			=>$this->input->post('AnneAd'),
 			'AnneTel'			=>$this->input->post('AnneTel'),
+			'AnneEmail'			=>$this->input->post('AnneEmail'),
 			'BabaAd'			=>$this->input->post('BabaAd'),
 			'BabaTel'			=>$this->input->post('BabaTel'),
+			'BabaEmail'			=>$this->input->post('BabaEmail'),
 			'Adres'				=>$this->input->post('Adres'),
 			'Tc'				=>$this->input->post('Tc'),
 			'Aciklama'			=>$this->input->post('Aciklama'),
@@ -1388,6 +1368,137 @@ class General_Model extends CI_Model
 		$No = $this->input->post('No');
 		$this->db->where('No', $No);
 		$this->db->delete('general_sinavbasvurusu');
+		if($this->db->affected_rows() > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+
+
+
+
+
+	/*
+		=====================================
+		  --------- Sinav Tarihleri -------
+		=====================================
+	*/
+	public function GetSinavTarihleri()
+	{
+		$query = $this->db
+		->order_by('Tarih','desc')
+		->get('general_sinav_tarihleri')
+		->result();
+
+		$today = date("Y-m-d");
+		$today_dt = new DateTime($today);
+		foreach ($query as $item) {
+			$records = $item->Tarih;
+			$records_dt = new DateTime($records);
+
+			if ($records_dt < $today_dt) {
+				$No = $item->No;
+				$this->db->where('No', $No);
+				$this->db->delete('general_sinav_tarihleri');
+				if($this->db->affected_rows() > 0){}
+			}
+		}
+
+		return $this->db
+		->order_by('Tarih','desc')
+		->get('general_sinav_tarihleri')
+		->result();
+		
+	}
+
+	public function GetSinavTarihleriNum()
+	{
+		return $this->db
+		->get('general_sinav_tarihleri')
+		->num_rows();
+	}
+
+	public function AddSinavTarihleri($CData){
+		foreach ($CData as $key => $value) {
+	       	if (is_null($value)) {
+	            $CData[$key] = "";
+	        }
+	    }
+		$Data = array(
+			'tr_Baslik'			=>$this->input->post('tr_Baslik'),
+			'tr_AnaResim'		=>$this->input->post('tr_AnaResim'),
+			'tr_DigerResimler'	=>$CData['tr_DigerResimler'],
+			'tr_Yazi'			=>$this->input->post('tr_Yazi'),
+			'tr_SectionID'		=>$CData['tr_SectionID'],
+
+			'en_Baslik'			=>$this->input->post('en_Baslik'),
+			'en_AnaResim'		=>$this->input->post('en_AnaResim'),
+			'en_DigerResimler'	=>$CData['en_DigerResimler'],
+			'en_Yazi'			=>$this->input->post('en_Yazi'),
+			'en_SectionID'		=>$CData['en_SectionID'],
+
+			'Okul'				=>$CData['Okul'],
+			'Tarih'				=>$this->input->post('Tarih'),
+		);
+		$this->db->insert('general_sinav_tarihleri', $Data);
+		if($this->db->affected_rows() > 0){
+			return true;
+		} else{
+			return false;
+		}
+	}
+
+	public function EditSinavTarihleri(){
+		$No = $this->input->post('No');
+		$this->db->where('No', $No);
+		$query = $this->db->get('general_sinav_tarihleri');
+		if($query->num_rows() > 0){
+			return $query->row();
+		}else{
+			return false;
+		}
+	}
+
+	public function UpdateSinavTarihleri($CData){
+		foreach ($CData as $key => $value) {
+	       	if (is_null($value)) {
+	            $CData[$key] = "";
+	        }
+	    }
+	    $No = $this->input->post('No');
+		$Data = array(
+			'tr_Baslik'			=>$this->input->post('tr_Baslik'),
+			'tr_AnaResim'		=>$this->input->post('tr_AnaResim'),
+			'tr_DigerResimler'	=>$CData['tr_DigerResimler'],
+			'tr_Yazi'			=>$this->input->post('tr_Yazi'),
+			'tr_SectionID'		=>$CData['tr_SectionID'],
+
+			'en_Baslik'			=>$this->input->post('en_Baslik'),
+			'en_AnaResim'		=>$this->input->post('en_AnaResim'),
+			'en_DigerResimler'	=>$CData['en_DigerResimler'],
+			'en_Yazi'			=>$this->input->post('en_Yazi'),
+			'en_SectionID'		=>$CData['en_SectionID'],
+
+			'Okul'				=>$CData['Okul'],
+			'Tarih'				=>$this->input->post('Tarih'),
+		);
+		$this->db->where('No', $No);
+		$this->db->update('general_sinav_tarihleri', $Data);
+		if ($this->db->trans_status() === FALSE) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+
+
+	function DeleteSinavTarihleri(){
+		$No = $this->input->post('No');
+		$this->db->where('No', $No);
+		$this->db->delete('general_sinav_tarihleri');
 		if($this->db->affected_rows() > 0){
 			return true;
 		}else{
@@ -1843,14 +1954,14 @@ class General_Model extends CI_Model
 	{
 		return $this->db
 		->order_by('No','asc')
-		->get('general_aylar')
+		->get('genel_aylar')
 		->result();
 	}
 
 	public function GetAylarNum()
 	{
 		return $this->db
-		->get('general_aylar')
+		->get('genel_aylar')
 		->num_rows();
 	}
 

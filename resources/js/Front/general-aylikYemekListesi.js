@@ -8,6 +8,10 @@ var vars = {
     sectionGetFunction: 'GetAylikYemekListesi',
     sectionIsFirst: true,
     aylikYemekListesiData: new Array(),
+
+    sectionDatas: {
+        Okullar: GetOkullarData(),
+    }
 };
 
 $(function() {
@@ -40,7 +44,7 @@ function GetAylikYemekListesi(where = '') {
                 var theData = {
                     Baslik: '',
                     Resim: '',
-                    Okul_Kodu: '',
+                    Okul: '',
                     Tarih: '',
                 }
                 var listArrays = {
@@ -81,30 +85,30 @@ function GetAylikYemekListesi(where = '') {
                     theData.Tarih = data[i].Tarih;
                     var dateAr = theData.Tarih.split('-');
                     theData.Tarih = dateAr[0] + '.' + dateAr[1];
-                    theData.Okul_Kodu = data[i].Okul_Kodu.split(',');
+                    theData.Okul = data[i].Okul.split(',');
 
                     var curData = {
                         Baslik: theData.Baslik,
                         Resim: theData.Resim,
-                        Okul_Kodu: theData.Okul_Kodu,
+                        Okul: theData.Okul,
                         Tarih: theData.Tarih,
                     }
 
-                    for (var j = 0; j < curData.Okul_Kodu.length; j++) {
-                        if (curData.Okul_Kodu[j] == '0') {
+                    for (var j = 0; j < curData.Okul.length; j++) {
+                        if (curData.Okul[j] == '0') {
                             listArrays['anaokulu'][listArraysC['anaokulu']] = curData;
                             listArraysC['anaokulu']++;
 
                             html += '<img src="' + baseurl + 'resources/images/' + curData.Resim + '"' +
                                 ' data-image="' + baseurl + 'resources/images/' + curData.Resim + '"' +
                                 ' data-baslik="' + curData.Baslik + '">';
-                        } else if (curData.Okul_Kodu[j] == '1') {
+                        } else if (curData.Okul[j] == '1') {
                             listArrays['ilkokul'][listArraysC['ilkokul']] = curData;
                             listArraysC['ilkokul']++;
-                        } else if (curData.Okul_Kodu[j] == '2') {
+                        } else if (curData.Okul[j] == '2') {
                             listArrays['ortaokul'][listArraysC['ortaokul']] = curData;
                             listArraysC['ortaokul']++;
-                        } else if (curData.Okul_Kodu[j] == '3') {
+                        } else if (curData.Okul[j] == '3') {
                             listArrays['anadoluLisesi'][listArraysC['anadoluLisesi']] = curData;
                             listArraysC['anadoluLisesi']++;
                         }
@@ -126,10 +130,12 @@ function GetAylikYemekListesi(where = '') {
         });
 
     } else {
-        for (var i = 0; i < okullarShowIDs.length; i++) {
-            if (where == '#' + okullarShowIDs[i]) {
+        var odata = vars.sectionDatas.Okullar
+        for (var i = 0; i < odata.length; i++) {
+            if (where == '#' + odata[i].ShowID) {
                 var html = '';
-                var theID = okullarShowIDs[i];
+                var theID = odata[i].ShowID;
+                console.log(theID);
                 var data = vars.aylikYemekListesiData[theID];
 
                 html += '<div id="' + vars.sectionGalleryCode + '" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">';
@@ -152,30 +158,28 @@ function GetAylikYemekListesi(where = '') {
 function GetAylikYemekListesiHtml(sectionBase = '') {
     var html = '';
     var i;
-    var Animation = 'bounceInUp';
-    var TextAnimation = 'fadeIn';
-    var TextAnimationDelay = (Number(wowDelayS) + 0.8);
     var isFirstJ = true;
 
     html += '<section id="' + vars.sectionNameLower + '">' +
         '<div class="container">' +
-        '<div class="col-lg-12 page-header wow bounceInDown paddingL0" data-wow-delay="' + wowDelay + '">' +
+        '<div class="col-lg-12 page-header wow '+AnimationHeader+' paddingL0" data-wow-delay="' + wowDelay + '">' +
         '<h2 id="showBaslik" class="text-center" data-basliklar="' + vars.sectionGalleryCode + '">' + vars.sectionNameNormal + '</h2>' +
         '</div>' +
         '</div>' +
         '<div class="container wow bounceInUp dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + TextAnimation + '" data-wow-delay="' + TextAnimationDelay + 's">' +
+        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's">' +
         '<div class="panel with-nav-tabs panel-default">' +
         '<div class="panel-heading">' +
         '<ul class="nav nav-tabs">';
 
     isFirstJ = true;
-    for (var j = 0; j < okullarShowIDs.length; j++) {
+    var data = vars.sectionDatas.Okullar;
+    for (var j = 0; j < data.length; j++) {
         if (isFirstJ) {
-            html += '<li class="active"><a href="#' + okullarShowIDs[j] + '" data-toggle="tab">' + okullarLang[j] + '</a></li>';
+            html += '<li class="active"><a href="#' + data[j].ShowID + '" data-toggle="tab">' + data[j].Ad + '</a></li>';
             isFirstJ = false;
         } else {
-            html += '<li><a href="#' + okullarShowIDs[j] + '" data-toggle="tab">' + okullarLang[j] + '</a></li>';
+            html += '<li><a href="#' + data[j].ShowID + '" data-toggle="tab">' + data[j].Ad + '</a></li>';
         }
     }
 
@@ -185,12 +189,12 @@ function GetAylikYemekListesiHtml(sectionBase = '') {
         '<div class="tab-content">';
 
     isFirstJ = true;
-    for (var j = 0; j < okullarShowIDs.length; j++) {
+    for (var j = 0; j < data.length; j++) {
         if (isFirstJ) {
-            html += '<div class="tab-pane fade in active" id="' + okullarShowIDs[j] + '"></div>';
+            html += '<div class="tab-pane fade in active" id="' + data[j].ShowID + '"></div>';
             isFirstJ = false;
         } else {
-            html += '<div class="tab-pane fade" id="' + okullarShowIDs[j] + '"></div>';
+            html += '<div class="tab-pane fade" id="' + data[j].ShowID + '"></div>';
         }
     }
 

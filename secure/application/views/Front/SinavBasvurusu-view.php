@@ -11,6 +11,12 @@
 
 <?php $this->view('Front/front-navbar.php'); ?>
 
+<style type="text/css">
+	#showSinavBasvurusu .row{
+		margin: 0px;
+	}
+</style>
+
 
 <div id="showSinavBasvurusu"></div>
 

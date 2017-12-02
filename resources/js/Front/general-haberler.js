@@ -37,13 +37,10 @@ $(function(){
         var Tarih;
         var Link;
         var Rmore = 'Devamını Oku';
-        var Animation = 'bounceInUp';
-        var TextAnimation = 'fadeIn';
-        var TextAnimationDelay = (Number(wowDelayS)+0.8);
 
         html += '<section id="haberler">'+
                 '<div class="container">'+
-                '<div class="col-lg-12 page-header wow bounceInDown paddingL0" data-wow-delay="'+wowDelay+'">'+
+                '<div class="col-lg-12 page-header wow '+AnimationHeader+' paddingL0" data-wow-delay="'+wowDelay+'">'+
                 '<h2 data-basliklar="GH">Haberler</h2>'+
                 '</div>';
         for(i=0; i<data.length; i++){
@@ -94,7 +91,7 @@ $(function(){
 
           html +=
             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad25 marginB35 wow '+Animation+'" data-wow-delay="'+wowDelay+'">'+
-            '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow '+TextAnimation+'" data-wow-delay="'+TextAnimationDelay+'s"> <!-- hidden-xs-sm-md -->'+
+            '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow '+AnimationText+'" data-wow-delay="'+wowDelayText+'s"> <!-- hidden-xs-sm-md -->'+
             '<div class="col-lg-4">'+
             '<a href="'+Link+'"><img alt="'+Baslik+'" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="'+baseurl+'resources/images/'+AnaResim+'"></a>'+
             '</div>'+
@@ -105,7 +102,7 @@ $(function(){
             '</div>'+
             '<a href="'+Link+'" class="btn btn-sm btn-danger borderRad10" style="position:absolute;bottom:20px;right:20px">'+Rmore+'</a>'+
             '</div>'+
-            '<div class="row visible-md visible-sm visible-xs marginTop20 wow '+TextAnimation+'" data-wow-delay="'+TextAnimationDelay+'s"> <!-- visible-xs-sm-md -->'+
+            '<div class="row visible-md visible-sm visible-xs marginTop20 wow '+AnimationText+'" data-wow-delay="'+wowDelayText+'s"> <!-- visible-xs-sm-md -->'+
             '<div class="col-xs-12 col-sm-12 col-md-12">'+
             '<h3 class="text-center"><a href="'+Link+'">'+Baslik+' <span class="fSize65per">('+Tarih+')</span></a></h3>'+
             '<a href="'+Link+'"><img alt="'+Baslik+'" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="'+baseurl+'resources/images/'+AnaResim+'"></a>'+
@@ -147,8 +144,8 @@ $(function(){
         var SectionID;
         var Tarih;
         var Animation = 'bounceInUp';
-        var TextAnimation = 'fadeIn';
-        var TextAnimationDelay = (Number(wowDelayS)+0.8);
+        var AnimationText = 'fadeIn';
+        var wowDelayText = (Number(wowDelayS)+0.8);
         if (en) {
           if (data.en_AnaResim == "") {
             AnaResim = data.tr_AnaResim;
@@ -205,12 +202,12 @@ $(function(){
                 '<div class="col-lg-12 page-header wow bounceInDown paddingL0" data-wow-delay="'+wowDelay+'">'+
                 '<h2>'+Baslik+' <span class="fSize65per">('+Tarih+')</span></h2>'+
                 '</div>'+
-                '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow '+TextAnimation+'" data-wow-delay="'+TextAnimationDelay+'s">'+
+                '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow '+AnimationText+'" data-wow-delay="'+wowDelayText+'s">'+
                 '<div id="GH" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">'+
                 DigerResimlerHtml+
                 '</div>'+
                 '</div>'+
-                '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow '+TextAnimation+'" data-wow-delay="'+TextAnimationDelay+'s">'+
+                '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow '+AnimationText+'" data-wow-delay="'+wowDelayText+'s">'+
                 '<p>'+Yazi+'</p>'+
                 '</div>'+
                 '</div>'+
@@ -250,9 +247,14 @@ $(function(){
       type: 'ajax',
       method: 'post',
       url: url,
+      data: {
+        NeedData: "true",
+        English: en
+      },
       async: false,
       dataType: 'json',
-      success: function(data){
+      success: function(result){
+        data = result.data;
         var html = '';
         var i;
         var Baslik;
@@ -262,9 +264,6 @@ $(function(){
         var Tarih;
         var Link;
         var btnTum = "Tüm";
-        var Animation = 'bounceInUp';
-        var TextAnimation = 'fadeIn';
-        var TextAnimationDelay = (Number(wowDelayS)+0.8);
 
         html += '<section id="haberlerA">'+
                 '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 marginTop15 wow '+Animation+'" data-wow-delay="'+wowDelay+'">'+
@@ -274,7 +273,6 @@ $(function(){
                 '</div>';
 
         for(i=0; i<=2; i++){
-
           if (en) {
             btnTum = "All";
             if (data[i].en_AnaResim == "") {
@@ -314,7 +312,7 @@ $(function(){
           var dateAr = Tarih.split('-');
           var Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];
 
-          html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddingLR0 paddingTB5 wow '+TextAnimation+'" data-wow-delay="'+TextAnimationDelay+'s">'+
+          html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddingLR0 paddingTB5 wow '+AnimationText+'" data-wow-delay="'+wowDelayText+'s">'+
                   '<div class="col-lg-4 visible-lg padding0">'+
                   '<a href="'+Link+'"><img src="'+baseurl+'resources/images/'+AnaResim+'" style="max-height:70px;max-width:170px;" class="img-responsive" alt="'+Baslik+'"></a>'+
                   '</div>'+

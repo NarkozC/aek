@@ -402,10 +402,13 @@ if (en) {
         Bolum: "Bölüm",
         AnneAd: "Mother's Name",
         AnneTel: "Mother's Mobile Phone",
+        AnneEmail: "Mother's E-mail",
         BabaAd: "Father's Name",
         BabaTel: "Father's Mobile Phone",
+        AnneEmail: "Father's E-mail",
         Adres: "Address",
         Tc: "Identity",
+        Basvur: "Apply",
     };
 
 } else {
@@ -494,6 +497,7 @@ if (en) {
         Cinsiyet: "Cinsiyet",
         CinsiyetSec: "Cinsiyet Seç...",
         SinavTarihi: "Sınav Tarihi",
+        SinavTarihiSec: "Sınav Tarihi Seç...",
         DogumTarihi: "Doğum Tarihi",
         DogumYeri: "Doğum Yeri",
         OOSinif: "Okumakta Olduğu Sınıf",
@@ -501,10 +505,14 @@ if (en) {
         Bolum: "Bölüm",
         AnneAd: "Anne Adı",
         AnneTel: "Anne Cep Telefonu",
+        AnneEmail: "Anne E-posta",
         BabaAd: "Baba Adı",
         BabaTel: "Baba Cep Telefonu",
+        BabaEmail: "Baba E-posta",
         Adres: "Adres",
         Tc: "Tc Kimlik No",
+        Basvur: "Başvur",
+
     };
 }
 
@@ -809,7 +817,7 @@ function GetResimlerData(getHtml = 0) {
                 }
                 setTimeout(Cache('GetResimlerData', url, theCacheData), 1)
             }
-            
+
         },
         error: function() {
             iziError();
@@ -864,6 +872,54 @@ function GetCinsiyetlerData(getS = 1, kod = "E") {
     });
 
     return cinsiyetlerD;
+}
+
+function GetAylarData(getS = 1, kod = "E") {
+    var controller = baseurl + 'Genel-Aylar/';
+    var getFunction = 'GetAylar';
+    var curData = new Array();
+
+    var url = controller + getFunction;
+    $.ajax({
+        type: 'ajax',
+        method: 'post',
+        url: url,
+        data: {
+            English: en,
+        },
+        async: false,
+        dataType: 'json',
+        success: function(result) {
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.Aylar;
+                curData = cache;
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.Aylar;
+                curData = cache;
+            } else {
+                var i, length;
+                var data = result.data;
+                for (i = 0, length = data.length; i < length; i++) {
+                    curData[i] = GetCurData(data[i]);
+                }
+                var theCacheData = {
+                    Aylar: curData
+                }
+                setTimeout(Cache('GetAylarData', url, theCacheData), 1)
+            }
+            if (getS != 1) {
+                var temp = curData.filter(function(ay) {
+                    return ay.Kod == kod;
+                });
+                curData = temp;
+            }
+        },
+        error: function() {
+            iziError();
+        }
+    });
+
+    return curData;
 }
 
 function Cache(who, url, data) {
@@ -946,7 +1002,13 @@ function GetCurData(data) {
 function ShowFormErrors(messages) {
     $.each(messages, function(key, value) {
         var ajaxGroup;
-        var element = $('[name="' + key + '"]');
+        var element
+        console.log(key);
+        if (key == "No") {
+            element = $('[name="' + key + '"]');
+        } else {
+            element = $('#' + key + '');
+        }
         ajaxGroup = element.parents('.ajax-group:first');
         ajaxGroup.addClass(value.length > 0 ? 'has-error' : 'has-success')
 

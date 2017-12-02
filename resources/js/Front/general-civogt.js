@@ -309,10 +309,10 @@ function GetCivogtHtml() {
             '</div>' +
             '</div>' +
             '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
             '<img src="' + imagesDir + 'Genel/CIVOGS-2.png" class="img-responsive img-center">' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 marginT15 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
 
             '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
             '<label>' + formLang.Yil + '</label>' +

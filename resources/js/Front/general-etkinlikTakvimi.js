@@ -12,6 +12,12 @@ var vars = {
     sectionIsAylarFirst: true,
     subelerData: new Array(),
     etkinlikTakvimiData: new Array(),
+
+    sectionDatas: {
+        Aylar: GetAylarData(),
+        Subeler: GetSubelerData(),
+        Okullar: GetOkullarData(),
+    }
 };
 
 var sube_ID = 'Subeler';
@@ -58,14 +64,6 @@ $(function() {
 
 function GetSubeler(okulKodu = 0) {
     if (vars.sectionIsSubelerFirst) {
-        var url = baseurl + 'Subeler/GetSubeler';
-        $.ajax({
-            type: 'ajax',
-            method: 'post',
-            url: url,
-            async: false,
-            dataType: 'json',
-            success: function(data) {
                 var okulsArrays = {
                     ilkokul: new Array(),
                     ortaokul: new Array(),
@@ -84,44 +82,23 @@ function GetSubeler(okulKodu = 0) {
 
                 var sube_html = '<select class="form-control selectpicker" data-live-search="true" name="Sube" id="' + sube_ID + '" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true" disabled></select>';
                 var okul_html = '<select class="form-control selectpicker" data-live-search="true" name="Okul" id="' + okul_ID + '" title="' + formLang.OkulSec + '" data-liveSearchNormalize="true">';
+                var data = vars.sectionDatas.Subeler;
+                var odata = vars.sectionDatas.Okullar
 
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].Okul_Kodu == "1") {
-                        if (en) {
-                            if (data[i].en_Okul == "") {
-                                okulNames[0] = data[i].tr_Okul;
-                            } else {
-                                okulNames[0] = data[i].en_Okul;
-                            }
-                        } else {
-                            okulNames[0] = data[i].tr_Okul;
-                        }
+
+                    if (data[i].Okul == "1") {
+                        okulNames[0] = odata[1].Ad;
                         okulsArrays['ilkokul'][okulsArraysC['ilkokul']] = data[i];
                         okulsArraysC['ilkokul']++;
                     }
-                    if (data[i].Okul_Kodu == "2") {
-                        if (en) {
-                            if (data[i].en_Okul == "") {
-                                okulNames[1] = data[i].tr_Okul;
-                            } else {
-                                okulNames[1] = data[i].en_Okul;
-                            }
-                        } else {
-                            okulNames[1] = data[i].tr_Okul;
-                        }
+                    if (data[i].Okul == "2") {
+                        okulNames[1] = odata[2].Ad;
                         okulsArrays['ortaokul'][okulsArraysC['ortaokul']] = data[i];
                         okulsArraysC['ortaokul']++;
                     }
-                    if (data[i].Okul_Kodu == "3") {
-                        if (en) {
-                            if (data[i].en_Okul == "") {
-                                okulNames[2] = data[i].tr_Okul;
-                            } else {
-                                okulNames[2] = data[i].en_Okul;
-                            }
-                        } else {
-                            okulNames[2] = data[i].tr_Okul;
-                        }
+                    if (data[i].Okul == "3") {
+                        okulNames[2] = odata[3].Ad;
                         okulsArrays['anadoluLisesi'][okulsArraysC['anadoluLisesi']] = data[i];
                         okulsArraysC['anadoluLisesi']++;
                     }
@@ -129,8 +106,8 @@ function GetSubeler(okulKodu = 0) {
                     okulsArraysC['tumokul']++;
 
                 }
-                for (var j = 0; j < okulNames.length; j++) {
-                    okul_html += '<option data-tokens="' + okulNames[j] + '" value="' + (j + 1) + '">' + okulNames[j] + '</option>';
+                for (var j = 1; j < odata.length; j++) {
+                    okul_html += '<option data-tokens="' + odata[j].Ad + '" value="' + (j + 1) + '">' + odata[j].Ad + '</option>';
                 }
 
                 okul_html += '</select>';
@@ -138,11 +115,7 @@ function GetSubeler(okulKodu = 0) {
                 $('#' + okul_section).html(okul_html);
                 $('#' + sube_section).html(sube_html);
 
-            },
-            error: function() {
-                iziError();
-            }
-        });
+           
         vars.sectionIsSubelerFirst = false;
     } else {
         var data;
@@ -153,8 +126,8 @@ function GetSubeler(okulKodu = 0) {
 
             data = vars.subelerData['tumokul'];
             for (var i = 0; i < data.length; i++) {
-                if (data[i].Okul_Kodu == okulKodu) {
-                    sube_html += '<option data-tokens="' + data[i].Sube + '" value="' + data[i].Sube + '">' + data[i].Sube + '</option>';
+                if (data[i].Okul == okulKodu) {
+                    sube_html += '<option data-tokens="' + data[i].Kod + '" value="' + data[i].Kod + '">' + data[i].Kod + '</option>';
                 }
             }
             sube_html += '</select>';
@@ -166,12 +139,12 @@ function GetSubeler(okulKodu = 0) {
 
 function GetAylar(ay = 0) {
     if (vars.sectionIsAylarFirst) {
-
+        var data = vars.sectionDatas.Aylar;
         var ay_html = '<select class="form-control selectpicker" data-live-search="true" name="Ay" id="' + ay_ID + '" title="' + formLang.AySec + '" data-liveSearchNormalize="true" disabled>' +
             '<option data-tokens="' + formLang.Sifirla + '" value="reset">' + formLang.Sifirla + '</option>';
 
-        for (var i = 0; i < aylarShowIDs.length; i++) {
-            ay_html += '<option data-tokens="' + aylarLang[i] + '" value="' + aylarKods[i] + '">' + aylarLang[i] + '</option>';
+        for (var i = 0; i < data.length; i++) {
+            ay_html += '<option data-tokens="' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
         }
 
         ay_html += '</select>';

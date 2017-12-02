@@ -116,6 +116,7 @@ define('FORM_LANG_TR', array(
 					'Ad' => 'Ad',
 					'Sinif' => 'Sınıf',
 					'Yil' => 'Yıl',
+					'Tc' => 'Tc',
 					));
 
 define('FORM_LANG_EN', array(

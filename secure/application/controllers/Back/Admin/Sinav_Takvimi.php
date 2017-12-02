@@ -48,7 +48,7 @@ class Sinav_Takvimi extends CI_Controller {
         if ($en == "true") {
           $this->config->set_item('language', FORM_LANGUAGES['Ingilizce']); 
           $this->form_validation->set_rules('tr_Aciklama', FORM_LANG_EN['Aciklama'], 'required|trim|strip_tags|xss_clean'); 
-          $this->form_validation->set_rules('tr_Ders', FORM_LANG_EN['Ders'], 'required|trim|max_length[255]|strip_tags|xss_clean');
+          $this->form_validation->set_rules('tr_Ders', FORM_LANG_EN['Ders'], 'trim|max_length[255]|strip_tags|xss_clean');
             
           $this->form_validation->set_rules('en_Aciklama', FORM_LANG_EN['Aciklama'], 'trim|strip_tags|xss_clean'); 
           $this->form_validation->set_rules('en_Ders', FORM_LANG_EN['Ders'], 'required|trim|max_length[255]|strip_tags|xss_clean');
@@ -62,7 +62,7 @@ class Sinav_Takvimi extends CI_Controller {
           $this->form_validation->set_rules('tr_Ders', FORM_LANG_TR['Ders'], 'required|trim|max_length[255]|strip_tags|xss_clean');
             
           $this->form_validation->set_rules('en_Aciklama', FORM_LANG_TR['Aciklama'], 'trim|strip_tags|xss_clean'); 
-          $this->form_validation->set_rules('en_Ders', FORM_LANG_TR['Ders'], 'required|trim|max_length[255]|strip_tags|xss_clean');
+          $this->form_validation->set_rules('en_Ders', FORM_LANG_TR['Ders'], 'trim|max_length[255]|strip_tags|xss_clean');
                
           $this->form_validation->set_rules('Sube[]', FORM_LANG_TR['Sube'], 'required|trim|strip_tags|xss_clean');
           $this->form_validation->set_rules('Okul_Kodu', FORM_LANG_TR['OkulKodu'], 'required|trim|max_length[255]|strip_tags|xss_clean');

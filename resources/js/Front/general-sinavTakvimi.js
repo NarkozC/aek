@@ -14,6 +14,13 @@ var vars = {
     sectionIsYillarFirst: true,
     subelerData: new Array(),
     sinavTakvimiData: new Array(),
+
+    sectionDatas: {
+        Okullar: GetOkullarData(),
+        Yillar: GetYillarData(), 
+        Aylar: GetAylarData(),
+        Subeler: GetSubelerData()
+    }
 };
 
 var sube_ID = 'SubeSelect';
@@ -35,35 +42,42 @@ $(function() {
         var valueSelected = this.value;
         RefreshHtmls()
         RefreshData(valueSelected);
+if (!isFirst) {
+            ShortenContent6();
+        }
     });
 
     $('#' + ay_ID).on('change', function(e) {
         var valueSelected = this.value;
         GetAylar(valueSelected);
+        if (!isFirst) {
+            ShortenContent6();
+        }
     });
 
     $('#' + yil_ID).on('change', function(e) {
         var valueSelected = this.value;
         GetYillar(valueSelected);
+        if (!isFirst) {
+            ShortenContent6();
+        }
     });
 
     $('#show' + vars.sectionNameUpper).on('change', '#' + sube_ID, function(e) {
         var valueSelected = this.value;
         RefreshData(0, valueSelected);
+        if (!isFirst) {
+            ShortenContent6();
+        }
     });
 
 });
 
 function GetSubeler(okulKodu = 0) {
     if (vars.sectionIsSubelerFirst) {
-        var url = baseurl + 'Subeler/GetSubeler';
-        $.ajax({
-            type: 'ajax',
-            method: 'post',
-            url: url,
-            async: false,
-            dataType: 'json',
-            success: function(data) {
+
+        var data = vars.sectionDatas.Subeler;
+        var odata = vars.sectionDatas.Okullar
                 var okulsArrays = {
                     ilkokul: new Array(),
                     ortaokul: new Array(),
@@ -84,42 +98,18 @@ function GetSubeler(okulKodu = 0) {
                 var okul_html = '<select class="form-control selectpicker" data-live-search="true" name="Okul" id="' + okul_ID + '" title="' + formLang.OkulSec + '" data-liveSearchNormalize="true">';
 
                 for (var i = 0; i < data.length; i++) {
-                    if (data[i].Okul_Kodu == "1") {
-                        if (en) {
-                            if (data[i].en_Okul == "") {
-                                okulNames[0] = data[i].tr_Okul;
-                            } else {
-                                okulNames[0] = data[i].en_Okul;
-                            }
-                        } else {
-                            okulNames[0] = data[i].tr_Okul;
-                        }
+                    if (data[i].Okul == "1") {
+                        okulNames[0] = odata[1].Ad
                         okulsArrays['ilkokul'][okulsArraysC['ilkokul']] = data[i];
                         okulsArraysC['ilkokul']++;
                     }
-                    if (data[i].Okul_Kodu == "2") {
-                        if (en) {
-                            if (data[i].en_Okul == "") {
-                                okulNames[1] = data[i].tr_Okul;
-                            } else {
-                                okulNames[1] = data[i].en_Okul;
-                            }
-                        } else {
-                            okulNames[1] = data[i].tr_Okul;
-                        }
+                    if (data[i].Okul == "2") {
+                        okulNames[1] = odata[2].Ad
                         okulsArrays['ortaokul'][okulsArraysC['ortaokul']] = data[i];
                         okulsArraysC['ortaokul']++;
                     }
-                    if (data[i].Okul_Kodu == "3") {
-                        if (en) {
-                            if (data[i].en_Okul == "") {
-                                okulNames[2] = data[i].tr_Okul;
-                            } else {
-                                okulNames[2] = data[i].en_Okul;
-                            }
-                        } else {
-                            okulNames[2] = data[i].tr_Okul;
-                        }
+                    if (data[i].Okul == "3") {
+                        okulNames[2] = odata[3].Ad
                         okulsArrays['anadoluLisesi'][okulsArraysC['anadoluLisesi']] = data[i];
                         okulsArraysC['anadoluLisesi']++;
                     }
@@ -137,11 +127,7 @@ function GetSubeler(okulKodu = 0) {
                 $('#' + okul_section).html(okul_html);
                 $('#' + sube_section).html(sube_html);
 
-            },
-            error: function() {
-                iziError();
-            }
-        });
+
         vars.sectionIsSubelerFirst = false;
     } else {
         var data;
@@ -152,8 +138,8 @@ function GetSubeler(okulKodu = 0) {
 
             data = vars.subelerData['tumokul'];
             for (var i = 0; i < data.length; i++) {
-                if (data[i].Okul_Kodu == okulKodu) {
-                    sube_html += '<option data-tokens="' + data[i].Sube + '" value="' + data[i].Sube + '">' + data[i].Sube + '</option>';
+                if (data[i].Okul == okulKodu) {
+                    sube_html += '<option data-tokens="' + data[i].Kod + '" value="' + data[i].Kod + '">' + data[i].Kod + '</option>';
                 }
             }
             sube_html += '</select>';
@@ -161,6 +147,9 @@ function GetSubeler(okulKodu = 0) {
         }
     }
     RefreshSelectpicker();
+    if (!isFirst) {
+        ShortenContent6();
+    }
 }
 
 function GetAylar(ay = 0) {
@@ -169,8 +158,9 @@ function GetAylar(ay = 0) {
         var ay_html = '<select class="form-control selectpicker" data-live-search="true" name="Ay" id="' + ay_ID + '" title="' + formLang.AySec + '" data-liveSearchNormalize="true" disabled>' +
             '<option data-tokens="' + formLang.Sifirla + '" value="reset">' + formLang.Sifirla + '</option>';
 
-        for (var i = 0; i < aylarShowIDs.length; i++) {
-            ay_html += '<option data-tokens="' + aylarLang[i] + '" value="' + aylarKods[i] + '">' + aylarLang[i] + '</option>';
+        var data = vars.sectionDatas.Aylar;
+        for (var i = 0; i < data.length; i++) {
+            ay_html += '<option data-tokens="' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
         }
 
         ay_html += '</select>';
@@ -196,6 +186,9 @@ function GetAylar(ay = 0) {
         }
     }
     RefreshSelectpicker();
+    if (!isFirst) {
+            ShortenContent6();
+        }
 }
 
 function GetYillar(yil = 0) {
@@ -203,9 +196,9 @@ function GetYillar(yil = 0) {
 
         var yil_html = '<select class="form-control selectpicker" data-live-search="true" name="' + yil_section + '" id="' + yil_ID + '" title="' + formLang.YilSec + '" data-liveSearchNormalize="true" disabled>' +
             '<option data-tokens="' + formLang.Sifirla + '" value="reset">' + formLang.Sifirla + '</option>';
-
-        for (var i = 0; i < yillarKods.length; i++) {
-            yil_html += '<option data-tokens="' + yillarKods[i] + '" value="' + yillarKods[i] + '">' + yillarKods[i] + '</option>';
+        var data = vars.sectionDatas.Yillar;
+        for (var i = 0; i < data.length; i++) {
+            yil_html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
         }
 
         yil_html += '</select>';
@@ -232,6 +225,9 @@ function GetYillar(yil = 0) {
         }
     }
     RefreshSelectpicker();
+    if (!isFirst) {
+            ShortenContent6();
+        }
 }
 
 function GetSinavTakvimi(okulKodu = 0, sube = 0, yil = 0) {
@@ -245,6 +241,7 @@ function GetSinavTakvimi(okulKodu = 0, sube = 0, yil = 0) {
             dataType: 'json',
             success: function(data) {
                 var i;
+                var odata = vars.sectionDatas.Okullar;
                 var dataArrays = new Array();
                 var dataArrayNames = new Array('Tumokul', 'Ilkokul', 'Ortaokul', 'AnadoluLisesi');
                 var dataArrayCounters = new Array(0, 0, 0, 0);
@@ -258,7 +255,7 @@ function GetSinavTakvimi(okulKodu = 0, sube = 0, yil = 0) {
                 for (i = 0; i < data.length; i++) {
 
                     var okul_Kodu = data[i].Okul_Kodu;
-                    for (var j = 1; j < okullarKods.length; j++) {
+                    for (var j = 1; j < odata.length; j++) {
                         if (okul_Kodu == String(j)) {
                             dataArrays[dataArrayNames[j]][dataArrayCounters[j]] = data[i];
                             dataArrayCounters[j]++;
@@ -345,26 +342,24 @@ function GetSinavTakvimi(okulKodu = 0, sube = 0, yil = 0) {
 
     }
 
+
 }
 
 
 function GetSinavTakvimiHtml() {
     var html = '';
     var isFirstHtml = '';
-    var Animation = 'bounceInUp';
-    var SinavTakvimiAnimation = 'fadeIn';
-    var SinavTakvimiAnimationDelay = (Number(wowDelayS) + 0.8);
     var isFirstJ = true;
 
     if (vars.sectionIsFirst) {
         isFirstHtml += '<section id="' + vars.sectionNameLower + '">' +
             '<div class="container">' +
-            '<div class="col-lg-12 page-header wow bounceInDown paddingL0" data-wow-delay="' + wowDelay + '">' +
+            '<div class="col-lg-12 page-header wow '+AnimationHeader+' paddingL0" data-wow-delay="' + wowDelay + '">' +
             '<h2 data-basliklar="' + vars.sectionBaslikCode + '">' + vars.sectionNameNormal + '</h2>' +
             '</div>' +
             '</div>' +
             '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + SinavTakvimiAnimation + '" data-wow-delay="' + SinavTakvimiAnimationDelay + 's">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's">' +
 
             '<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
             '</div>' +

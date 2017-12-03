@@ -586,8 +586,9 @@ body.loading .theLoader {
 .badge {
 	float: right;
 	font-size: 50%;
-	padding-top: 1px;
-	padding-bottom: 3px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-radius: 50%;
 	background-color: #f0ad4e;
 	cursor:default;
 	-webkit-animation-name: hvr-icon-bob-float, hvr-icon-bob;
@@ -607,10 +608,7 @@ body.loading .theLoader {
 }
 
 .badge:hover {
-	padding-top: 4px;
-	padding-bottom: 4px;
-	border-radius: 50%;
-	animation: none;
+	background-color: #ed9c2c;
 }
 
 .shadow {

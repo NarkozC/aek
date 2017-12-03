@@ -1527,8 +1527,8 @@ class General_Model extends CI_Model
 		// $i = 1;
 		// foreach ($query as $item) {
 		// 	$okulKodu = '';
-		// 	$tr_okul = explode(',', $item->tr_Okul);
-		// 	for ($k=0; $k < sizeof($tr_okul); $k++) { 
+			// $tr_okul = explode(',', $item->tr_Okul);
+			// for ($k=0; $k < sizeof($tr_okul); $k++) { 
 		// 		if ($tr_okul[$k] == "Anaokulu") {
 		// 			$okulKodu = $okulKodu."0,";
 		// 		}
@@ -1753,6 +1753,88 @@ class General_Model extends CI_Model
 	*/
 	public function GetSinavTakvimi()
 	{
+
+		// $query = $this->db
+		// ->order_by('Tarih','asc')
+		// ->get('general_sinav_takvimi')
+		// ->result();
+
+
+		// $i = 0;
+		// foreach ($query as $item) {
+		// 	$subes = explode(',', $item->Sube);
+		// 	if (sizeof($subes) > 1) {
+		// 		$newString = '';
+		// 		$willUpdate = false;
+		// 		for ($k=0; $k < sizeof($subes); $k++) {
+		// 			if ($subes[$k] == $subes[$k+1]) {
+		// 				$newString .= $subes[$k].',';
+		// 				// $k++;
+		// 				$willUpdate = true;
+		// 			} else {
+		// 				$newString .= $subes[$k].',';
+		// 			}
+		// 		}
+
+		// 		$newString = preg_replace('/,[^,]*$/', '', $newString);
+
+		// 		if ($willUpdate) {
+		// 			$updateRecord = array(
+		// 				// 'Okul_Kodu'   	=> $newString,
+		// 				'Sube'   		=> $newString,
+		// 			);
+		// 			$No = $item->No;
+		// 			$this->db->where('No', $No);
+		// 			$this->db->update('general_sinav_takvimi', $updateRecord);
+		// 			$this->db->trans_complete();
+		// 		}
+		// 	}
+		// }
+
+
+		// $i = 0;
+
+		// foreach ($query as $item) {
+		// 	$row1 = $query[$i];
+		// 	$row2 = $query[$i+1];
+		// 	if ($row1->Tarih == $row2->Tarih && $row1->tr_Aciklama == $row2->tr_Aciklama) {
+		// 		$newRecord = array(
+		// 			  'Okul_Kodu'   	=> $row1->Okul_Kodu.','.$row2->Okul_Kodu,
+		// 			  'tr_Aciklama'   	=> $row1->tr_Aciklama,
+		// 			  'en_Aciklama'   	=> $row1->en_Aciklama,
+		// 			  'Sube'   			=> $row1->Sube.','.$row2->Sube,
+		// 			  'Tarih'   		=> $row1->Tarih,
+		// 			  'Yil'   			=> $row1->Yil,
+		// 			  'tr_Ders'   		=> $row1->tr_Ders,
+		// 			  'en_Ders'   		=> $row1->en_Ders,
+		// 		);
+
+		// 		$No = $row1->No;
+		// 		$this->db->where('No', $No);
+		// 		$this->db->delete('general_sinav_takvimi');
+		// 		if($this->db->affected_rows() > 0){}
+
+		// 		$No2 = $row2->No;
+		// 		$this->db->where('No', $No2);
+		// 		$this->db->delete('general_sinav_takvimi');
+		// 		if($this->db->affected_rows() > 0){}
+
+		// 		$this->db->insert('general_sinav_takvimi', $newRecord);
+		// 		if($this->db->affected_rows() > 0){}
+		// 		$i = $i + 2;
+		// 	} else {
+		// 		$i++;
+		// 	}
+		// }
+
+		// $query2 = $this->db
+		// 	->order_by('Tarih','asc')
+		// 	->get('general_sinav_takvimi')
+		// 	->result();
+		
+
+		// return sizeof($query2);
+
 		return $this->db
 		->order_by('Tarih','desc')
 		->get('general_sinav_takvimi')
@@ -2073,6 +2155,53 @@ class General_Model extends CI_Model
 	*/
 	public function GetEtkinlikTakvimi()
 	{
+		// $query = $this->db
+		// ->order_by('Tarih','asc')
+		// ->get('general_etkinlik_takvimi')
+		// ->result();
+
+
+		// $i = 0;
+
+		// foreach ($query as $item) {
+		// 	$row1 = $query[$i];
+		// 	$row2 = $query[$i+1];
+		// 	if ($row1->Tarih == $row2->Tarih && $row1->tr_Aciklama == $row2->tr_Aciklama) {
+		// 		$newRecord = array(
+		// 			  'Okul'   			=> $row1->Okul.','.$row2->Okul,
+		// 			  'tr_Aciklama'   	=> $row1->tr_Aciklama,
+		// 			  'en_Aciklama'   	=> $row1->en_Aciklama,
+		// 			  'Sube'   			=> $row1->Sube.','.$row2->Sube,
+		// 			  'Tarih'   		=> $row1->Tarih,
+		// 		);
+
+		// 		$No = $row1->No;
+		// 		$this->db->where('No', $No);
+		// 		$this->db->delete('general_etkinlik_takvimi');
+		// 		if($this->db->affected_rows() > 0){}
+
+		// 		$No2 = $row2->No;
+		// 		$this->db->where('No', $No2);
+		// 		$this->db->delete('general_etkinlik_takvimi');
+		// 		if($this->db->affected_rows() > 0){}
+
+		// 		$this->db->insert('general_etkinlik_takvimi', $newRecord);
+		// 		if($this->db->affected_rows() > 0){}
+		// 		$i = $i + 2;
+		// 	} else {
+		// 		$i++;
+		// 	}
+		// }
+
+		// $query2 = $this->db
+		// 	->order_by('Tarih','asc')
+		// 	->get('general_etkinlik_takvimi')
+		// 	->result();
+		
+
+		// return sizeof($query2);
+		
+
 		return $this->db
 		->order_by('Tarih','desc')
 		->get('general_etkinlik_takvimi')

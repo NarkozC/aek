@@ -35,6 +35,7 @@ $(function() {
 
     $('#' + okul_ID).on('change', function(e) {
         var valueSelected = this.value;
+        console.log(valueSelected);
         var valueSelectedAy = $('#' + ay_ID).selectpicker('val');
         if (valueSelectedAy != '') {
             RefreshHtmls()
@@ -47,11 +48,13 @@ $(function() {
 
     $('#' + ay_ID).on('change', function(e) {
         var valueSelected = this.value;
+        console.log(valueSelected);
         GetAylar(valueSelected);
     });
 
     $('#show' + vars.sectionNameUpper).on('change', '#' + sube_ID, function(e) {
         var valueSelected = this.value;
+        console.log(valueSelected);
         var valueSelectedAy = $('#' + ay_ID).selectpicker('val');
         if (valueSelectedAy != '') {
             RefreshData(0, valueSelected, valueSelectedAy);
@@ -107,7 +110,7 @@ function GetSubeler(okulKodu = 0) {
 
                 }
                 for (var j = 1; j < odata.length; j++) {
-                    okul_html += '<option data-tokens="' + odata[j].Ad + '" value="' + (j + 1) + '">' + odata[j].Ad + '</option>';
+                    okul_html += '<option data-tokens="' + odata[j].Ad + '" value="' + j + '">' + odata[j].Ad + '</option>';
                 }
 
                 okul_html += '</select>';
@@ -191,13 +194,13 @@ function GetEtkinlikTakvimi(okulKodu = 0, sube = 0) {
 
                 for (i = 0; i < data.length; i++) {
 
-                    if (data[i].Okul_Kodu == 1) {
+                    if (data[i].Okul == 1) {
                         okulsArrays['ilkokul'][okulsArraysC['ilkokul']] = data[i];
                         okulsArraysC['ilkokul']++;
-                    } else if (data[i].Okul_Kodu == 2) {
+                    } else if (data[i].Okul == 2) {
                         okulsArrays['ortaokul'][okulsArraysC['ortaokul']] = data[i];
                         okulsArraysC['ortaokul']++;
-                    } else if (data[i].Okul_Kodu == 3) {
+                    } else if (data[i].Okul == 3) {
                         okulsArrays['anadoluLisesi'][okulsArraysC['anadoluLisesi']] = data[i];
                         okulsArraysC['anadoluLisesi']++;
                     }
@@ -275,20 +278,17 @@ function GetEtkinlikTakvimi(okulKodu = 0, sube = 0) {
 function GetEtkinlikTakvimiHtml() {
     var html = '';
     var isFirstHtml = '';
-    var Animation = 'bounceInUp';
-    var EtkinlikTakvimiAnimation = 'fadeIn';
-    var EtkinlikTakvimiAnimationDelay = (Number(wowDelayS) + 0.8);
     var isFirstJ = true;
 
     if (vars.sectionIsFirst) {
         isFirstHtml += '<section id="' + vars.sectionNameLower + '">' +
             '<div class="container">' +
-            '<div class="col-lg-12 page-header wow bounceInDown paddingL0" data-wow-delay="' + wowDelay + '">' +
+            '<div class="col-lg-12 page-header wow '+AnimationHeader+' paddingL0" data-wow-delay="' + wowDelay + '">' +
             '<h2 data-basliklar="GET">' + vars.sectionNameNormal + '</h2>' +
             '</div>' +
             '</div>' +
             '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + EtkinlikTakvimiAnimation + '" data-wow-delay="' + EtkinlikTakvimiAnimationDelay + 's">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's">' +
 
             '<form role="form" method="post" id="' + vars.sectionNameLower + '-form" action="' + vars.sectionController + vars.sectionFilterFunction + '">' +
             '<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">' +
@@ -336,7 +336,7 @@ function GetEtkinlikTakvimiHtml() {
 function GetHtmlTr(data) {
     var No = data.No;
     var Sube = data.Sube;
-    var Okul_Kodu = data.Okul_Kodu;
+    var Okul = data.Okul;
     var Tarih = data.Tarih;
     var dateAr = Tarih.split('-');
     Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];

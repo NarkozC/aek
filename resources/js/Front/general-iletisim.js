@@ -113,7 +113,7 @@ function GetIletisim() {
             for (i = 0, length = data.length; i < length; i++) {
                 curData = GetCurData(data[i]);
                 if (curData.Kod == "Kolej") {
-                    html += '<div class="col-xs-offset-0 col-sm-offset-0 col-md-offset-1 col-lg-offset-0 col-xs-12 col-sm-12 col-md-10 col-lg-3 marginT15 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">' +
+                    html += '<div class="col-xs-offset-0 col-sm-offset-0 col-md-offset-1 col-lg-offset-0 col-xs-12 col-sm-12 col-md-10 col-lg-3 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow">' +
                         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page-header text-center" data-wow-delay="">' +
                         '<h4>' + curData.Ad + '</h4>' +
@@ -182,7 +182,7 @@ function GetIletisim() {
                         '</div>';
                 } else if (curData.Kod == "Maps") {
                     html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                         '<iframe class="iltGM" frameborder="0" style="border:0" ' +
                         'src="' + curData.Maps + '" allowfullscreen></iframe>' +
                         '</div>' +
@@ -193,7 +193,7 @@ function GetIletisim() {
 
             html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '" id="' + vars.sectionContactShowID + '">' +
                 '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow">' +
-                '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + TextAnimation + '" data-wow-delay="' + wowDelayText + '">' +
+                '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                 '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page-header text-center">' +
                 '<h3>' + formLang.BizeUlasin + '</h3>' +
                 '</div>' +

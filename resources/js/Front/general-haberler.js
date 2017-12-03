@@ -24,9 +24,14 @@ $(function(){
       type: 'ajax',
       method: 'post',
       url: url,
+      data:{
+        English:en,
+        NeedData: "true"
+      },
       async: false,
       dataType: 'json',
-      success: function(data){
+      success: function(result){
+        var data = result.data;
         var html = '';
         var i;
         var Baslik;
@@ -43,6 +48,7 @@ $(function(){
                 '<div class="col-lg-12 page-header wow '+AnimationHeader+' paddingL0" data-wow-delay="'+wowDelay+'">'+
                 '<h2 data-basliklar="GH">Haberler</h2>'+
                 '</div>';
+                console.log(data);
         for(i=0; i<data.length; i++){
           if (en) {
             Rmore = "Read More";

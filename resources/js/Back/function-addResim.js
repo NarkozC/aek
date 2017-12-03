@@ -20,9 +20,7 @@ var rVars = {
 
 $(function() {
 
-    if ($('#'+rVars.sectionShowBase).length <= 0) {
-        $("body").append('<div id="' + rVars.sectionShowBase + '"></div> ');
-    }
+    $("body").append('<div id="' + rVars.sectionShowBase + '"></div> ');
 
     //Button that opens add/update modal
     $('#' + rVars.sectionOpenModalButton).click(function(e) {

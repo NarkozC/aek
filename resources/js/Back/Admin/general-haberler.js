@@ -336,6 +336,8 @@ function GetResimlerSelect() {
         $('#' + en_DigerSection).html(en_Digerhtml);
         RefreshSelectpicker();
     }, 5);
+
+
 }
 
 function GetSectionsNum() {

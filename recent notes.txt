@@ -1,10 +1,26 @@
+haberler delete bitti otomatik refreshlemesi için fonksiyon kurduğum mantık ise
+fonksiyonda altında ve üstünde tr varmı diye bakacak eğer yok ise yani tek ise otomatik yenilenecek
+ve internette şuanki sayfa numarası ve datatable da sayfa numarasını göstermeye bakacağım
+
+
+facebook ve twitter paylaşım
+
+
 yazılara resim ekleme yapılacak. ( zaten yapıldı. sasiogludogucan@gmail.com'da annemden mail olarak geldi. )
 
 
 kurumlardan örnek olarak ilkokula basıldığında navdaki başlık "Özel Ankara Eğitim Kurumları"ndan "Özel Ankara Eğitim Kurumları İlkokulu" şeklinde olacak
 
 
+kadro gruplarına anaokulu ilkokul ortaokul anadolu lisesi eklenecek yapıya. 1 veya 0 şeklinde belirlenecek
+kurumlardan örnek olarak ilkokula girildiğinde sadece ilgili kişiler gözükecek
+
+
 4x4ler dinamikleştirilecek
+
+
+Sınav Takvimi için;
+https://bootsnipp.com/snippets/featured/panels-with-nav-tabs
 
 
 06.11.17
@@ -17,6 +33,30 @@ resim ile beraber video seçilebilecek normal bir element gibi
 mesela galeride karar verirken uzantısına bakacak
 birde preview butonu eklenecek buda her select "resminin"(Videolarda yok, uzantısına bakılıp karar verilecek) yanında preview(göz ikonu olabilir) yazacak
 basıldığında ise lightgallery den açılacak
+
+
+
+24.11.17
+kadronun paneli yapılacak en son kadrodatadan verileri hallettik getkadro dan trinside bilgiler çekilip tabloya konulacak
+
+untitled den kalanlar
+
+normaldeki gibi kadro section id yi al
+bu sefer kadrogrups larda ara
+eğer yoksa kadrodata da oluştur içine curcontenti koy
+eğer varsa direk içine curcontenti koy
+
+
+kadrodata grupslarda ara ardından eğer yoksa oluştur ve içine curcontenti koy
+eğer varsa içine curcontenti koy
+
+
+
+27.11.17
+navbarda linki böl eğer başında http varsa baseurl koyma
+eğer yok ise koy
+
+
 
 
 

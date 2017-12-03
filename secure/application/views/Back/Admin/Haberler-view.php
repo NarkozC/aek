@@ -17,4 +17,5 @@
 
 <script type="text/javascript" src="<?php echo base_url(); ?>resources/js/Back/Admin/general-haberler.js"></script>
 <script type="text/javascript" src="<?php echo base_url(); ?>resources/js/Back/function-addResim.js"></script>
+<script type="text/javascript" src="<?php echo base_url(); ?>resources/js/Back/function-refresh.js"></script>
 <?php $this->view('Back/back-footer.php'); ?>

@@ -23,7 +23,8 @@
           sectionDatas: {
               Popup: {
                   Data: new Array(),
-                  FData: new Array(),
+                  FHtml: new Array(),
+                  BHtml: '',
                   Num: 0,
               },
           },
@@ -36,7 +37,7 @@
 
       function CheckPopup() {
           var data = vars.sectionDatas.Popup.Data,
-              fData = vars.sectionDatas.Popup.FData,
+              fData = vars.sectionDatas.Popup.FHtml,
               length = data.length,
               todayZaman = new Date($.now()),
               url = vars.sectionControllers.Normal + vars.sectionFunctions.Session;
@@ -83,8 +84,13 @@
       }
 
       function GetPopupData() {
+          vars.sectionDatas.Popup = {
+              Data: new Array(),
+              FHtml: new Array(),
+              BHtml: '',
+              Num: 0,
+          }
           var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
-
           $.ajax({
               type: 'ajax',
               method: 'post',
@@ -102,18 +108,34 @@
                       var cache = result.cachedataTR.Popup;
                       vars.sectionDatas.Popup = cache;
                   } else {
-                      var i, curData, html;
                       var data = result.data,
-                          length = data.length;
+                          length = data.length,
+                          html = '',
+                          fHtml = '';
+                      var i, curData, trInside, trArray;
 
                       for (i = 0; i < length; i++) {
+                          curData = data[i];
+                          curData.BasSaat = curData.BasSaat.split(':')
+                          curData.BitSaat = curData.BitSaat.split(':')
+                          curData.BasSaat = curData.BasSaat[0] + ':' + curData.BasSaat[1];
+                          curData.BitSaat = curData.BitSaat[0] + ':' + curData.BitSaat[1];
+
+                          trArray = new Array('BasSaat', 'BitSaat');
+                          trInside = GetHtmlTr(curData, trArray);
+                          html += '<tr>' + trInside + '</tr>';
+
+
+
                           curData = data[i]
                           curData.BasSaat = curData.BasSaat.split(':')
                           curData.BitSaat = curData.BitSaat.split(':')
+                          curData.BasSaat = new Array(curData.BasSaat[0], curData.BasSaat[1]);
+                          curData.BitSaat = new Array(curData.BitSaat[0], curData.BitSaat[1]);
                           curData.BasSaat[1] = (curData.BasSaat[0] * 10) + curData.BasSaat[1];
                           curData.BitSaat[1] = (curData.BitSaat[0] * 10) + curData.BitSaat[1];
 
-                          html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
+                          fHtml = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
                               '<div class="modal-dialog">' +
                               '<div class="modal-content">' +
                               '<div class="modal-header" align="center">' +
@@ -132,20 +154,41 @@
                               '</div>';
 
                           vars.sectionDatas.Popup.Data[i] = curData;
-                          vars.sectionDatas.Popup.FData[i] = html;
-
-
+                          vars.sectionDatas.Popup.FHtml[i] = fHtml;
                       }
+
+                      vars.sectionDatas.Popup.BHtml = html;
+                      vars.sectionDatas.Popup.Num = length;
                       var theCacheData = {
                           Popup: vars.sectionDatas.Popup,
                       }
-                      setTimeout(Cache('GetPopupData', url, theCacheData), 1);
+                      setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
                   }
               },
               error: function() {
                   iziError();
               }
           });
+      }
+
+      function GetHtmlTr(data, trArray) {
+          var i;
+          var newHtml = '';
+          var length = trArray.length;
+          var no = data.No;
+
+          for (i = 0; i < length; i++) {
+              newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+          }
+          newHtml +=
+              '<td>' +
+              '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+              '</td>' +
+              '<td>' +
+              '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+              '</td>';
+
+          return newHtml;
       }
 
 

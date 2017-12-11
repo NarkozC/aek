@@ -2666,8 +2666,23 @@ class General_Model extends CI_Model
 	public function GetPopup()
 	{
 		return $this->db
+		->order_by('BasSaat','asc')
 		->get('general_popup')
 		->result();
+	}
+
+	public function AddPopup(){
+		$Data = array(
+			'BasSaat'			=>$this->input->post('BasSaat'),
+			'BitSaat'			=>$this->input->post('BitSaat'),
+			'Resim'				=>$this->input->post('Resim'),
+		);
+		$this->db->insert('general_popup', $Data);
+		if($this->db->affected_rows() > 0){
+			return true;
+		} else{
+			return false;
+		}
 	}
 
 	public function EditPopup(){
@@ -2675,29 +2690,38 @@ class General_Model extends CI_Model
 		$this->db->where('No', $No);
 		$query = $this->db->get('general_popup');
 		if($query->num_rows() > 0){
-		  return $query->row();
+			return $query->row();
 		}else{
-		  return false;
+			return false;
 		}
 	}
 
 	public function UpdatePopup(){
-		$No = $this->input->post('No');
-		$field = array(
-		  'tr_Baslik'   =>$this->input->post('tr_Baslik'),
-		  'tr_Resim'    =>$this->input->post('tr_Resim'),
-		  'tr_Link'   =>$this->input->post('tr_Link'),
-
-		  'en_Baslik'   =>$this->input->post('en_Baslik'),
-		  'en_Resim'    =>$this->input->post('en_Resim'),
-		  'en_Link'   =>$this->input->post('en_Link'),
+	    $No = $this->input->post('No');
+		$Data = array(
+			'BasSaat'			=>$this->input->post('BasSaat'),
+			'BitSaat'			=>$this->input->post('BitSaat'),
+			'Resim'				=>$this->input->post('Resim'),
 		);
 		$this->db->where('No', $No);
-		$this->db->update('general_popup', $field);
+		$this->db->update('general_popup', $Data);
+		if ($this->db->trans_status() === FALSE) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+
+
+	function DeletePopup(){
+		$No = $this->input->post('No');
+		$this->db->where('No', $No);
+		$this->db->delete('general_popup');
 		if($this->db->affected_rows() > 0){
-		  return true;
+			return true;
 		}else{
-		  return false;
+			return false;
 		}
 	}
 

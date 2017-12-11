@@ -1,3 +1,8 @@
+// $(document).ready(function() {
+//     $('.timepicker').wickedpicker();
+// });
+
+
 /* for 2 captcha */
 var CaptchaCallback = function() {
     setTimeout(function() {
@@ -46,7 +51,7 @@ function render() {
 
 function renderCB() {
     window.setTimeout(function() {
-        
+
         if ($("#anasayfaP").length != 0) {
             $('body').css('padding-top', "0px");
         } else {
@@ -417,6 +422,8 @@ if (en) {
         Bekle: 'Please Wait...',
         Tum: 'All',
         Kapat: 'Close',
+        BasSaat: 'Start Time',
+        BitSaat: 'End Time',
     };
 
 } else {
@@ -524,6 +531,8 @@ if (en) {
         Bekle: 'Lütfen Bekleyin...',
         Tum: 'Tüm',
         Kapat: 'Kapat',
+        BasSaat: 'Başlangıç Saati',
+        BitSaat: 'Bitiş Saati',
     };
 }
 

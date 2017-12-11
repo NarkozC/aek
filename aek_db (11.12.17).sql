@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1:3306
--- Üretim Zamanı: 11 Ara 2017, 14:51:19
+-- Üretim Zamanı: 11 Ara 2017, 18:36:53
 -- Sunucu sürümü: 5.7.19
 -- PHP Sürümü: 7.0.23
 
@@ -2113,7 +2113,7 @@ CREATE TABLE IF NOT EXISTS `general_kullanicilar` (
 --
 
 INSERT INTO `general_kullanicilar` (`No`, `Email`, `TCNo`, `Sifre`, `Ogrenci`, `Ogretmen`, `Rehberlik`, `Teknik`, `Yonetici`, `Admin`, `user_date`, `user_modified`, `user_last_login`) VALUES
-(1, 'sasiogludogucan@gmail.com', '65911056744', '$2a$08$3p9nD0puKQ45xUKuEjwd7u4np0q1KVli3qPZu2mgEmT/yJyiZg0cq', 0, 0, 0, 0, 0, 1, '2017-08-11 11:21:38', '2017-08-11 11:21:38', '2017-12-11 13:28:25'),
+(1, 'sasiogludogucan@gmail.com', '65911056744', '$2a$08$3p9nD0puKQ45xUKuEjwd7u4np0q1KVli3qPZu2mgEmT/yJyiZg0cq', 0, 0, 0, 0, 0, 1, '2017-08-11 11:21:38', '2017-08-11 11:21:38', '2017-12-11 20:30:19'),
 (2, 'doktorlar@gmail.com', '12345678910', '$2a$08$YN0Y6H6J2NSnfwp2m5Q4vOzMIsf8d99gFpDMAu02L6rqVFslfm..6', 0, 0, 0, 0, 0, 1, '2017-10-03 19:48:28', '2017-10-03 19:48:28', '2017-12-01 17:57:20');
 
 -- --------------------------------------------------------
@@ -2276,17 +2276,19 @@ CREATE TABLE IF NOT EXISTS `general_popup` (
   `No` int(11) NOT NULL AUTO_INCREMENT,
   `BasSaat` time NOT NULL,
   `BitSaat` time NOT NULL,
-  `Resim` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
+  `Resim` text COLLATE utf8_turkish_ci NOT NULL,
   PRIMARY KEY (`No`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci ROW_FORMAT=COMPACT;
 
 --
 -- Tablo döküm verisi `general_popup`
 --
 
 INSERT INTO `general_popup` (`No`, `BasSaat`, `BitSaat`, `Resim`) VALUES
-(5, '20:00:00', '22:30:00', 'Placeholder/250x250.png'),
-(12, '19:00:00', '13:30:00', 'Placeholder/270x190.png');
+(5, '20:00:00', '23:59:00', 'Placeholder/250x250.png'),
+(12, '15:00:00', '20:00:00', 'Placeholder/270x190.png'),
+(13, '07:00:00', '10:30:00', 'Placeholder/250x250.png'),
+(14, '10:00:00', '15:00:00', 'Placeholder/270x190.png');
 
 -- --------------------------------------------------------
 

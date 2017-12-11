@@ -1,6 +1,6 @@
     var nVars = {
         sectionControllers: {
-            Normal: baseurl + 'Navbar/',
+            Normal: baseurl + 'Portal/Admin/Navbar/',
         },
         sectionNames: {
             Normal: 'Navbar',
@@ -12,7 +12,7 @@
             TheNavbar: 'AekNavbar',
         },
         sectionFunctions: {
-            Get: 'GetNavbarFront',
+            Get: 'GetNavbarBack',
         },
         sectionDatas: {
             Navbar: {

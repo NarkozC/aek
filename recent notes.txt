@@ -1,4 +1,4 @@
-yazılara resim ekleme yapılacak. ( zaten yapıldı. sasiogludogucan@gmail.com'da annemden mail olarak geldi. )
+﻿yazılara resim ekleme yapılacak. ( zaten yapıldı. sasiogludogucan@gmail.com'da annemden mail olarak geldi. )
 
 
 kurumlardan örnek olarak ilkokula basıldığında navdaki başlık "Özel Ankara Eğitim Kurumları"ndan "Özel Ankara Eğitim Kurumları İlkokulu" şeklinde olacak
@@ -15,21 +15,9 @@ videoyu yüklerken isim,youtube linki,kategori istenecek
 --kullanırken ise--
 resim ile beraber video seçilebilecek normal bir element gibi
 mesela galeride karar verirken uzantısına bakacak
-birde preview butonu eklenecek buda her select "resminin"(Videolarda yok, uzantısına bakılıp karar verilecek) yanında preview(göz ikonu olabilir) yazacak
-basıldığında ise lightgallery den açılacak
 
 
 
-01.12.17
-popun
-başlangıç tarihi
-bitiş tarihi
-resim
-başlangıç tarihini şuanki zamanla karşılaştırılacak eğer tutuyorsa o kayıt gösterilecek
-eğer uymuyorsa fuck u
-
-etkinlik takvimi bir query
-açıklama ve tarih aynı ise şubeleri birleştir
 
 
 sınav başvurusu için portaldan bir şekilde excele geçicek wtf

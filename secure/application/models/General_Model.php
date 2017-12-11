@@ -462,11 +462,11 @@ class General_Model extends CI_Model
 		  ------------ Navbar --------------
 		=====================================
 	*/
-	public function GetNavbar()
+	public function GetNavbarFront()
 	{
 		$query = $this->db
 		->order_by('ListOrder','asc')
-		->get('general_navbar')
+		->get('general_navbar_front')
 		->result();
 
 		$i = 1;
@@ -475,13 +475,37 @@ class General_Model extends CI_Model
 		  'ListOrder'   =>$i,
 		  );
 		  $this->db->where('No', $item->No);
-		  $this->db->update('general_navbar', $field);
+		  $this->db->update('general_navbar_front', $field);
 		  $i++;
 		}
 
 		$result = $this->db
 		->order_by('ListOrder','asc')
-		->get('general_navbar')
+		->get('general_navbar_front')
+		->result();
+		return $result;
+	}
+
+	public function GetNavbarBack()
+	{
+		$query = $this->db
+		->order_by('ListOrder','asc')
+		->get('general_navbar_back')
+		->result();
+
+		$i = 1;
+		foreach ($query as $item) {
+		  $field = array(
+		  'ListOrder'   =>$i,
+		  );
+		  $this->db->where('No', $item->No);
+		  $this->db->update('general_navbar_back', $field);
+		  $i++;
+		}
+
+		$result = $this->db
+		->order_by('ListOrder','asc')
+		->get('general_navbar_back')
 		->result();
 		return $result;
 	}

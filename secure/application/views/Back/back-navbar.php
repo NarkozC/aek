@@ -10,7 +10,7 @@
   <script src="<?php echo base_url(); ?>resources/js/jssor.slider.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/headerscript.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/Back/portal-helper.js"></script>
-  <!--<script src="<?php echo base_url(); ?>resources/js/Back/nav-ust.js"></script>-->
+  <script src="<?php echo base_url(); ?>resources/js/Back/general-navbar.js"></script>
 
 </head>
 <body>
@@ -22,10 +22,6 @@
     <div id="line"></div>
   </div>
 </div>
-
-<!-- <div class="cssload-container">
-  <div class="cssload-zenith"></div>
-</div> -->
 
   <div id="page">
 
@@ -42,6 +38,10 @@
       <div class="row text-center">
         <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
           <a class="navbar-brand" href="<?php echo base_url(); ?>"><img class="img-responsive" src="<?php echo base_url(); ?>resources/images/aek-logo.png" alt="LOGO"></a>
+        </div>
+        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+          <h3 class="paddingB0 paddingT25">Özel Ankara Eğitim Kurumları</h3>
+          <!--<h3 class="paddingB0 paddingT0">AEK DOKTORLAR INTERNATIONAL PREMIER COLLAGE</h3>-->
         </div>
       </div>
     </div>
@@ -68,25 +68,15 @@
         HingeUpToDown
         ScaleTopToBottom
         -->
-        <ul class="nav navbar-nav navbar-left HingeUpToDown" id="showNavUst">
+        <ul class="nav navbar-nav navbar-left HingeUpToDown" id="showNavbar">
           <!-- Left side navigation-->
 
 
-          <li><a data-basliklar="GH" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Haberler">Haberler</a></li>
-          <li><a data-basliklar="GD" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Duyurular-Etkinlikler">Duyurular-Etkinlikler</a></li>
-          <li><a data-basliklar="GG" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Galeriler">Galeriler</a></li>
-          <li><a data-basliklar="GAYT" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Aylik-Yemek-Listesi">Aylık Yemek Listesi</a></li>
-          <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Sinav-Takvimi">Sınav Takvimi</a></li>
-          <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Etkinlik-Takvimi">Etkinlik Takvimi</a></li>
-          <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Genel-Resimler">Resimler</a></li>
-          <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Kadro">Kadro</a></li>
-          <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Popup">Popup</a></li>
+        <!-- GOOD ANIMATIONS
+        BounceRightToLeft
+        RotateRightTopFixedDown
 
-<!-- GOOD ANIMATIONS
-BounceRightToLeft
-RotateRightTopFixedDown
-
- -->
+         -->
         </ul>
         <ul class="nav navbar-nav navbar-right HingeUpToDown navbar-rightt">
           <!-- Right side navigation-->

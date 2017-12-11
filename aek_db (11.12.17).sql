@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Anamakine: 127.0.0.1:3306
--- Üretim Zamanı: 11 Ara 2017, 18:36:53
+-- Üretim Zamanı: 11 Ara 2017, 19:47:13
 -- Sunucu sürümü: 5.7.19
 -- PHP Sürümü: 7.0.23
 
@@ -2144,11 +2144,51 @@ INSERT INTO `general_kurucu_mesaji` (`No`, `tr_Baslik`, `en_Baslik`, `tr_Yazi`, 
 -- --------------------------------------------------------
 
 --
--- Tablo için tablo yapısı `general_navbar`
+-- Tablo için tablo yapısı `general_navbar_back`
 --
 
-DROP TABLE IF EXISTS `general_navbar`;
-CREATE TABLE IF NOT EXISTS `general_navbar` (
+DROP TABLE IF EXISTS `general_navbar_back`;
+CREATE TABLE IF NOT EXISTS `general_navbar_back` (
+  `No` int(11) NOT NULL AUTO_INCREMENT,
+  `tr_Ad` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
+  `en_Ad` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
+  `IsLink` int(11) NOT NULL DEFAULT '1',
+  `IsLinkInBaseurl` int(11) NOT NULL DEFAULT '1',
+  `Link` text COLLATE utf8_turkish_ci NOT NULL,
+  `Level` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
+  `MainSectionID` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
+  `SubSectionID` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
+  `ListOrder` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`No`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
+
+--
+-- Tablo döküm verisi `general_navbar_back`
+--
+
+INSERT INTO `general_navbar_back` (`No`, `tr_Ad`, `en_Ad`, `IsLink`, `IsLinkInBaseurl`, `Link`, `Level`, `MainSectionID`, `SubSectionID`, `ListOrder`) VALUES
+(1, 'Anasayfa', 'Home', 0, 1, '', 'Main', 'anasayfa', '', 4),
+(2, 'Haberler', '', 1, 1, 'Portal/Admin/Haberler', 'Sub', 'anasayfa', '', 5),
+(3, 'Duyurular-Etkinlikler', '', 1, 1, 'Portal/Admin/Duyurular-Etkinlikler', 'Sub', 'anasayfa', '', 6),
+(4, 'Galeriler', '', 1, 1, 'Portal/Admin/Galeriler', 'Sub', 'anasayfa', '', 7),
+(7, '4x4', '', 0, 1, '', 'Sub', 'anasayfa', '4x4', 8),
+(9, 'Aylık Yemek Listesi', '', 1, 1, 'Portal/Admin/Aylik-Yemek-Listesi', 'SubSub', '4x4', '', 10),
+(10, 'Sınav Takvimi', '', 1, 1, 'Portal/Admin/Sinav-Takvimi', 'SubSub', '4x4', '', 11),
+(11, 'Etkinlik Takvimi', '', 1, 1, 'Portal/Admin/Etkinlik-Takvimi', 'SubSub', '4x4', '', 12),
+(12, 'Genel', 'General', 0, 1, '', 'Main', 'genel', '', 1),
+(13, 'Resimler', '', 1, 1, 'Portal/Admin/Genel-Resimler', 'Sub', 'genel', '', 2),
+(15, 'Popup', '', 1, 1, 'Portal/Admin/Popup', 'Sub', 'genel', '', 3),
+(16, 'Kurumsal', '', 0, 1, '', 'Main', 'kurumsal', '', 13),
+(18, 'Kadro', '', 1, 1, 'Portal/Admin/Kadro', 'Sub', 'kurumsal', '', 14);
+
+-- --------------------------------------------------------
+
+--
+-- Tablo için tablo yapısı `general_navbar_front`
+--
+
+DROP TABLE IF EXISTS `general_navbar_front`;
+CREATE TABLE IF NOT EXISTS `general_navbar_front` (
   `No` int(11) NOT NULL AUTO_INCREMENT,
   `tr_Ad` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
   `en_Ad` varchar(255) COLLATE utf8_turkish_ci NOT NULL,
@@ -2163,17 +2203,15 @@ CREATE TABLE IF NOT EXISTS `general_navbar` (
 ) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8 COLLATE=utf8_turkish_ci;
 
 --
--- Tablo döküm verisi `general_navbar`
+-- Tablo döküm verisi `general_navbar_front`
 --
 
-INSERT INTO `general_navbar` (`No`, `tr_Ad`, `en_Ad`, `IsLink`, `IsLinkInBaseurl`, `Link`, `Level`, `MainSectionID`, `SubSectionID`, `ListOrder`) VALUES
+INSERT INTO `general_navbar_front` (`No`, `tr_Ad`, `en_Ad`, `IsLink`, `IsLinkInBaseurl`, `Link`, `Level`, `MainSectionID`, `SubSectionID`, `ListOrder`) VALUES
 (1, 'Anasayfa', 'Home', 1, 1, '', 'Main', '', '', 1),
 (2, 'Kurumsal', '', 0, 1, '', 'Main', 'kurumsal', '', 2),
 (3, 'Eğitim Sistemimiz', '', 1, 1, 'Egitim-Sistemimiz', 'Main', '', '', 3),
 (4, 'Neden AEK', '', 1, 1, 'Neden-AEK', 'Main', '', '', 4),
 (5, 'Hakkımızda', 'About Us', 1, 1, 'Hakkimizda', 'Sub', 'kurumsal', '', 10),
-(6, 'Birimler', '', 0, 1, '', 'Sub', 'kurumsal', 'birimler', 14),
-(7, 'Lojistik Hizmetler', '', 1, 1, 'Lojistik-Hizmetler', 'SubSub', 'birimler', '', 19),
 (8, 'Kurumlar', '', 0, 1, '', 'Main', 'kurumlar', '', 5),
 (9, 'Veli/Öğrenci', '', 0, 1, '', 'Main', 'veli-ogrenci', '', 6),
 (10, 'İnsan Kaynakları', '', 1, 1, '#', 'Main', '', '', 7),
@@ -2182,13 +2220,12 @@ INSERT INTO `general_navbar` (`No`, `tr_Ad`, `en_Ad`, `IsLink`, `IsLinkInBaseurl
 (14, 'Yönetim Kurulu', 'Administrative Staff', 1, 1, 'Yonetim-Kurulu', 'Sub', 'kurumsal', '', 11),
 (15, 'Kurucu Mesajı', 'Founder’s Message', 1, 1, 'Kurucu-Mesaji', 'Sub', 'kurumsal', '', 12),
 (16, 'Kadro', '', 1, 1, 'Kadro', 'Sub', 'kurumsal', '', 13),
-(17, 'Anaokulu', 'Kindergarten', 1, 1, '#', 'Sub', 'kurumlar', '', 15),
-(18, 'İlkokul', 'Primary School', 1, 1, '#', 'Sub', 'kurumlar', '', 16),
-(19, 'Ortaokul', 'Middle School', 1, 1, '#', 'Sub', 'kurumlar', '', 17),
-(20, 'Anadolu Lisesi', 'Anatolian High School', 1, 1, '#', 'Sub', 'kurumlar', '', 18),
-(21, 'K12 Öğrenci Takip Sistemi', '', 1, 0, 'http://ankaraegitimkurumlari.k12net.com/', 'Sub', 'veli-ogrenci', '', 21),
-(22, 'Sınav Başvurusu', '', 1, 1, 'Sinav-Basvurusu', 'Sub', 'veli-ogrenci', '', 22),
-(23, 'İdari Birimler', '', 1, 1, 'Idari-Birimler', 'SubSub', 'birimler', '', 20);
+(17, 'Anaokulu', 'Kindergarten', 1, 1, '#', 'Sub', 'kurumlar', '', 14),
+(18, 'İlkokul', 'Primary School', 1, 1, '#', 'Sub', 'kurumlar', '', 15),
+(19, 'Ortaokul', 'Middle School', 1, 1, '#', 'Sub', 'kurumlar', '', 16),
+(20, 'Anadolu Lisesi', 'Anatolian High School', 1, 1, '#', 'Sub', 'kurumlar', '', 17),
+(21, 'K12 Öğrenci Takip Sistemi', '', 1, 0, 'http://ankaraegitimkurumlari.k12net.com/', 'Sub', 'veli-ogrenci', '', 18),
+(22, 'Sınav Başvurusu', '', 1, 1, 'Sinav-Basvurusu', 'Sub', 'veli-ogrenci', '', 19);
 
 -- --------------------------------------------------------
 

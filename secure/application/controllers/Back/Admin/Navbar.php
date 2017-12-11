@@ -7,27 +7,27 @@ class Navbar extends CI_Controller {
 		parent::__construct();
 		$this->data = array('cached' => false, 'data' => '', 'cachedataTR' => '', 'cachedataEN' => '', 'cacheTime' => 172800,
 						'cacheKeys' => array(
-                          'GetNavbarFrontTR' => md5('GetNavbarFrontCacheTR'),
-                          'GetNavbarFrontEN' => md5('GetNavbarFrontCacheEN'),
+                          'GetNavbarBackTR' => md5('GetNavbarBackCacheTR'),
+                          'GetNavbarBackEN' => md5('GetNavbarBackCacheEN'),
                         ),
 
 		);
 		$this->load->driver('cache', array('adapter' => 'file', 'backup' => 'file'));
 	}
 
-	public function GetNavbarFront(){
+	public function GetNavbarBack(){
 		if(! $this->input->is_ajax_request()) {
 		    redirect('404');
 		} else {
 			$this->data['cachePostTR'] = $this->input->post('CacheTR');
 			$this->data['cachePostEN'] = $this->input->post('CacheEN');
-			$cacheKeyTR = $this->data['cacheKeys']['GetNavbarFrontTR'];
-            $cacheKeyEN = $this->data['cacheKeys']['GetNavbarFrontEN'];
+			$cacheKeyTR = $this->data['cacheKeys']['GetNavbarBackTR'];
+            $cacheKeyEN = $this->data['cacheKeys']['GetNavbarBackEN'];
 			$this->data['English'] = $this->input->post('English');
 			$this->data['NeedData'] = $this->input->post('NeedData');
 
 			if ($this->data['NeedData'] == "true") {
-				$this->data['data'] = $this->General_Model->GetNavbarFront();
+				$this->data['data'] = $this->General_Model->GetNavbarBack();
 			} else {
 				if ($this->data['cachePostTR'] != null) {
 					$this->cache->save($cacheKeyTR, $this->data['cachePostTR'], $this->data['cacheTime']);
@@ -49,9 +49,9 @@ class Navbar extends CI_Controller {
 					}
 					if ($this->data['English'] != null) {
 						if ($this->data['English'] == "true" && !$gotCacheEN) {
-							$this->data['data'] = $this->General_Model->GetNavbarFront();
+							$this->data['data'] = $this->General_Model->GetNavbarBack();
 						} else if($this->data['English'] == "false" && !$gotCacheTR) {
-							$this->data['data'] = $this->General_Model->GetNavbarFront();
+							$this->data['data'] = $this->General_Model->GetNavbarBack();
 						}
 					}
 					

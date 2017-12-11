@@ -1,3 +1,0 @@
--Yan menünün açma/kapama butonunun animasyonu yapýldý.
--Kadro sayfasý açýldý. (Zaman kaybetmemek için fotoðraflarý koymadým.)
--Animasyonlar güncellendi.

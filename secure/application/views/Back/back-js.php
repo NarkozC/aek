@@ -12,19 +12,6 @@
 <script src="<?php echo base_url(); ?>resources/js/dataTables.bootstrap.min.js"></script>
 <script src="<?php echo base_url(); ?>resources/js/iziToast.min.js"></script>
 <script src="<?php echo base_url(); ?>resources/js/iziModal.min.js"></script>
-<script src="<?php echo base_url(); ?>resources/js/jquery.multilevelpushmenu.min.js"></script>
-
+<script src="<?php echo base_url(); ?>resources/js/md5.min.js"></script>
 
 <script src="<?php echo base_url(); ?>resources/js/customScript.js"></script>
-<!-- <script>
-$(document).ready(function(){
-// HTML markup implementation, overlap mode
-$( '#back-menu' ).multilevelpushmenu({
-containersToPush: [$( '#pushobj' )],
-onItemClick: function() {
-	$(this).html()
-},
-
-});
-});
-</script> -->

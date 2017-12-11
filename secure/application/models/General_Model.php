@@ -82,7 +82,6 @@ class General_Model extends CI_Model
 		->get('general_kadro')
 		->result();
 		return $result;
-		// return true;
 	}
 
 	public function GetKadroWGrupSectionID($GrupSectionID)
@@ -455,6 +454,37 @@ class General_Model extends CI_Model
 		}
 	}
 
+
+
+
+	/*
+		=====================================
+		  ------------ Navbar --------------
+		=====================================
+	*/
+	public function GetNavbar()
+	{
+		$query = $this->db
+		->order_by('ListOrder','asc')
+		->get('general_navbar')
+		->result();
+
+		$i = 1;
+		foreach ($query as $item) {
+		  $field = array(
+		  'ListOrder'   =>$i,
+		  );
+		  $this->db->where('No', $item->No);
+		  $this->db->update('general_navbar', $field);
+		  $i++;
+		}
+
+		$result = $this->db
+		->order_by('ListOrder','asc')
+		->get('general_navbar')
+		->result();
+		return $result;
+	}
 
 
 
@@ -1867,13 +1897,13 @@ class General_Model extends CI_Model
 	    }
 		$Data = array(
 			'tr_Aciklama'	=>$this->input->post('tr_Aciklama'),
-			
 			'en_Aciklama'	=>$this->input->post('en_Aciklama'),
 			
 			'Sube'			=>$CData['Sube'],
-			'Okul_Kodu'		=>$this->input->post('Okul_Kodu'),
+			'Okul'			=>$this->input->post('Okul'),
 			'Yil'			=>$this->input->post('Yil'),
 			'Tarih'			=>$this->input->post('Tarih'),
+			'Ders'			=>$this->input->post('Ders'),
 		);
 		$this->db->insert('general_sinav_takvimi', $Data);
 		if($this->db->affected_rows() > 0){
@@ -1892,13 +1922,13 @@ class General_Model extends CI_Model
 	    }
 		$Data = array(
 			'tr_Aciklama'	=>$this->input->post('tr_Aciklama'),
-			
 			'en_Aciklama'	=>$this->input->post('en_Aciklama'),
 			
 			'Sube'			=>$CData['Sube'],
-			'Okul_Kodu'		=>$this->input->post('Okul_Kodu'),
+			'Okul'			=>$this->input->post('Okul'),
 			'Yil'			=>$this->input->post('Yil'),
 			'Tarih'			=>$this->input->post('Tarih'),
+			'Ders'			=>$this->input->post('Ders'),
 		);
 		$this->db->where('No', $No);
 		$this->db->update('general_sinav_takvimi', $Data);
@@ -2155,53 +2185,6 @@ class General_Model extends CI_Model
 	*/
 	public function GetEtkinlikTakvimi()
 	{
-		// $query = $this->db
-		// ->order_by('Tarih','asc')
-		// ->get('general_etkinlik_takvimi')
-		// ->result();
-
-
-		// $i = 0;
-
-		// foreach ($query as $item) {
-		// 	$row1 = $query[$i];
-		// 	$row2 = $query[$i+1];
-		// 	if ($row1->Tarih == $row2->Tarih && $row1->tr_Aciklama == $row2->tr_Aciklama) {
-		// 		$newRecord = array(
-		// 			  'Okul'   			=> $row1->Okul.','.$row2->Okul,
-		// 			  'tr_Aciklama'   	=> $row1->tr_Aciklama,
-		// 			  'en_Aciklama'   	=> $row1->en_Aciklama,
-		// 			  'Sube'   			=> $row1->Sube.','.$row2->Sube,
-		// 			  'Tarih'   		=> $row1->Tarih,
-		// 		);
-
-		// 		$No = $row1->No;
-		// 		$this->db->where('No', $No);
-		// 		$this->db->delete('general_etkinlik_takvimi');
-		// 		if($this->db->affected_rows() > 0){}
-
-		// 		$No2 = $row2->No;
-		// 		$this->db->where('No', $No2);
-		// 		$this->db->delete('general_etkinlik_takvimi');
-		// 		if($this->db->affected_rows() > 0){}
-
-		// 		$this->db->insert('general_etkinlik_takvimi', $newRecord);
-		// 		if($this->db->affected_rows() > 0){}
-		// 		$i = $i + 2;
-		// 	} else {
-		// 		$i++;
-		// 	}
-		// }
-
-		// $query2 = $this->db
-		// 	->order_by('Tarih','asc')
-		// 	->get('general_etkinlik_takvimi')
-		// 	->result();
-		
-
-		// return sizeof($query2);
-		
-
 		return $this->db
 		->order_by('Tarih','desc')
 		->get('general_etkinlik_takvimi')
@@ -2234,7 +2217,6 @@ class General_Model extends CI_Model
 	    }
 		$Data = array(
 			'tr_Aciklama'	=>$this->input->post('tr_Aciklama'),
-			
 			'en_Aciklama'	=>$this->input->post('en_Aciklama'),
 			
 			'Sube'			=>$CData['Sube'],
@@ -2258,7 +2240,6 @@ class General_Model extends CI_Model
 	    }
 		$Data = array(
 			'tr_Aciklama'	=>$this->input->post('tr_Aciklama'),
-			
 			'en_Aciklama'	=>$this->input->post('en_Aciklama'),
 			
 			'Sube'			=>$CData['Sube'],
@@ -2686,7 +2667,7 @@ class General_Model extends CI_Model
 	{
 		return $this->db
 		->get('general_popup')
-		->row();
+		->result();
 	}
 
 	public function EditPopup(){

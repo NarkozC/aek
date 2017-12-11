@@ -1172,6 +1172,10 @@ body.loading .theLoader {
 .maxW150 {
 	max-width: 150px;
 }
+.maxW100 {
+	max-width: 100px;
+}
+
 
 
 

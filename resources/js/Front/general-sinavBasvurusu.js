@@ -3,33 +3,28 @@ var vars = {
         Sections: baseurl + 'Sinav-Basvurusu/',
         SinavTarihleri: baseurl + 'Sinav-Tarihleri/',
     },
-    sectionShowBase: '#showSinavBasvurusu',
-
-    sectionBaslikKod: 'GSB',
-    sectionIsFirst: true,
-
+    sectionShowBases: {
+        Sections: 'showSinavBasvurusu',
+    },
     sectionObjects: {
         Form: 'form',
     },
-
     sectionButtons: {
         Submit: 'SinavBasvurusuSubmit'
     },
-
     sectionNames: {
         Normal: 'Sınav Başvurusu',
         Lower: 'sinav-basvurusu',
         Upper: 'SinavBasvurusu',
+        Kod: 'GSB',
     },
     sectionDatas: {
         Cinsiyetler: GetCinsiyetlerData(),
         Siniflar: GetSiniflarData(),
         SinavTarihleri: {
             Data: new Array(),
-            Counter: new Array(),
         },
     },
-
     sectionFunctions: {
         Add: 'AddSinavBasvurusu',
 
@@ -41,6 +36,7 @@ var vars = {
         OOSinif: 'OOSinif',
         SinavTarihi: 'SinavTarihi',
     },
+    sectionIsFirst: true,
 };
 
 $(function() {
@@ -62,7 +58,7 @@ $(function() {
     });
 
     //Button for posting data for add
-    $(vars.sectionShowBase).on('click', '#' + vars.sectionButtons.Submit, function(e) {
+    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
         var $link = $(e.target);
         if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
             var url = vars.sectionControllers.Sections + vars.sectionFunctions.Add;
@@ -82,20 +78,20 @@ $(function() {
                     console.log(response);
                     ResetFormErrors();
                     if (response.success) {
-                        // ResetForm(vars.sectionObjects.Form);
+                        ResetForm(vars.sectionObjects.Form);
                         iziSuccess();
                     } else {
                         var ajaxGroup;
                         if (response.messages.length != 0) {
                             ShowFormErrors(response.messages);
                         } else {
-                            // RefreshData(1, 1);
+                            RefreshData(1, 1);
                             iziError();
                         }
                     }
                 },
                 error: function() {
-                    // RefreshData(1, 1);
+                    RefreshData(1, 1);
                     iziError();
                 }
             });
@@ -125,21 +121,21 @@ function GetSinavTarihleriData() {
                 var cache = result.cachedataTR.SinavTarihleri;
                 vars.sectionDatas.SinavTarihleri = cache;
             } else {
-                var i;
-                var data = result.data;
-                var length = data.length;
+                var i, clength;
+                var data = result.data,
+                    length = data.length;
+
                 vars.sectionDatas.SinavTarihleri.Data[0] = new Array();
                 vars.sectionDatas.SinavTarihleri.Data[0][0] = {};
-                vars.sectionDatas.SinavTarihleri.Counter[0] = 0;
                 for (i = 1; i < length; i++) {
                     if (vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif] == undefined) {
                         vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif] = new Array();
-                        vars.sectionDatas.SinavTarihleri.Counter[data[i].Sinif] = 0;
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][vars.sectionDatas.SinavTarihleri.Counter[data[i].Sinif]] = data[i];
-                        vars.sectionDatas.SinavTarihleri.Counter[data[i].Sinif]++;
+
+                        clength = vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif].length;
+                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][clength] = data[i];
                     } else {
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][vars.sectionDatas.SinavTarihleri.Counter[data[i].Sinif]] = data[i];
-                        vars.sectionDatas.SinavTarihleri.Counter[data[i].Sinif];
+                        clength = vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif].length;
+                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][clength] = data[i];
                     }
                 }
             }
@@ -152,54 +148,54 @@ function GetSinavTarihleriData() {
 }
 
 function GetCinsiyetlerSelect() {
-    var i;
-    var data = vars.sectionDatas.Cinsiyetler;
-    var length = data.length;
-    var id = vars.secionSPs.Cinsiyet + 'Select';
-    var section = vars.secionSPs.Cinsiyet;
+    var i, html;
+    var data = vars.sectionDatas.Cinsiyetler,
+        length = data.length,
+        id = vars.secionSPs.Cinsiyet + 'Select',
+        section = vars.secionSPs.Cinsiyet;
 
-    var html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.CinsiyetSec + '" data-liveSearchNormalize="true">';
-
+    html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.CinsiyetSec + '" data-liveSearchNormalize="true">';
     for (i = 0; i < length; i++) {
         html += '<option data-tokens="' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
     }
-
     html += '</select>';
+
     $('#' + section).html(html);
     RefreshSelectpicker();
 }
 
 function GetSiniflarSelect() {
-    var i;
-    var data = vars.sectionDatas.Siniflar;
-    var length = data.length;
-    var id = vars.secionSPs.OOSinif + 'Select';
-    var section = vars.secionSPs.OOSinif;
+    var i, html;
+    var data = vars.sectionDatas.Siniflar,
+        length = data.length,
+        id = vars.secionSPs.OOSinif + 'Select',
+        section = vars.secionSPs.OOSinif;
 
-    var html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true">';
+    html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true">';
     for (i = 0; i < length; i++) {
         html += '<option data-tokens="' + data[i].Kod + '" value="' + data[i].Okul + '-' + data[i].Kod + '">' + data[i].Kod + '</option>';
     }
-
     html += '</select>';
+
     $('#' + section).html(html);
     RefreshSelectpicker();
 }
 
 function GetSinavTarihleriSelect(sinif = 0) {
     var html;
-    var id = vars.secionSPs.SinavTarihi + 'Select';
-    var section = vars.secionSPs.SinavTarihi;
+    var id = vars.secionSPs.SinavTarihi + 'Select',
+        section = vars.secionSPs.SinavTarihi;
     if (sinif == 0) {
         html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinavTarihiSec + '" data-liveSearchNormalize="true" disabled></select>';
     } else {
-        var i;
+        var i, length;
         var data = vars.sectionDatas.SinavTarihleri.Data[sinif];
-        ResetFormErrors();
+        $('#OOSinif').parents('.ajax-group:first').find('.text-danger:first').remove();
         if (data == undefined) {
             messages = {
                 SinavTarihi: '<p style="margin:10px 0px;" class="text-danger">Bu sınıf için sınav tarihi bulunmamaktadır.</p>'
             }
+            $('#SinavTarihi').parents('.ajax-group:first').find('.text-danger:first').remove();
             ShowFormErrors(messages);
 
             $('body').append('<a href="#SinavTarihi" id="smoothScrollTemp"></a>');
@@ -208,7 +204,7 @@ function GetSinavTarihleriSelect(sinif = 0) {
                 offset: -125
             }).trigger("click").remove();
         }
-        var length = data.length;
+        length = data.length;
 
         html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinavTarihiSec + '" data-liveSearchNormalize="true">';
         for (i = 0; i < length; i++) {
@@ -216,7 +212,7 @@ function GetSinavTarihleriSelect(sinif = 0) {
         }
         html += '</select>';
     }
-    $('#' + section).html('');
+
     $('#' + section).html(html);
     RefreshSelectpicker();
 }
@@ -228,13 +224,13 @@ function GetSectionsHtml() {
     html += '<section id="' + vars.sectionNames.Lower + '">' +
         '<div class="container">' +
         '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-        '<h2 data-basliklar="' + vars.sectionBaslikKod + '">' + vars.sectionNames.Normal + '</h2>' +
+        '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
         '</div>' +
         '</div>' +
         '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's">' +
 
-        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" action="' + vars.sectionControllers.Sections + vars.sectionAddFunction + '">' +
+        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" action="' + vars.sectionControllers.Sections + vars.sectionFunctions.Add + '">' +
 
         '<div class="row">' +
 
@@ -356,21 +352,15 @@ function GetSectionsHtml() {
         '</div>' +
         '</div><!-- End container -->' +
         '</section>';
-    $('#show' + vars.sectionNames.Upper).html(html);
-    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
 
+    $('#' + vars.sectionShowBases.Sections).html(html);
+    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
     $("#Bolum").prop("readonly", true);
 }
-
-var isFirst = true;
 
 function RefreshData(html = 1, side = 0) {
     if (html == 1) {
         GetSectionsHtml()
-        if (!isFirst) {
-            ShortenContent4();
-        }
-        isFirst = false;
     }
     if (side != 0) {
         GetCinsiyetlerSelect()

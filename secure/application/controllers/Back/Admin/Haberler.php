@@ -39,7 +39,7 @@ class Haberler extends CI_Controller {
         if ($en == "true") {
           $this->config->set_item('language', FORM_LANGUAGES['Ingilizce']);
           $this->form_validation->set_rules('tr_Baslik', FORM_LANG_EN['Baslik'], 'required|trim|max_length[255]|strip_tags|xss_clean');       
-          $this->form_validation->set_rules('tr_AnaResim', 'deneme', 'required|trim|max_length[255]|strip_tags|xss_clean');
+          $this->form_validation->set_rules('tr_AnaResim', FORM_LANG_EN['AnaResim'], 'required|trim|max_length[255]|strip_tags|xss_clean');
           $this->form_validation->set_rules('tr_DigerResimler[]', FORM_LANG_EN['DigerResimler'], 'trim|strip_tags|xss_clean');
           $this->form_validation->set_rules('tr_Yazi', FORM_LANG_EN['Yazi'], 'required|trim');
 
@@ -128,7 +128,7 @@ class Haberler extends CI_Controller {
           $this->config->set_item('language', FORM_LANGUAGES['Ingilizce']);
           $this->form_validation->set_rules('No', FORM_LANG_EN['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
           $this->form_validation->set_rules('tr_Baslik', FORM_LANG_EN['Baslik'], 'required|trim|max_length[255]|strip_tags|xss_clean');       
-          $this->form_validation->set_rules('tr_AnaResim', 'deneme', 'required|trim|max_length[255]|strip_tags|xss_clean');
+          $this->form_validation->set_rules('tr_AnaResim', FORM_LANG_EN['AnaResim'], 'required|trim|max_length[255]|strip_tags|xss_clean');
           $this->form_validation->set_rules('tr_DigerResimler[]', FORM_LANG_EN['DigerResimler'], 'trim|strip_tags|xss_clean');
           $this->form_validation->set_rules('tr_Yazi', FORM_LANG_EN['Yazi'], 'required|trim');
 

@@ -37,10 +37,3 @@ Sınav başvurusu için 3 tane silme yöntemi olacak
 1 Kayıt üstünden
 2 Tarih aratarak multiple
 3 Tüm sınav başvuruları
-
-
-
-
-02.12.17
-mesela duyurular etkinliklerdeki okul selecti için
-eğer okul için bir değer yok ise boş oluşturulacak

@@ -117,6 +117,21 @@ define('FORM_LANG_TR', array(
 					'Sinif' => 'Sınıf',
 					'Yil' => 'Yıl',
 					'Tc' => 'Tc',
+					'AdSoyad' => 'Ad Soyad',
+					'Cinsiyet' => 'Cinsiyet',
+					'DogumTarihi' => 'Doğum Tarihi',
+					'DogumYeri' => 'Doğum Yeri',
+					'AnneAd' => 'Anne Adı',
+					'AnneTel' => 'Anne Cep Telefonu',
+					'AnneEmail' => 'Anne E-posta',
+					'BabaAd' => 'Baba Adı',
+					'BabaTel' => 'Baba Cep Telefonu',
+					'BabaEmail' => 'Baba E-posta',
+					'Adres' => 'Adres',
+					'OOOkul' => 'Okumakta Olduğu Okul',
+					'OOSinif' => 'Okumakta Olduğu Sınıf',
+					'Bolum' => 'Bölüm',
+					'SinavTarihi' => 'Sınav Tarihi',
 					));
 
 define('FORM_LANG_EN', array(

@@ -324,9 +324,8 @@ class Kadro extends CI_Controller {
         if ($this->form_validation->run()) {
 
           $result = $this->General_Model->UpKadro();
-          $this->data['deneme'] = $result;
           if($result){
-            // $cacheKeys = array('Kadro', 'KadroHtml', 'YonetimKurulu', 'OkulAileBirligi');
+            $cacheKeys = array('Kadro', 'KadroHtml', 'YonetimKurulu', 'OkulAileBirligi');
 
             for ($i=0; $i < sizeof($cacheKeys); $i++) { 
               $cacheKeyTR = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'TR'];

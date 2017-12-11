@@ -2,15 +2,13 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  	<meta charset="utf-8">
-  	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-  	<meta name="viewport" content="width=device-width, initial-scale=1">
   	<title>Anasayfa | AEK</title>
-
 <?php $this->view('Front/front-navbar.php'); ?>
-<div class="container-fluid padding0 margin0">
+
+
+<div class="container padding0">
   <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginTop50 padding0">
-    <div id="BannerA" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">
+    <div id="BannerA" style="display:none;position: relative;left: 50%;transform: translate(-50%,0)">
 
       <img alt="Banner Resim 1" src="<?php echo base_url(); ?>resources/images/Banner/Anasayfa-Banner-1.jpg"
         data-image="<?php echo base_url(); ?>resources/images/Banner/Anasayfa-Banner-1.jpg">
@@ -26,7 +24,7 @@
     
     </div>
   </div>
-</div>    
+</div>
 
 <section id="duy_etk_hab">
 

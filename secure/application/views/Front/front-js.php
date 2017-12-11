@@ -19,5 +19,8 @@
 <script src="<?php echo base_url(); ?>resources/unitegallery/themes/slider/ug-theme-slider.js"></script>
 <!--<script src="<?php echo base_url(); ?>resources/js/jquery.sidr.min.js"></script>-->
 <script src="<?php echo base_url(); ?>resources/js/iziModal.min.js"></script>
+<script src="<?php echo base_url(); ?>resources/js/md5.min.js"></script>
+
+
 
 <script src="<?php echo base_url(); ?>resources/js/customScript.js"></script>

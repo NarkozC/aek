@@ -31,6 +31,8 @@ var vars = {
     sectionDatas: {
         Haberler: {
             Data: new Array(),
+            FData: new Array(),
+            FHtml: new Array(),
             Num: 0,
         },
 
@@ -52,22 +54,16 @@ $(function() {
 
 
     //Button that opens add/update modal
-    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.OpenModal, function(e) {
-        var $link = $(e.target); 
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var formAction = vars.sectionControllers.Portal + vars.sectionFunctions.Add;
-            $(vars.sectionObjects.Form).attr('action', formAction);
-            ResetForm(vars.sectionObjects.Form);
-            $('.nav-tabs a[href="#' + formTabs.Turkce + '"]').tab('show');
-            $(vars.sectionObjects.Modal).modal('show');
-        }
-        $link.data('lockedAt', +new Date());
-    });
+    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
+        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+        vars.sectionObjects.Form, vars.sectionObjects.Modal);
+
+
 
     //Button for posting data for add/update
     $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
         var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
             var url = vars.sectionObjects.Form.attr('action');
             var data = vars.sectionObjects.Form.serializeArray();
             data.push({
@@ -121,15 +117,15 @@ $(function() {
                         iziSuccess();
                         if (willRefresh) {
                             setTimeout(function() {
-                                RefreshData(1, 1)
-                            }, 300);
+                                RefreshData(1, 1, 1)
+                            }, 310);
                         }
                     } else {
                         var ajaxGroup;
                         if (response.messages.length != 0) {
                             ShowFormErrors(response.messages);
                         } else {
-                            RefreshData(1)
+                            RefreshData(1, 1, 1)
 
                             $(vars.sectionObjects.Modal).modal('hide');
                             iziError();
@@ -137,7 +133,7 @@ $(function() {
                     }
                 },
                 error: function() {
-                    RefreshData(1)
+                    RefreshData(1, 1, 1)
                     $(vars.sectionObjects.Modal).modal('hide');
                     iziError();
                 }
@@ -150,7 +146,7 @@ $(function() {
     //Button for editing
     $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
         var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
             var no = $(this).attr('data');
             var sayfa = $(this).parents('.tab-pane.fade.active.in').attr('id')
             $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
@@ -171,27 +167,27 @@ $(function() {
                             var tr_DigerResimlerArray = result.data.tr_DigerResimler.split(',');
                             var en_DigerResimlerArray = result.data.en_DigerResimler.split(',');
                             $('input[name=No]').val(result.data.No);
-                            $('input[name=tr_Baslik]').val(result.data.tr_Baslik);
-                            $('input[name=en_Baslik]').val(result.data.en_Baslik);
+                            $('#tr_Baslik').val(result.data.tr_Baslik);
+                            $('#en_Baslik').val(result.data.en_Baslik);
                             $('#tr_' + vars.sectionSPs.AnaResim + 'Select').selectpicker('val', result.data.tr_AnaResim);
                             $('#tr_' + vars.sectionSPs.DigerResimler + 'Select').selectpicker('val', tr_DigerResimlerArray);
                             $('#en_' + vars.sectionSPs.AnaResim + 'Select').selectpicker('val', result.data.en_AnaResim);
                             $('#en_' + vars.sectionSPs.DigerResimler + 'Select').selectpicker('val', en_DigerResimlerArray);
-                            $('textarea[name=tr_Yazi]').val(result.data.tr_Yazi);
-                            $('textarea[name=en_Yazi]').val(result.data.en_Yazi);
+                            $('#tr_Yazi').val(result.data.tr_Yazi);
+                            $('#en_Yazi').val(result.data.en_Yazi);
                             $('#' + vars.sectionSPs.Okul + 'Select').selectpicker('val', OkulArray);
-                            $('input[name=Tarih]').val(result.data.Tarih);
+                            $('#Tarih').val(result.data.Tarih);
 
                             $('.nav-tabs a[href="#' + formTabs['Turkce'] + '"]').tab('show');
                             $(vars.sectionObjects.Modal).modal('show');
                         } else {
-                            RefreshData(1, 1)
+                            RefreshData(1, 1, 1)
                             iziError();
                         }
                     }, 15);
                 },
                 error: function() {
-                    RefreshData(1, 1)
+                    RefreshData(1, 1, 1)
                     iziError();
                 }
             });
@@ -201,82 +197,9 @@ $(function() {
     });
 
     //Button for deleting
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonDelete, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var btn = $(this);
-            var no = $(this).attr('data');
-
-            iziToast.question({
-                timeout: 15000,
-                close: false,
-                overlay: true,
-                toastOnce: true,
-                id: 'iziDelete',
-                zindex: 999,
-                title: formLang.delTitle,
-                message: formLang.delMessage,
-                position: 'center',
-                buttons: [
-                    ['<button><b>' + formLang.delEvetBtn + '</b></button>', function(instance, toast) {
-
-                        url = vars.sectionControllers.Portal + vars.sectionFunctions.Delete;
-                        $.ajax({
-                            type: 'ajax',
-                            method: 'post',
-                            async: false,
-                            url: url,
-                            data: {
-                                No: no
-                            },
-                            dataType: 'json',
-                            success: function(result) {
-                                if (result.success) {
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-
-                                    $(btn).parents('tr:first').css('background-color', '#ccc').fadeOut('slow', function() {
-                                        $(this).remove();
-                                    });
-
-                                    iziSuccess();
-                                } else {
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-                                    iziError();
-                                }
-                            },
-                            error: function() {
-                                instance.hide(toast, {
-                                    transitionOut: 'fadeOutDown'
-                                }, 'button');
-                                iziError();
-                            },
-                            complete: function() {
-                                var sayfaID = $(btn).parents('tbody:first').attr('id');
-                                var rowCount = $('#' + sayfaID + ' tr').length;
-                                if (rowCount == 1) {
-                                    RefreshData(1, 1);
-                                }
-                            }
-                        });
-
-                    }, true],
-                    ['<button>' + formLang.delHayirBtn + '</button>', function(instance, toast) {
-
-                        instance.hide(toast, {
-                            transitionOut: 'fadeOutDown'
-                        }, 'button');
-
-                    }]
-                ],
-            });
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
+    FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
+        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+        RefreshData, "1, 1, 1");
 });
 
 function GetOkullarSelect() {
@@ -352,6 +275,8 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.Haberler.Data[i]);
     }
 
+    ShortenContent6();
+
     if (!vars.sectionIsFirst) {
         CreateDataTables();
     }
@@ -361,6 +286,8 @@ function CreateSectionsTable() {
 function GetSectionsData() {
     vars.sectionDatas.Haberler = {
         Data: new Array(),
+        FData: new Array(),
+        FHtml: new Array(),
         Num: 0,
     }
 
@@ -383,7 +310,7 @@ function GetSectionsData() {
                 vars.sectionDatas.Haberler = cache;
             } else {
                 var i, j, data = result.data,
-                    length, length2, htmls = {};
+                    length, length2, htmls = {}, fHtml = '', fData = new Array();
                 var curData, trInside, trArray;
 
                 for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
@@ -404,7 +331,46 @@ function GetSectionsData() {
                         trInside = GetHtmlTr(curData, trArray);
                         htmls[okul[j]] += '<tr>' + trInside + '</tr>';
                     }
+
+
+
+                    if (en) {
+                        curData.Link = baseurl + 'en/'+page+'/Haber/' + curData.SectionID;
+                    } else {
+                        curData.Link = baseurl + page +'/Haber/' + curData.SectionID;
+                    }
+                    var dateAr = curData.Tarih.split('-');
+                    curData.Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];
+                    fData[i] = curData;
+
+                    fHtml +=
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad25 marginB35 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
+                        '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- hidden-xs-sm-md -->' +
+                        '<div class="col-lg-4">' +
+                        '<a href="' + curData.Link + '"><img alt="' + curData.Baslik + '" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="' + imagesDir + curData.AnaResim + '"></a>' +
+                        '</div>' +
+                        '<div class="col-lg-8">' +
+                        '<h3><a href="' + curData.Link + '">' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></a></h3>' +
+                        '<p class="shorten_content8">' + curData.Yazi + '</p>' +
+                        '<br>' +
+                        '</div>' +
+                        '<a href="' + curData.Link + '" class="btn btn-sm btn-danger borderRad10" style="position:absolute;bottom:20px;right:20px">' + formLang.ReadMore + '</a>' +
+                        '</div>' +
+                        '<div class="row visible-md visible-sm visible-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- visible-xs-sm-md -->' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12">' +
+                        '<h3 class="text-center"><a href="' + curData.Link + '">' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></a></h3>' +
+                        '<a href="' + curData.Link + '"><img alt="' + curData.Baslik + '" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="' + imagesDir + curData.AnaResim + '"></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 marginTop10">' +
+                        '<p class="shorten_content8">' + curData.Yazi + '</p>' +
+                        '<br><a href="' + curData.Link + '" style="position:absolute;bottom:0;"><span class="btn btn-sm btn-danger pull-right marginR15 borderRad10">' + formLang.ReadMore + '</span></a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
                 }
+
+                vars.sectionDatas.Haberler.FHtml = fHtml;
+                vars.sectionDatas.Haberler.FData = fData;
                 vars.sectionDatas.Haberler.Data = htmls;
                 vars.sectionDatas.Haberler.Num = length;
 
@@ -536,7 +502,7 @@ function GetSectionsHtml() {
         '<div class="col-lg-12 page-header text-center">' +
         '<h2>' +
         '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionOpenModalButton + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
+        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
         vars.sectionNames.Normal +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +

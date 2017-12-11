@@ -1,17 +1,21 @@
 var vars = {
-    form: 'form',
-    modal: 'modal',
-    sectionNameNormal: 'Çözümleriniz İçin Veli Öğretmen Görüşme Takvimi',
-    sectionNameLower: 'civogt',
-    sectionNameUpper: 'Civogt',
-    sectionController: baseurl + 'CIVOGT/',
-    sectionShowBase: '#showCivogt',
-    sectionBaslikCode: 'CIVOGT',
-
+    sectionNames: {
+        Normal: 'Çözümleriniz İçin Veli Öğretmen Görüşme Takvimi',
+        Upper: 'Civogt',
+        Lower: 'civogt',
+        Kod: 'GCIVOGT',
+    },
+    sectionControllers: {
+        Normal: baseurl + 'CIVOGT/',
+    },
+    sectionShowBases: {
+        Sections: 'showCivogt',
+        Table: 'showTableData',
+    },
     sectionDatas: {
         Civogt: {
-            Data: {},
-            DataCounter: 0,
+            Data: new Array(),
+            Num: 0,
         },
         Okullar: GetOkullarData(),
         Gunler: GetGunlerData(),
@@ -20,19 +24,15 @@ var vars = {
         Siniflar: GetSiniflarData(),
         Subeler: GetSubelerData(),
     },
-
     sectionFunctions: {
-        CivogtGet: 'GetCivogt',
+        Get: 'GetCivogt',
     },
-
     sectionButtons: {
         ShowTable: 'showTable',
     },
-
     sectionIsFirst: {
         Civogt: true,
     },
-
     sectionSPs: {
         Yil: 'Yil',
         Donem: 'Donem',
@@ -52,8 +52,7 @@ var vars = {
 $(function() {
 
     //Refresh Page
-    RefreshHtmls();
-    RefreshData();
+    RefreshData(1, 1, 1);
 
     $('#' + vars.sectionButtons.ShowTable).on('click', function(e) {
         CreateTable();
@@ -61,65 +60,64 @@ $(function() {
 });
 
 function GetYillar() {
-    var i, length, data;
-    data = vars.sectionDatas.Yillar;
-    length = data.length;
+    var i, html;
+    var data = vars.sectionDatas.Yillar,
+        length = data.length;
 
-    var yil_html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Yil + '" id="' + vars.sectionSPs.Yil + 'Select" title="' + formLang.YilSec + '" data-liveSearchNormalize="true">';
 
+    html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Yil + '" id="' + vars.sectionSPs.Yil + 'Select" title="' + formLang.YilSec + '" data-liveSearchNormalize="true">';
     for (i = 0; i < length; i++) {
-        yil_html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
+        html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
     }
+    html += '</select>';
 
-    yil_html += '</select>';
-    $('#' + vars.sectionSPs.Yil).html(yil_html);
-    setTimeout(RefreshSelectpicker(), 1);
+    $('#' + vars.sectionSPs.Yil).html(html);
+    RefreshSelectpicker()
 
     $('#' + vars.sectionSPs.Yil + 'Select').on('change', function(e) {
         var valueSelected = this.value;
         vars.sectionSPsValues.Yil = valueSelected;
         $('#' + vars.sectionSPs.Donem + 'Select').prop('disabled', false);
-        $('#' + vars.sectionSPs.Donem + 'Select').selectpicker('refresh');
+        RefreshSelectpicker()
     });
 }
 
 function GetDonem() {
-    var i, length, data;
-    data = new Array("1", "2");
-    length = data.length;
+    var i, html;
+    var data = new Array("1", "2"),
+        length = data.length;
 
-    var html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Donem + '" id="' + vars.sectionSPs.Donem + 'Select" title="' + formLang.DonemSec + '" data-liveSearchNormalize="true" disabled>';
 
+    html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Donem + '" id="' + vars.sectionSPs.Donem + 'Select" title="' + formLang.DonemSec + '" data-liveSearchNormalize="true" disabled>';
     for (i = 0; i < length; i++) {
         html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
     }
-
     html += '</select>';
+
     $('#' + vars.sectionSPs.Donem).html(html);
-    setTimeout(RefreshSelectpicker(), 1);
+    RefreshSelectpicker()
 
     $('#' + vars.sectionSPs.Donem + 'Select').on('change', function(e) {
         var valueSelected = this.value;
         vars.sectionSPsValues.Donem = valueSelected;
         $('#' + vars.sectionSPs.Okul + 'Select').prop('disabled', false);
-        $('#' + vars.sectionSPs.Okul + 'Select').selectpicker('refresh');
+        RefreshSelectpicker()
     });
 }
 
 function GetOkul() {
-    var i, length, data;
-    data = vars.sectionDatas.Okullar;
-    length = data.length;
+    var i, html;
+    var data = vars.sectionDatas.Okullar,
+        length = data.length;
 
-    var html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Okul + '" id="' + vars.sectionSPs.Okul + 'Select" title="' + formLang.OkulSec + '" data-liveSearchNormalize="true" disabled>';
-
+    html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Okul + '" id="' + vars.sectionSPs.Okul + 'Select" title="' + formLang.OkulSec + '" data-liveSearchNormalize="true" disabled>';
     for (i = 1; i < length; i++) {
         html += '<option ad="' + data[i].Ad + '" data-tokens="' + data[i].Kod + ' ' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
     }
-
     html += '</select>';
+
     $('#' + vars.sectionSPs.Okul).html(html);
-    setTimeout(RefreshSelectpicker(), 1);
+    RefreshSelectpicker()
 
     $('#' + vars.sectionSPs.Okul + 'Select').on('change', function(e) {
         var valueSelected = this.value;
@@ -127,15 +125,17 @@ function GetOkul() {
         vars.sectionSPsValues.Okul = ad;
         GetSinif(valueSelected);
         GetSube();
+        RefreshSelectpicker()
     });
 }
 
 function GetSinif(okul = -1) {
-    var i, length, data;
-    data = vars.sectionDatas.Siniflar;
+    var i, html, length;
+    var data = vars.sectionDatas.Siniflar;
+
     if (okul == -1) {
         length = data.length;
-        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sinif + '" id="' + vars.sectionSPs.Sinif + 'Select" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true" disabled></select>';
+        html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sinif + '" id="' + vars.sectionSPs.Sinif + 'Select" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true" disabled></select>';
         $('#' + vars.sectionSPs.Sinif).html(html);
     } else {
         var curSiniflar = data.filter(function(sinif) {
@@ -143,7 +143,7 @@ function GetSinif(okul = -1) {
         });
 
         length = curSiniflar.length;
-        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sinif + '" id="' + vars.sectionSPs.Sinif + 'Select" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true">';
+        html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sinif + '" id="' + vars.sectionSPs.Sinif + 'Select" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true">';
         for (i = 0; i < length; i++) {
             html += '<option data-tokens="' + curSiniflar[i].Kod + ' ' + curSiniflar[i].Kod + '" value="' + curSiniflar[i].Kod + '">' + curSiniflar[i].Kod + '</option>';
         }
@@ -154,18 +154,20 @@ function GetSinif(okul = -1) {
             var valueSelected = this.value;
             vars.sectionSPsValues.Sinif = valueSelected;
             GetSube(valueSelected)
+            RefreshSelectpicker()
         });
     }
-    setTimeout(RefreshSelectpicker(), 1);
+    RefreshSelectpicker()
 }
 
 function GetSube(sinif = -1) {
-    var i, length, data;
-    data = vars.sectionDatas.Subeler;
+    var i, length;
+    var data = vars.sectionDatas.Subeler;
+
     $('#' + vars.sectionButtons.ShowTable).prop('disabled', true);
     if (sinif == -1) {
         length = data.length;
-        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sube + '" id="' + vars.sectionSPs.Sube + 'Select" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true" disabled></select>';
+        html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sube + '" id="' + vars.sectionSPs.Sube + 'Select" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true" disabled></select>';
         $('#' + vars.sectionSPs.Sube).html(html);
     } else {
         var curSubeler = data.filter(function(sube) {
@@ -173,7 +175,7 @@ function GetSube(sinif = -1) {
         });
 
         length = curSubeler.length;
-        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sube + '" id="' + vars.sectionSPs.Sube + 'Select" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true">';
+        html = '<select class="form-control selectpicker" data-live-search="true" name="' + vars.sectionSPs.Sube + '" id="' + vars.sectionSPs.Sube + 'Select" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true">';
         for (i = 0; i < length; i++) {
             html += '<option data-tokens="' + curSubeler[i].Kod + ' ' + curSubeler[i].Okul + '" value="' + curSubeler[i].Kod + '">' + curSubeler[i].Kod + '</option>';
         }
@@ -186,14 +188,16 @@ function GetSube(sinif = -1) {
             $('#' + vars.sectionButtons.ShowTable).prop('disabled', false);
         });
     }
-    setTimeout(RefreshSelectpicker(), 1);
+    RefreshSelectpicker()
 }
 
 function CreateTable() {
     var i, html, length, data, values, trArray, trInside;
-    html = '';
-    values = vars.sectionSPsValues;
-    data = vars.sectionDatas.Civogt.Data;
+    var html = '',
+        values = vars.sectionSPsValues,
+        data = vars.sectionDatas.Civogt.Data;
+
+    console.log(data);
 
     var yilF = data.filter(function(civogt) {
         return civogt.Yil == values.Yil;
@@ -216,28 +220,27 @@ function CreateTable() {
     trArray = new Array('Ders', 'Gun', 'Saat')
     for (i = 0; i < length; i++) {
         trInside = GetHtmlTr(data[i], trArray);
-        html += '<tr class="shorten_content6">' + trInside + '</tr>';
+        html += '<tr>' + trInside + '</tr>';
     }
 
-    GetCivogtHtml();
-    $('#show' + vars.sectionNameUpper + 'Data').html(html);
+    $('#' + vars.sectionShowBases.Table).show();
+    if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('.datatable').DataTable().destroy();
+    }
+
+    $('#' + vars.sectionShowBases.Table).find('tbody:first').html(html);
+
+    CreateDataTables()
 
     setTimeout(function() {
-        if ($.fn.DataTable.isDataTable('.datatable')) {
-            $('.datatable').DataTable().destroy();
-        }
-    }, 1)
+        ShortenContent6();
+    }, 1);
 
-    setTimeout(CreateDataTables(), 2)
 
 }
 
 function GetCivogtData() {
-    vars.sectionDatas.Civogt = {
-        Data: {},
-        DataCounter: 0,
-    }
-    var url = vars.sectionController + vars.sectionFunctions.CivogtGet;
+    var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
     $.ajax({
         type: 'ajax',
         method: 'post',
@@ -279,8 +282,8 @@ function GetCivogtData() {
                     curData.Okul = curOkul[0].Ad;
                     curData.Gun = curGun[0].Ad;
 
-                    vars.sectionDatas.Civogt.Data[vars.sectionDatas.Civogt.DataCounter] = curData;
-                    vars.sectionDatas.Civogt.DataCounter++;
+                    vars.sectionDatas.Civogt.Data[vars.sectionDatas.Civogt.Num] = curData;
+                    vars.sectionDatas.Civogt.Num++;
                 }
                 var theCacheData = {
                     Civogt: vars.sectionDatas.Civogt,
@@ -299,77 +302,68 @@ function GetCivogtData() {
 
 function GetCivogtHtml() {
     var html = '';
-    var isFirstJ = true;
 
-    if (vars.sectionIsFirst.Civogt) {
-        html += '<section id="' + vars.sectionNameLower + '">' +
-            '<div class="container">' +
-            '<div class="col-lg-12 page-header wow bounceInDown paddingL0" data-wow-delay="' + wowDelay + '">' +
-            '<h2 data-basliklar="' + vars.sectionBaslikCode + '">' + vars.sectionNameNormal + '</h2>' +
-            '</div>' +
-            '</div>' +
-            '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-            '<img src="' + imagesDir + 'Genel/CIVOGS-2.png" class="img-responsive img-center">' +
-            '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+    html += '<section id="' + vars.sectionNames.Lower + '">' +
+        '<div class="container">' +
+        '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
+        '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
+        '</div>' +
+        '</div>' +
+        '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
+        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+        '<img src="' + imagesDir + 'Genel/CIVOGS-2.png" class="img-responsive img-center">' +
+        '</div>' +
+        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
 
-            '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
-            '<label>' + formLang.Yil + '</label>' +
-            '<div id="Yil"></div>' +
-            '</div>' +
-            '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
-            '<label>' + formLang.Donem + '</label>' +
-            '<div id="Donem"></div>' +
-            '</div>' +
-            '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
-            '<label>' + formLang.Okul + '</label>' +
-            '<div id="Okul"></div>' +
-            '</div>' +
-            '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
-            '<label>' + formLang.Sinif + '</label>' +
-            '<div id="Sinif"></div>' +
-            '</div>' +
-            '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
-            '<label>' + formLang.Sube + '</label>' +
-            '<div id="Sube"></div>' +
-            '</div>' +
-            '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
-            '<label> </label>' +
-            '<button type="button" id="' + vars.sectionButtons.ShowTable + '" class="btn btn-danger btn-md btn-block">' + formLang.Goster + '</button>' +
-            '</div>' +
+        '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
+        '<label>' + formLang.Yil + '</label>' +
+        '<div id="' + vars.sectionSPs.Yil + '"></div>' +
+        '</div>' +
+        '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
+        '<label>' + formLang.Donem + '</label>' +
+        '<div id="' + vars.sectionSPs.Donem + '"></div>' +
+        '</div>' +
+        '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
+        '<label>' + formLang.Okul + '</label>' +
+        '<div id="' + vars.sectionSPs.Okul + '"></div>' +
+        '</div>' +
+        '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
+        '<label>' + formLang.Sinif + '</label>' +
+        '<div id="' + vars.sectionSPs.Sinif + '"></div>' +
+        '</div>' +
+        '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
+        '<label>' + formLang.Sube + '</label>' +
+        '<div id="' + vars.sectionSPs.Sube + '"></div>' +
+        '</div>' +
+        '<div class="col-xs-6 col-sm-6 col-md-2 col-lg-2">' +
+        '<label> </label>' +
+        '<button type="button" id="' + vars.sectionButtons.ShowTable + '" class="btn btn-danger btn-md btn-block">' + formLang.Goster + '</button>' +
+        '</div>' +
+        '</div>' +
+        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15">' +
+        '<div class="table-responsive" id="' + vars.sectionShowBases.Table + '">' +
+        '<table class="table table-bordered table-hover datatable">' +
+        '<thead class="text-center">' +
+        '<th class="text-center">' + formLang.Ders + '</th>' +
+        '<th class="text-center">' + formLang.Gun + '</th>' +
+        '<th class="text-center">' + formLang.Saat + '</th>' +
+        '</thead>' +
+        '<tbody>' +
+        '</tbody>' +
+        '</table>' +
+        '</div>' +
+        '</div>' +
+        '</div><!-- End container -->' +
+        '</section>';
 
-            '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15">' +
-            '<div id="show' + vars.sectionNameUpper + 'Table"></div>' +
-            '</div>' +
-            '</div><!-- End container -->' +
-            '</section>';
-        $('#show' + vars.sectionNameUpper).html(html);
-
-        vars.sectionIsFirst.Civogt = false;
-    } else {
-        html += '<div class="table-responsive">' +
-            '<table class="table table-bordered table-hover datatable">' +
-            '<thead class="text-center">' +
-            '<th class="text-center">' + formLang.Ders + '</th>' +
-            '<th class="text-center">' + formLang.Gun + '</th>' +
-            '<th class="text-center">' + formLang.Saat + '</th>' +
-            '</thead>' +
-            '<tbody id="show' + vars.sectionNameUpper + 'Data">' +
-            '</tbody>' +
-            '</table>' +
-            '</div>';
-        $('#show' + vars.sectionNameUpper + 'Table').html(html);
-    }
+    $('#' + vars.sectionShowBases.Sections).html(html);
+    $('#' + vars.sectionShowBases.Table).hide();
 }
 
 function GetHtmlTr(data, trArray) {
+    var newHtml = '',
+        length = trArray.length;
     var i;
-    var newHtml = '';
-    var length = trArray.length;
-    var no = data.No;
-    var listOrder = data.ListOrder;
 
     for (i = 0; i < length; i++) {
         newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
@@ -377,27 +371,18 @@ function GetHtmlTr(data, trArray) {
     return newHtml;
 }
 
-function RefreshData() {
-    GetCivogtData();
-    RefreshSideData()
-}
-
-var isFirst = true;
-
-function RefreshSideData() {
-    $(function() {
-        if (!isFirst) {
-            ShortenContent6();
-        }
-        isFirst = false;
+function RefreshData(data = 1, html = 0, side = 0) {
+    if (data == 1) {
+        GetCivogtData();
+    }
+    if (html == 1) {
+        GetCivogtHtml()
+    }
+    if (side == 1) {
         GetYillar()
         GetDonem();
         GetOkul();
         GetSinif();
         GetSube();
-    });
-}
-
-function RefreshHtmls() {
-    GetCivogtHtml()
+    }
 }

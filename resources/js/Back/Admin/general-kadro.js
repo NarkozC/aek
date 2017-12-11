@@ -51,6 +51,8 @@ var vars = {
 
             Tabs: new Array('gruplar', 'aciklamalar'),
         },
+
+        Resimler: GetResimlerData(),
     },
     sectionFunctions: {
         KadroGrupGet: 'GetKadroGrup',
@@ -70,8 +72,6 @@ var vars = {
         KadroNum: 'GetKadroNum',
         KadroUp: 'UpKadro',
         KadroDown: 'DownKadro',
-
-        ResimlerGet: baseurl + 'Portal/Admin/Resimler/GetResimler',
     },
     sectionNumShowIDs: {
         Kadro: 'KadroNum',
@@ -93,7 +93,6 @@ var vars = {
         Kadro: true,
         KadroGrup: true,
 
-        GetResimler: true,
         GetGrupSectionID: true,
         GetAciklama: true,
     },
@@ -114,17 +113,10 @@ function GetResimler(who = '') {
         vars.sectionIsFirst.GetResimler = false;
         $(vars.sectionShowBases.Kadro + ' #' + Section).parent('.ajax-group').hide()
     } else {
-        var url = vars.sectionFunctions.ResimlerGet;
-
-        $.ajax({
-            type: 'ajax',
-            method: 'post',
-            url: url,
-            async: false,
-            dataType: 'json',
-            success: function(data) {
+        var data = vars.sectionDatas.Resimler
                 var i;
                 var length = data.length;
+                var lastParts = data.Html;
 
                 if (who == 'okul-aile-birligi-galeri') {
                     html = '<select class="form-control selectpicker" data-live-search="true" name="' + Section + '[]" id="' + ID + '" title="' + formLang.ResimSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
@@ -135,13 +127,9 @@ function GetResimler(who = '') {
                 for (i = 0; i < length; i++) {
                     html += '<option data-tokens="' + data[i].RKategoriler + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategoriler + '" value="' + data[i].RKategoriler + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategoriler + ')</option>';
                 }
-
-                html += '</select>';
-            },
-            error: function() {
-                iziError();
-            }
-        });
+                lastParts += '</select>';
+                html += lastParts;
+            
         $(vars.sectionShowBases.Kadro + ' #' + Section).parent('.ajax-group').show()
     }
     $(vars.sectionShowBases.Kadro + ' #' + Section).html(html);
@@ -803,7 +791,7 @@ function GetKadroHtml() {
         '<div class="col-lg-12 page-header text-center wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
         '<h2>' +
         '<button id="' + vars.sectionButtons.KadroOpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionOpenModalButton + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
+        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
         vars.sectionNameNormal.Kadro +
         '<span id="' + vars.sectionNumShowIDs.Kadro + '" class="badge"></span>' +
         '</h2>' +
@@ -1756,7 +1744,10 @@ function RefreshFunctionsKadroGrup() {
             if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
                 var No = $(this).attr('data');
                 var ListOrder = $(this).attr('data2');
+                console.log('No:'+No)
+                console.log('ListOrder:'+ListOrder)
                 var url = vars.sectionPortalController + vars.sectionFunctions.KadroGrupUp;
+                console.log('url:'+url);
                 $.ajax({
                     type: 'ajax',
                     method: 'post',
@@ -1768,13 +1759,14 @@ function RefreshFunctionsKadroGrup() {
                     async: false,
                     dataType: 'json',
                     success: function(result) {
+                        console.log(result);
                         if (result.success) {
                             iziSuccess();
                             TargetListOrder = Number(ListOrder) - 1;
                             var upbtn = $(vars.sectionShowBases.KadroGrup + ' tr .item-up[data2=' + ListOrder + ']')
                             var downbtn = $(vars.sectionShowBases.KadroGrup + ' tr .item-down[data2=' + ListOrder + ']')
                             var tr = upbtn.parents('tr:first');
-                            if ($(vars.sectionShowBases.KadroGrup + ' tr .item-up[data2=' + TargetListOrder + ']').length) {
+                            if ($('tr .item-up[data2=' + TargetListOrder + ']').length) {
                                 var targetupbtn = $(vars.sectionShowBases.KadroGrup + ' tr .item-up[data2=' + TargetListOrder + ']')
                                 var targetdownbtn = $(vars.sectionShowBases.KadroGrup + ' tr .item-down[data2=' + TargetListOrder + ']')
                                 var targettr = targetupbtn.parents('tr:first');

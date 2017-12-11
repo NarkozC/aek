@@ -1,4 +1,8 @@
   <meta name="description" content="Özel Ankara Eğitim Kurumları, 1994 de Okul Öncesi ile başladığı eğitim hayatına, daha sonra diğer okullarını da ekleyerek eğitim öğretim hayatına devam ediyor.">
+  <meta name="keywords" content="aek, dek, kolej, doktorlar,ankara eğitim kurumları" />
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="alternate" hreflang="tr" href="<?php echo base_url(); ?>" />
   <link rel="alternate" hreflang="en" href="<?php echo base_url(); ?>en" />
   <link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url(); ?>resources/images/aek-logo.png" />
@@ -10,7 +14,8 @@
   <script src="<?php echo base_url(); ?>resources/js/jquery.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/jssor.slider.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/headerscript.js"></script>
-  <script src="<?php echo base_url(); ?>resources/js/Front/nav-ust.js"></script>
+  <script src="<?php echo base_url(); ?>resources/js/Front/general-popup.js"></script>
+  <script src="<?php echo base_url(); ?>resources/js/Front/general-navbar.js"></script>
 </head>
 <body>
 <div id="loader-container">
@@ -60,7 +65,7 @@
         HingeUpToDown
         ScaleTopToBottom
         -->
-        <ul class="nav navbar-nav navbar-left HingeUpToDown" id="showNavUst">
+        <ul class="nav navbar-nav navbar-left HingeUpToDown" id="showNavbar">
           <!-- Left side navigation-->
 
 

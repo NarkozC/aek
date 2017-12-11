@@ -1,65 +1,73 @@
 var vars = {
-    form: 'form',
-    modal: 'modal',
-    sectionNameNormal: 'Sınav Takvimi',
-    sectionNameLower: 'sinavTakvimi',
-    sectionNameUpper: 'SinavTakvimi',
-    sectionPortalController: baseurl + 'Portal/Admin/Sinav-Takvimi/',
-    sectionController: baseurl + 'Sinav-Takvimi/',
-    sectionShowBase: '.panel-body',
-    sectionGetFunction: 'GetSinavTakvimi',
-    sectionAddFunction: 'AddSinavTakvimi',
-    sectionUpdateFunction: 'UpdateSinavTakvimi',
-    sectionEditFunction: 'EditSinavTakvimi',
-    sectionDeleteFunction: 'DeleteSinavTakvimi',
-    sectionNumFunction: 'GetSinavTakvimiNum',
-    sectionOpenModalButton: 'SinavTakvimiOpenModal',
-    sectionAddUpdateSubmitButton: 'SinavTakvimiAddUpdateSubmit',
-    sectionEditButton: 'item-edit',
-    sectionDeleteButton: 'item-delete',
-    sectionIsFirst: true,
-
+    sectionObjects: {
+        Form: 'form',
+        Modal: 'modal',
+    },
+    sectionControllers: {
+        Normal: baseurl + 'Sinav-Takvimi/',
+        Portal: baseurl + 'Portal/Admin/Sinav-Takvimi/',
+    },
+    sectionNames: {
+        Normal: 'Sınav Takvimi',
+        Upper: 'SinavTakvimi',
+        Lower: 'sinavTakvimi',
+    },
+    sectionShowBases: {
+        Sections: 'showSinavTakvimi',
+        Num: 'showNum',
+        Modal: 'showSectionsModal',
+    },
+    sectionFunctions: {
+        Get: 'GetSinavTakvimi',
+        Add: 'AddSinavTakvimi',
+        Update: 'UpdateSinavTakvimi',
+        Edit: 'EditSinavTakvimi',
+        Delete: 'DeleteSinavTakvimi',
+    },
+    sectionButtons: {
+        OpenModal: 'SinavTakvimiOpenModal',
+        Submit: 'SinavTakvimiSubmit',
+    },
     sectionDatas: {
-        Dersler: GetDerslerData(),
-        Yil: GetYillarData(),
+        SinavTakvimi: {
+            Data: new Array(),
+            FData: new Array(),
+            Num: 0,
+        },
+
         Okullar: GetOkullarData(),
-    }
+        Yillar: GetYillarData(),
+        Dersler: GetDerslerData(),
+        Subeler: GetSubelerData(),
+        Siniflar: GetSiniflarData(),
+    },
+    sectionSPs: {
+        Yil: 'Yil',
+        Ders: 'Ders',
+        Sube: 'Sube',
+    },
+    sectionIsFirst: true,
 };
 
 $(function() {
 
     //Refresh Page
-    RefreshHtmls();
-    RefreshData(1);
-    var derslerA = GetDersler()
+    RefreshData(1, 1, 1);
 
 
     //Button that opens add/update modal
-    $('#' + vars.sectionOpenModalButton).click(function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var formAction = vars.sectionPortalController + vars.sectionAddFunction;
-            $(vars.form).attr('action', formAction);
-            ResetForm(vars.form);
-            if (en) {
-                $('#tr_Ders').hide();
-                $('#en_Ders').show();
-            } else {
-                $('#tr_Ders').show();
-                $('#en_Ders').hide();
-            }
-            $('.nav-tabs a[href="#' + formTabs.Turkce + '"]').tab('show');
-            $(vars.modal).modal('show');
-        }
-        $link.data('lockedAt', +new Date());
-    });
+    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
+        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+        vars.sectionObjects.Form, vars.sectionObjects.Modal);
+
+
 
     //Button for posting data for add/update
-    $('#' + vars.sectionAddUpdateSubmitButton).click(function(e) {
+    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
         var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var url = vars.form.attr('action');
-            var data = vars.form.serializeArray();
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+            var url = vars.sectionObjects.Form.attr('action');
+            var data = vars.sectionObjects.Form.serializeArray();
             data.push({
                 name: 'English',
                 value: String(en)
@@ -68,59 +76,33 @@ $(function() {
             var dataTarget;
             var dataTargetSecond;
 
-            if (en) {
-                dataTarget = "en_Ders";
-                dataTargetSecond = "tr_Ders";
-            } else {
-                dataTarget = "tr_Ders";
-                dataTargetSecond = "en_Ders";
-            }
-            var firstDers = "";
-            var secondaryDers = "";
-
-            for (var i = 0; i < data.length; i++) {
-                if (data[i].name == dataTarget) {
-                    firstDers = data[i];
-                }
-                if (data[i].name == dataTargetSecond) {
-                    if (firstDers.value != "") {
-                        for (var j = 0; j < derslerA.length; j++) {
-                            if (en) {
-                                if (derslerA[j][0] != undefined && firstDers.value == derslerA[j][1]) {
-                                    data[i].value = derslerA[j][0];
-                                }
-                            } else {
-                                if (derslerA[j][1] != undefined && firstDers.value == derslerA[j][0]) {
-                                    data[i].value = derslerA[j][1];
-                                }
-                            }
-
-
-                        }
-                    }
-                }
-            }
-
             dataTarget = "Sube[]";
-            var okul_KoduA = new Array;
-            var okul_KoduS = '';
-            var okul_KoduC = 0;
+            var okulA = new Array();
+            var okulS = '';
             for (var i = 0; i < data.length; i++) {
                 if (data[i].name == dataTarget) {
                     var splittedValue = data[i].value.split('-');
-                    if (okul_KoduA.indexOf(splittedValue[0]) == -1) {
-                        okul_KoduA[okul_KoduC] = splittedValue[0];
-                        okul_KoduS += splittedValue[0] + ',';
-                        okul_KoduC++;
+                    var compareSube = vars.sectionDatas.Siniflar.filter(function(sinif) {
+                        return sinif.Kod == splittedValue[0];
+                    });
+
+                    okulA = new Array();
+                    var okulSTemp = okulS.split(',');
+                    var compareString = okulSTemp.filter(function(oS) {
+                        return oS == compareSube[0].Okul;
+                    });
+
+                    var oSinArray = jQuery.inArray(compareSube[0].Okul, compareString)
+                    if (oSinArray == -1) {
+                        okulS += compareSube[0].Okul + ',';
                     }
                 }
             }
-            okul_KoduS = okul_KoduS.substring(0, okul_KoduS.length - 1);
+            okulS = okulS.substring(0, okulS.length - 1);
             data.push({
-                name: 'Okul_Kodu',
-                value: okul_KoduS
+                name: 'Okul',
+                value: okulS
             });
-
             $.ajax({
                 type: 'ajax',
                 method: 'post',
@@ -132,36 +114,61 @@ $(function() {
                     ResetFormErrors();
                     if (response.success) {
                         ResetSelectpicker();
-                        if (response.type == 'add') {
-                            $(vars.modal).modal('hide');
-                            RefreshData();
+                        var trArray;
+                        var newSayfa = response.sayfa;
+                        var willRefresh = false;
 
-                        } else if (response.type == 'update') {
+                        if (response.type == 'add') {
+                            willRefresh = true;
+                        } else {
                             var no = response.data.No;
-                            var trInside = GetHtmlTr(response.data);
-                            $(vars.modal).modal('hide');
-                            $('tr .' + vars.sectionEditButton + '[data=' + no + ']').parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
-                                $('tr .' + vars.sectionEditButton + '[data=' + no + ']').parents('tr:first').html(trInside);
-                                RefreshData();
-                                $(this).css('background-color', '#EDEDED').fadeIn();
+                            var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
+                            var oldSayfa = editBtn.parents('.tab-pane.fade.active.in').attr('id');
+
+                            newSayfa = newSayfa.split(',');
+                            var newSayfaTemp = new Array();
+                            for (var i = 0, length = newSayfa.length; i < length; i++) {
+                                newSayfaTemp[i] = GetOkullarData(0, newSayfa[i]);
+                            }
+                            var compareSayfa = newSayfaTemp.filter(function(sayfa) {
+                                return sayfa[0].ShowID == oldSayfa;
                             });
+
+                            if (compareSayfa.length > 0) {
+                                var curData = GetCurData(response.data);
+                                trArray = new Array('ozel-Tarih', 'Yil', 'ozel-Ders', 'Sube');
+                                var trInside = GetHtmlTr(curData, trArray);
+                                editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
+                                    editBtn.parents('tr:first').html(trInside);
+                                    $(this).css('background-color', '#EDEDED').fadeIn();
+                                });
+                            } else {
+                                willRefresh = true;
+                            }
+
                         }
+                        $(vars.sectionObjects.Modal).modal('hide');
                         iziSuccess();
+                        if (willRefresh) {
+                            setTimeout(function() {
+                                RefreshData(1, 1, 1)
+                            }, 310);
+                        }
                     } else {
                         var ajaxGroup;
                         if (response.messages.length != 0) {
                             ShowFormErrors(response.messages);
                         } else {
-                            RefreshData(1)
+                            RefreshData(1, 1, 1)
 
-                            $(vars.modal).modal('hide');
+                            $(vars.sectionObjects.Modal).modal('hide');
                             iziError();
                         }
                     }
                 },
                 error: function() {
-                    RefreshData(1)
-                    $(vars.modal).modal('hide');
+                    RefreshData(1, 1, 1)
+                    $(vars.sectionObjects.Modal).modal('hide');
                     iziError();
                 }
             });
@@ -170,52 +177,45 @@ $(function() {
         $link.data('lockedAt', +new Date());
     });
 
-
     //Button for editing
-    $(vars.sectionShowBase).on('click', '.' + vars.sectionEditButton, function(e) {
+    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
         var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var No = $(this).attr('data');
-            $(vars.form).attr('action', vars.sectionPortalController + vars.sectionUpdateFunction);
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+            var no = $(this).attr('data');
+            var sayfa = $(this).parents('.tab-pane.fade.active.in').attr('id')
+            $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
             $.ajax({
                 type: 'ajax',
                 method: 'post',
-                url: vars.sectionPortalController + vars.sectionEditFunction,
+                url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
                 data: {
-                    No: No
+                    No: no
                 },
                 async: false,
                 dataType: 'json',
                 success: function(result) {
-                    ResetForm(vars.form);
-                    if (result.success) {
-                        var subelerA = result.data.Sube.split(',');
-                        $('input[name=No]').val(result.data.No);
-                        $('#tr_Aciklama').val(result.data.tr_Aciklama);
-                        $('#en_Aciklama').val(result.data.en_Aciklama);
-                        $('#SubeSelect').selectpicker('val', subelerA);
-                        $('#YilSelect').selectpicker('val', result.data.Yil);
-                        $('#tr_DersSelect').selectpicker('val', result.data.tr_Ders);
-                        $('#en_DersSelect').selectpicker('val', result.data.en_Ders);
-                        if (en) {
-                            $('#tr_Ders').hide();
-                            $('#en_Ders').show();
+                    setTimeout(function() {
+                        ResetForm(vars.sectionObjects.Form);
+                        if (result.success) {
+                            var SubeArray = result.data.Sube.split(',');
+                            $('input[name=No]').val(result.data.No);
+                            $('#' + vars.sectionSPs.Yil + 'Select').selectpicker('val', result.data.Yil);
+                            $('#' + vars.sectionSPs.Ders + 'Select').selectpicker('val', result.data.Ders);
+                            $('#tr_Aciklama').val(result.data.tr_Aciklama);
+                            $('#en_Aciklama').val(result.data.en_Aciklama);
+                            $('#' + vars.sectionSPs.Sube + 'Select').selectpicker('val', SubeArray);
+                            $('#Tarih').val(result.data.Tarih);
+
+                            $('.nav-tabs a[href="#' + formTabs['Turkce'] + '"]').tab('show');
+                            $(vars.sectionObjects.Modal).modal('show');
                         } else {
-                            $('#tr_Ders').show();
-                            $('#en_Ders').hide();
+                            RefreshData(1, 1, 1)
+                            iziError();
                         }
-                        $('#Tarih').val(result.data.Tarih);
-
-                        $('.nav-tabs a[href="#turkce-tab"]').tab('show');
-                        $(vars.modal).modal('show');
-                    } else {
-                        RefreshData(1)
-                        iziError();
-                    }
-
+                    }, 15);
                 },
                 error: function() {
-                    RefreshData(1)
+                    RefreshData(1, 1, 1)
                     iziError();
                 }
             });
@@ -225,388 +225,292 @@ $(function() {
     });
 
     //Button for deleting
-    $(vars.sectionShowBase).on('click', '.' + vars.sectionDeleteButton, function(e) {
+    FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
+        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+        RefreshData, "1, 1, 1");
+});
+
+function GetYillarSelect() {
+    var i, data = vars.sectionDatas.Yillar,
+        length = data.length,
+        html;
+
+    var tr_ID = vars.sectionSPs.Yil + 'Select';
+    var tr_section = vars.sectionSPs.Yil;
+
+    html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '" id="' + tr_ID + '" title="' + formLang.YilSec + '" data-liveSearchNormalize="true">';
+
+    for (i = 0; i < length; i++) {
+        html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
+    }
+
+    html += '</select>'
+    $('#' + tr_section).html(html);
+    RefreshSelectpicker();
+}
+
+function GetDerslerSelect() {
+    setTimeout(function() {
+        var i, data = vars.sectionDatas.Dersler,
+            length = data.length;
+
+        var tr_ID = vars.sectionSPs.Ders + 'Select';
+        var tr_Section = vars.sectionSPs.Ders;
+
+        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_Section + '" id="' + tr_ID + '" title="' + formLang.DersSec + '" data-liveSearchNormalize="true">';
+
+        for (i = 0; i < length; i++) {
+            html += '<option data-tokens="' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
+        }
+
+        html += '</select>';
+
+        $('#' + tr_Section).html(html);
+        RefreshSelectpicker();
+    }, 5);
+}
+
+function GetSubelerSelect() {
+    var i, data = vars.sectionDatas.Subeler,
+        odata = vars.sectionDatas.Okullar,
+        length = data.length,
+        html = '';
+
+    var tr_ID = vars.sectionSPs.Sube + 'Select';
+    var tr_section = vars.sectionSPs.Sube;
+
+    html += '<button type="button" id="SelectTumOkul" class="btn btn-danger btn-sm marginR5 marginB5">' + formLang.Okul + '</button>';
+
+    for (var j = 1, length2 = odata.length; j < length2; j++) {
+        html += '<button type="button" id="SSube' + odata[j].ShowID + '" class="btn btn-danger btn-sm marginR5 marginB5">' + odata[j].Ad + '</button>';
+    }
+
+    html += '<button type="button" id="SelectSifirla" class="btn btn-danger btn-sm marginR5 marginB5">' + formLang.Sifirla + '</button>' +
+        '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '[]" id="' + tr_ID + '" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
+
+    for (i = 0; i < length; i++) {
+        html += '<option data-tokens="' + data[i].Kod + '" value="' + data[i].Kod + '">' + data[i].Kod + '</option>';
+    }
+
+    html += '</select>'
+    $('#' + tr_section).html(html);
+    RefreshSelectpicker();
+
+    $('#' + tr_section).on('click', '#SelectTumOkul', function(e) {
         var $link = $(e.target);
         if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var btn = $(this);
-            var No = $(this).attr('data');
-
-            iziToast.question({
-                timeout: 15000,
-                close: false,
-                overlay: true,
-                toastOnce: true,
-                id: 'iziDelete',
-                zindex: 999,
-                title: formLang.delTitle,
-                message: formLang.delMessage,
-                position: 'center',
-                buttons: [
-                    ['<button><b>' + formLang.delEvetBtn + '</b></button>', function(instance, toast) {
-
-                        url = vars.sectionPortalController + vars.sectionDeleteFunction;
-                        $.ajax({
-                            type: 'ajax',
-                            method: 'post',
-                            async: false,
-                            url: url,
-                            data: {
-                                No: No
-                            },
-                            dataType: 'json',
-                            success: function(result) {
-                                if (result.success) {
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-
-                                    $(btn).parents('tr:first').css('background-color', '#ccc').fadeOut('slow', function() {
-                                        $(this).remove();
-                                        RefreshData()
-                                    });
-
-                                    iziSuccess();
-                                } else {
-                                    RefreshData(1)
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-                                    iziError();
-                                }
-                            },
-                            error: function() {
-                                RefreshData(1)
-                                instance.hide(toast, {
-                                    transitionOut: 'fadeOutDown'
-                                }, 'button');
-                                iziError();
-                            }
-                        });
-
-                    }, true],
-                    ['<button>' + formLang.delHayirBtn + '</button>', function(instance, toast) {
-
-                        instance.hide(toast, {
-                            transitionOut: 'fadeOutDown'
-                        }, 'button');
-
-                    }]
-                ],
-            });
+            var theArrayTemp = vars.sectionDatas.Subeler;
+            var theArray = new Array();
+            for (var i = 0, length = theArrayTemp.length; i < length; i++) {
+                theArray[i] = theArrayTemp[i].Kod;
+            }
+            var olds = $('#' + tr_ID).val();
+            var newA = $.merge($.merge([], theArray), olds);
+            $('#' + tr_ID).selectpicker('val', newA);
         }
         $link.data('lockedAt', +new Date());
     });
 
+    $('#' + tr_section).on('click', '#SSube' + vars.sectionDatas.Okullar[1].ShowID, function(e) {
+        var $link = $(e.target);
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
+            var theArrayTemp = vars.sectionDatas.Subeler.filter(function(sube) {
+                return sube.Okul == "1";
+            });
+            var theArray = new Array();
+            for (var i = 0, length = theArrayTemp.length; i < length; i++) {
+                theArray[i] = theArrayTemp[i].Kod;
+            }
+            var olds = $('#' + tr_ID).val();
+            var newA = $.merge($.merge([], theArray), olds);
 
-});
+            $('#' + tr_ID).selectpicker('val', newA);
+        }
+        $link.data('lockedAt', +new Date());
+    });
 
-function GetYil() {
-    var tr_ID = 'YilSelect';
-    var tr_section = 'Yil';
-    
+    $('#' + tr_section).on('click', '#SSube' + vars.sectionDatas.Okullar[2].ShowID, function(e) {
+        var $link = $(e.target);
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
+            var theArrayTemp = vars.sectionDatas.Subeler.filter(function(sube) {
+                return sube.Okul == "2";
+            });
+            var theArray = new Array();
+            for (var i = 0, length = theArrayTemp.length; i < length; i++) {
+                theArray[i] = theArrayTemp[i].Kod;
+            }
+            var olds = $('#' + tr_ID).val();
+            var newA = $.merge($.merge([], theArray), olds);
 
-    var tr_html = '<select class="form-control selectpicker" data-live-search="true" name="'+tr_section+'" id="'+tr_ID+'" title="' + formLang.YilSec + '" data-liveSearchNormalize="true">';
+            $('#' + tr_ID).selectpicker('val', newA);
+        }
+        $link.data('lockedAt', +new Date());
+    });
 
-    var data = vars.sectionDatas.Yil;
-    for (i = 0; i < data.length; i++) {
-        tr_html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
-    }
-    tr_html += '</select>';
-    $('#' + tr_section).html(tr_html);
-    RefreshSelectpicker();
+    $('#' + tr_section).on('click', '#SSube' + vars.sectionDatas.Okullar[3].ShowID, function(e) {
+        var $link = $(e.target);
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
+            var theArrayTemp = vars.sectionDatas.Subeler.filter(function(sube) {
+                return sube.Okul == "3";
+            });
+            var theArray = new Array();
+            for (var i = 0, length = theArrayTemp.length; i < length; i++) {
+                theArray[i] = theArrayTemp[i].Kod;
+            }
+            var olds = $('#' + tr_ID).val();
+            var newA = $.merge($.merge([], theArray), olds);
+
+            $('#' + tr_ID).selectpicker('val', newA);
+        }
+        $link.data('lockedAt', +new Date());
+    });
+
+    $('#' + tr_section).on('click', '#SelectSifirla', function(e) {
+        $('#' + tr_ID).selectpicker('deselectAll');
+        $('#' + tr_ID).selectpicker('val', '');
+    });
 }
 
-function GetDersler() {
-    var url = baseurl + 'Genel-Dersler/GetDersler';
-    var dersler = new Array();
+function GetSectionsNum() {
+    $('#' + vars.sectionShowBases.Num).html(vars.sectionDatas.SinavTakvimi.Num);
+}
+
+function CreateSectionsTable() {
+    var i, length;
+    if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('.datatable').DataTable().destroy();
+    }
+
+    for (i = 1, length = vars.sectionDatas.Okullar.length; i < length; i++) {
+        $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.SinavTakvimi.Data[i]);
+    }
+
+    ShortenContent6();
+
+    if (!vars.sectionIsFirst) {
+        CreateDataTables();
+    }
+    vars.sectionIsFirst = false;
+}
+
+function GetSectionsData() {
+    vars.sectionDatas.SinavTakvimi = {
+        Data: new Array(),
+        FData: new Array(),
+        Num: 0,
+    }
+
+    var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
     $.ajax({
         type: 'ajax',
         method: 'post',
         url: url,
         data: {
-            NeedData: true,
+            English: en,
         },
         async: false,
         dataType: 'json',
         success: function(result) {
-            var data = result.data;
-            var tr_ID = 'tr_DersSelect';
-            var tr_section = 'tr_Ders';
-            var en_ID = 'en_DersSelect';
-            var en_section = 'en_Ders';
-            var i;
-
-            var tr_html = '<select class="form-control selectpicker" data-live-search="true" name="'+tr_section+'" id="'+tr_ID+'" title="' + formLang.DersSec + '" data-liveSearchNormalize="true">';
-            var en_html = '<select class="form-control selectpicker" data-live-search="true" name="'+en_section+'" id="'+en_ID+'" title="' + formLang.DersSec + '" data-liveSearchNormalize="true">';
-
-
-            for (var i = 0; i < data.length; i++) {
-                var tr_Ad = data[i].tr_Ad;
-                var en_Ad = data[i].en_Ad;
-                var ders = [tr_Ad, en_Ad];
-                dersler[i] = ders;
-                var Ad;
-                if (en) {
-                    if (en_Ad == "") {
-                        Ad = tr_Ad;
-                    } else {
-                        Ad = en_Ad;
-                    }
-                    tr_html += '<option data-tokens="' + tr_Ad + ' ' + en_Ad + '" value="' + tr_Ad + '">' + Ad + '</option>';
-                    en_html += '<option data-tokens="' + tr_Ad + ' ' + en_Ad + '" value="' + en_Ad + '">' + Ad + '</option>';
-                } else {
-                    Ad = tr_Ad;
-                    tr_html += '<option data-tokens="' + tr_Ad + ' ' + en_Ad + '" value="' + tr_Ad + '">' + Ad + '</option>';
-                    en_html += '<option data-tokens="' + tr_Ad + ' ' + en_Ad + '" value="' + en_Ad + '">' + Ad + '</option>';
-                }
-            }
-            tr_html += '</select>';
-            en_html += '</select>';
-            $('#' + tr_section).html(tr_html);
-            $('#' + en_section).html(en_html);
-            RefreshSelectpicker();
-        },
-        error: function() {
-            iziError();
-        }
-    });
-    return dersler;
-}
-
-function GetSubeler() {
-    var url = baseurl + 'Genel-Subeler/GetSubeler';
-    var subeler = new Array();
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
-        data: {
-            NeedData: "true",
-        },
-        async: false,
-        dataType: 'json',
-        success: function(result) {
-            var data = result.data;
-            var odata = vars.sectionDatas.Okullar;
-            var tr_ID = 'SubeSelect';
-            var tr_section = 'Sube';
-            var dataArrays = new Array();
-            var dataArrayNames = new Array('Tumokul', 'Ilkokul', 'Ortaokul', 'AnadoluLisesi');
-            var dataArrayCounters = new Array(0, 0, 0, 0);
-            dataArrays = {
-                Tumokul: new Array(),
-                Ilkokul: new Array(),
-                Ortaokul: new Array(),
-                AnadoluLisesi: new Array(),
-            }
-
-            var i;
-            var tr_html = '<button type="button" id="SelectTumOkul" class="btn btn-danger btn-sm marginR5 marginB5">Okul</button>' +
-                '<button type="button" id="SelectIlkokul" class="btn btn-danger btn-sm marginR5 marginB5">İlkokul</button>' +
-                '<button type="button" id="SelectOrtaokul" class="btn btn-danger btn-sm marginR5 marginB5">Ortaokul</button>' +
-                '<button type="button" id="SelectAnadolu" class="btn btn-danger btn-sm marginR5 marginB5">Anadolu Lisesi</button>' +
-                '<button type="button" id="SelectSifirla" class="btn btn-danger btn-sm marginR5 marginB5">Sıfırla</button>' +
-                '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '[]" id="' + tr_ID + '" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
-
-            for (var i = 0; i < data.length; i++) {
-                var okul_Kodu = data[i].Okul_Kodu;
-                for (var j = 1; j < odata.length; j++) {
-                    if (okul_Kodu == String(j)) {
-                        dataArrays[dataArrayNames[j]][dataArrayCounters[j]] = data[i].Kod;
-                        dataArrayCounters[j]++;
-                    }
-                }
-                dataArrays['Tumokul'][dataArrayCounters[0]] = data[i].Kod;
-                dataArrayCounters[0]++;
-
-                tr_html += '<option data-tokens="' + data[i].Kod + '" value="' + data[i].Kod + '">' + data[i].Kod + '</option>';
-            }
-            subeler = [dataArrays['Tumokul'], dataArrays['Ilkokul'], dataArrays['Ortaokul'], dataArrays['AnadoluLisesi']];
-            tr_html += '</select>';
-            $('#' + tr_section).html(tr_html);
-            RefreshSelectpicker();
-
-
-            $('#' + tr_section).on('click', '#SelectTumOkul', function(e) {
-                var $link = $(e.target);
-                if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-                    var theArray = subeler[0];
-                    var olds = $('#' + tr_ID).val();
-                    var newA = $.merge($.merge([], theArray), olds);
-                    $('#' + tr_ID).selectpicker('val', newA);
-                }
-                $link.data('lockedAt', +new Date());
-            });
-
-            $('#' + tr_section).on('click', '#SelectIlkokul', function(e) {
-                var $link = $(e.target);
-                if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-                    var theArray = subeler[1];
-                    var olds = $('#' + tr_ID).val();
-                    var newA = $.merge($.merge([], theArray), olds);
-                    $('#' + tr_ID).selectpicker('val', newA);
-                }
-                $link.data('lockedAt', +new Date());
-            });
-
-            $('#' + tr_section).on('click', '#SelectOrtaokul', function(e) {
-                var $link = $(e.target);
-                if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-                    var theArray = subeler[2];
-                    var olds = $('#' + tr_ID).val();
-                    var newA = $.merge($.merge([], theArray), olds);
-                    $('#' + tr_ID).selectpicker('val', newA);
-                }
-                $link.data('lockedAt', +new Date());
-            });
-
-            $('#' + tr_section).on('click', '#SelectAnadolu', function(e) {
-                var $link = $(e.target);
-                if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-                    var theArray = subeler[3];
-                    var olds = $('#' + tr_ID).val();
-                    var newA = $.merge($.merge([], theArray), olds);
-                    $('#' + tr_ID).selectpicker('val', newA);
-                }
-                $link.data('lockedAt', +new Date());
-            });
-
-            $('#' + tr_section).on('click', '#SelectSifirla', function(e) {
-                $('#' + tr_ID).selectpicker('deselectAll');
-                $('#' + tr_ID).selectpicker('val', '');
-            });
-
-        },
-        error: function() {
-            iziError();
-        }
-    });
-    return subeler;
-}
-
-function GetSinavTakvimiNum() {
-    var url = vars.sectionController + vars.sectionNumFunction;
-
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
-        async: false,
-        dataType: 'json',
-        success: function(data) {
-            var html = data;
-            $('#num').html(html);
-        },
-        error: function() {
-            iziError();
-        }
-    });
-}
-
-function GetSinavTakvimi() {
-    var url = vars.sectionController + vars.sectionGetFunction;
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
-        async: false,
-        dataType: 'json',
-        success: function(data) {
-            var i;
-            var okulKodu;
-            var htmls = new Array();
-            var odata = vars.sectionDatas.Okullar;
-
-
-            for (var i = 1; i < odata.length; i++) {
-                htmls[odata[i].ShowID] = '';
-            }
-
-            for (i = 0; i < data.length; i++) {
-                okulKodu = data[i].Okul_Kodu.split(',');
-                for (var j = 0; j < okulKodu.length; j++) {
-                    for (var k = 1; k < odata.length; k++) {
-                        if (okulKodu[j] == k) {
-                            var trInside = GetHtmlTr(data[i]);
-                            htmls[odata[k].ShowID] += '<tr>' + trInside + '</tr>';
-                        }
-                    }
-                }
-            }
-
-            if ($.fn.DataTable.isDataTable('.datatable')) {
-                $('.datatable').DataTable().destroy();
-            }
-
-            for (var j = 1; j < odata.length; j++) {
-                $('#show' + vars.sectionNameUpper + 'Data' + odata[j].ShowID).html(htmls[odata[j].ShowID]);
-            }
-
-            if (!vars.sectionIsFirst) {
-                CreateDataTables();
-            }
-            vars.sectionIsFirst = false;
-        },
-        error: function() {
-            iziError();
-        }
-    });
-}
-
-function GetHtmlTr(data) {
-    var no = data.No;
-    var yil = data.Yil;
-    var sube = data.Sube;
-    var tarih = data.Tarih.split('-');
-    tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
-
-    var trEnNames = new Array(
-        'Aciklama'
-    );
-
-    var trEnDatas = new Array();
-    trEnDatas = {
-        Aciklama: ''
-    }
-
-    for (var i = 0; i < trEnNames.length; i++) {
-        var trData = 'tr_' + trEnNames[i];
-        var enData = 'en_' + trEnNames[i];
-        if (en) {
-            if (data[enData] == "") {
-                trEnDatas[trEnNames[i]] = data[trData];
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.SinavTakvimi;
+                vars.sectionDatas.SinavTakvimi = cache;
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.SinavTakvimi;
+                vars.sectionDatas.SinavTakvimi = cache;
             } else {
-                trEnDatas[trEnNames[i]] = data[enData];
+                var i, j, data = result.data,
+                    length, length2, htmls = {};
+                var curData, trInside, trArray;
+
+                for (i = 1, length = vars.sectionDatas.Okullar.length; i < length; i++) {
+                    htmls[vars.sectionDatas.Okullar[i].Kod] = '';
+                }
+
+                for (i = 0, length = data.length; i < length; i++) {
+                    curData = GetCurData(data[i]);
+
+                    curData.Ders = vars.sectionDatas.Dersler.filter(function(ders) {
+                        return ders.Kod == curData.Ders;
+                    });
+                    if (curData.Ders[0] != undefined) {
+                        curData.Ders = curData.Ders[0].Ad;
+                    }
+
+                    curData.Tarih = curData.Tarih.split('-');
+                    curData.Tarih = curData.Tarih[2] + '.' + curData.Tarih[1] + '.' + curData.Tarih[0];
+                    vars.sectionDatas.SinavTakvimi.FData[i] = curData;
+
+
+                    okul = curData.Okul.split(',');
+
+                    for (j = 0, length2 = okul.length; j < length2; j++) {
+                        trArray = new Array('Tarih', 'Yil', 'Ders', 'Sube');
+                        trInside = GetHtmlTr(curData, trArray);
+                        htmls[okul[j]] += '<tr>' + trInside + '</tr>';
+                    }
+                }
+                vars.sectionDatas.SinavTakvimi.Data = htmls;
+                vars.sectionDatas.SinavTakvimi.Num = length;
+
+                var theCacheData = {
+                    SinavTakvimi: vars.sectionDatas.SinavTakvimi,
+                }
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+            }
+        },
+        error: function() {
+            iziError();
+        }
+    });
+}
+
+function GetHtmlTr(data, trArray) {
+    var i;
+    var newHtml = '';
+    var length = trArray.length;
+    var no = data.No;
+
+    for (i = 0; i < length; i++) {
+        var trArrayTemp = trArray[i].split('-');
+        if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "Tarih") {
+            var tarih = data.Tarih.split('-');
+            tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
+
+            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+        } else if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "Ders") {
+            var dersTemp = vars.sectionDatas.Dersler.filter(function(ders) {
+                return ders.Kod == data.Ders;
+            });
+            if (dersTemp.length > 0) {
+                newHtml += '<td class="shorten_content6">' + dersTemp[0].Ad + '</td>';
+            } else {
+                newHtml += '<td class="shorten_content6">' + trArrayTemp[1] + '</td>';
             }
         } else {
-            trEnDatas[trEnNames[i]] = data[trData];
+            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
         }
     }
-
-
-    newHtml =
-        '<td class="shorten_content6">' + yil + '</td>' +
-        '<td class="shorten_content6">' + tarih + '</td>' +
-        '<td class="shorten_content6">' + sube + '</td>' +
-        '<td class="shorten_content6">' + trEnDatas.Aciklama + '</td>' +
+    newHtml +=
         '<td>' +
-        '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + vars.sectionEditButton + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+        '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
         '</td>' +
         '<td>' +
-        '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + vars.sectionDeleteButton + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+        '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
         '</td>';
+
     return newHtml;
 }
 
-function GetAddUpdateModalHtml() {
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNameLower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
+function GetSectionsModalHtml() {
+
+    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog">' +
         '<div class="modal-content">' +
         '<div class="modal-header" align="center">' +
         '<img class="maxW150" src="' + logoUrl + '">' +
-        '<button type="button" class="close hvr-icon-spin" data-dismiss="modal" aria-label="Close"></button>' +
+        modalOpts.ModalCloseButton +
         '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNameLower + '-form" class="form-horizontal" action="' + vars.sectionPortalController + vars.sectionAddFunction + '">' +
+        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
         '<div class="modal-body">' +
         '<ul class="nav nav-tabs" role="tablist">' +
         '<li role="presentation" class="active"><a class="hvr-wobble-top" href="#' + formTabs.Turkce + '" aria-controls="' + formTabs.Turkce + '" role="tab" data-toggle="tab">' + formLang.Turkce + '</a></li>' +
@@ -614,62 +518,64 @@ function GetAddUpdateModalHtml() {
         '</ul>' +
         '<div class="tab-content">' +
         '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
+        '<div class="ajax-group col-sm-12 paddingLR0">' +
+        '<label>' + formLang.Yil + '</label>' +
+        '<div id="' + vars.sectionSPs.Yil + '"></div>' +
+        '</div>' +
+        '<div class="ajax-group col-sm-12 paddingLR0">' +
+        '<label>' + formLang.Ders + '</label>' +
+        '<div id="' + vars.sectionSPs.Ders + '"></div>' +
+        '</div>' +
+        '<div class="ajax-group col-sm-12 paddingLR0">' +
+        '<label>' + formLang.Sube + '</label>' +
+        '<div id="' + vars.sectionSPs.Sube + '"></div>' +
+        '</div>' +
+        '<div class="ajax-group col-sm-12 paddingLR0">' +
+        '<label>' + formLang.Tarih + '</label>' +
+        '<input name="Tarih" id="Tarih" class="form-control" type="date" placeholder="' + formLang.Tarih + '">' +
+        '</div>' +
         '<div role="tabpanel" class="tab-pane fade in active" id="' + formTabs.Turkce + '">' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Aciklama + '</label>' +
-        '<textarea rows="3" name="tr_Aciklama" id="tr_Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '"></textarea>' +
+        '<label>' + formLang.Aciklama + '</label> <br>' +
+        '<textarea name="tr_Aciklama" id="tr_Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '" rows="3"></textarea>' +
         '</div>' +
         '</div>' +
         '<div role="tabpanel" class="tab-pane fade" id="' + formTabs.Ingilizce + '">' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Aciklama + '</label>' +
-        '<textarea rows="3" name="en_Aciklama" id="en_Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '"></textarea>' +
+        '<label>' + formLang.Aciklama + '</label> <br>' +
+        '<textarea name="en_Aciklama" id="en_Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '" rows="3"></textarea>' +
         '</div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Sube + '</label>' +
-        '<div id="Sube"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Ders + '</label>' +
-        '<div id="tr_Ders"></div>' +
-        '<div id="en_Ders"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Yil + '</label>' +
-        '<div id="Yil"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Tarih + '</label>' +
-        '<input name="Tarih" id="Tarih" class="form-control" type="date">' +
         '</div>' +
         '</div>' +
         '</div>' +
         '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionAddUpdateSubmitButton + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
+        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
         '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
         '</div>' +
-        '</form>' +
+        '</form> ' +
         '</div>' +
         '</div>' +
         '</div>';
-    $('#showAddUpdateModal').html(html);
-    vars.form = $('#' + vars.sectionNameLower + '-form');
-    vars.modal = $('#' + vars.sectionNameLower + '-modal');
+    $('#' + vars.sectionShowBases.Modal).html(html);
+    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
 }
 
-function GetSinavTakvimiHtml() {
+function GetSectionsHtml() {
     var html = '';
-    var data = vars.sectionDatas.Okullar;
-    var isFirstJ = true;
+    var thei = true;
+    var i = 0,
+        data = vars.sectionDatas.Okullar,
+        length = data.length;
 
-    html += '<section id="' + vars.sectionNameLower + '" class="marginTB25">' +
+    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
         '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+        '<div class="col-lg-12 page-header text-center">' +
         '<h2>' +
-        '<button id="' + vars.sectionOpenModalButton + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        vars.sectionNameNormal +
-        '<span id="num" class="badge"></span>' +
+        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
+        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
+        vars.sectionNames.Normal +
+        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
         '</div>' +
         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
@@ -678,13 +584,13 @@ function GetSinavTakvimiHtml() {
         '<div class="panel-heading">' +
         '<ul class="nav nav-tabs">';
 
-    isFirstJ = true;
-    for (var j = 1; j < data.length; j++) {
-        if (isFirstJ) {
-            html += '<li class="active"><a href="#' + data[j].ShowID + '" data-toggle="tab">' + data[j].Ad + '</a></li>';
-            isFirstJ = false;
+    thei = true;
+    for (i = 1; i < length; i++) {
+        if (thei) {
+            html += '<li class="active"><a href="#' + data[i].ShowID + '" data-toggle="tab">' + data[i].Ad + '</a></li>';
+            thei = false;
         } else {
-            html += '<li><a href="#' + data[j].ShowID + '" data-toggle="tab">' + data[j].Ad + '</a></li>';
+            html += '<li><a href="#' + data[i].ShowID + '" data-toggle="tab">' + data[i].Ad + '</a></li>';
         }
     }
 
@@ -693,25 +599,25 @@ function GetSinavTakvimiHtml() {
         '<div class="panel-body">' +
         '<div class="tab-content">';
 
-    isFirstJ = true;
-    for (var j = 1; j < data.length; j++) {
-        if (isFirstJ) {
-            html += '<div class="tab-pane fade in active" id="' + data[j].ShowID + '">';
-            isFirstJ = false;
+    thei = true;
+    for (i = 1; i < length; i++) {
+        if (thei) {
+            html += '<div class="tab-pane fade in active" id="' + data[i].ShowID + '">';
+            thei = false;
         } else {
-            html += '<div class="tab-pane fade" id="' + data[j].ShowID + '">';
+            html += '<div class="tab-pane fade" id="' + data[i].ShowID + '">';
         }
         html += '<div class="table-responsive">' +
             '<table class="table table-bordered table-hover datatable">' +
             '<thead class="text-center">' +
-            '<th class="text-center">' + formLang.Yil + '</th>' +
             '<th class="text-center">' + formLang.Tarih + '</th>' +
+            '<th class="text-center">' + formLang.Yil + '</th>' +
+            '<th class="text-center">' + formLang.Ders + '</th>' +
             '<th class="text-center">' + formLang.Sube + '</th>' +
-            '<th class="text-center">' + formLang.Aciklama + '</th>' +
             '<th class="text-center">' + formLang.Duzenle + '</th>' +
             '<th class="text-center">' + formLang.Sil + '</th>' +
             '</thead>' +
-            '<tbody id="show' + vars.sectionNameUpper + 'Data' + data[j].ShowID + '">' +
+            '<tbody id="show' + vars.sectionNames.Upper + 'Data' + data[i].ShowID + '">' +
             '</tbody>' +
             '</table>' +
             '</div>' +
@@ -724,37 +630,35 @@ function GetSinavTakvimiHtml() {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div id="showAddUpdateModal"></div>' +
-        '<div id="ShowAddResimModal"></div>' +
+        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
         '</div>' +
         '</section>';
 
-    $('#show' + vars.sectionNameUpper).html(html);
-}
-
-function RefreshData(refreshSide = 0) {
-    GetSinavTakvimi();
-    RefreshSideData(refreshSide)
+    $('#' + vars.sectionShowBases.Sections).html(html);
 }
 
 var isFirst = true;
 
-function RefreshSideData(refresh = 0) {
-    GetSinavTakvimiNum();
-    $(function() {
+function RefreshData(main = 1, html = 0, side = 0) {
+    if (main == 1) {
+        GetSectionsData();
+    }
+    if (html != 0) {
+        GetSectionsHtml()
+        GetSectionsModalHtml()
+        CreateSectionsTable()
+    }
+    if (side != 0) {
+        GetYillarSelect();
+        GetDerslerSelect();
+        GetSubelerSelect();
+    }
+
+    setTimeout(function() {
         if (!isFirst) {
             ShortenContent6();
         }
-        if (refresh = 1) {
-            GetSubeler();
-            GetYil()
-        }
         isFirst = false;
-
-    });
-}
-
-function RefreshHtmls() {
-    GetSinavTakvimiHtml()
-    GetAddUpdateModalHtml()
+    }, 5);
+    GetSectionsNum();
 }

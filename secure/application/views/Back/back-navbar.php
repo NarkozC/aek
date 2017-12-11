@@ -9,6 +9,7 @@
   <script src="<?php echo base_url(); ?>resources/js/jquery.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/jssor.slider.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/headerscript.js"></script>
+  <script src="<?php echo base_url(); ?>resources/js/Back/portal-helper.js"></script>
   <!--<script src="<?php echo base_url(); ?>resources/js/Back/nav-ust.js"></script>-->
 
 </head>

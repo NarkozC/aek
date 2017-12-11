@@ -1,56 +1,69 @@
 var vars = {
-    form: 'form',
-    modal: 'modal',
-    sectionNameNormal: 'Duyurular - Etkinlikler',
-    sectionNameLower: 'duyurularEtkinlikler',
-    sectionNameUpper: 'DuyurularEtkinlikler',
-    sectionPortalController: baseurl + 'Portal/Admin/Duyurular-Etkinlikler/',
-    sectionController: baseurl + 'Duyurular-Etkinlikler/',
-    sectionShowBase: '.panel-body',
-    sectionGetFunction: 'GetDuyurularEtkinlikler',
-    sectionAddFunction: 'AddDuyurularEtkinlikler',
-    sectionUpdateFunction: 'UpdateDuyurularEtkinlikler',
-    sectionEditFunction: 'EditDuyurularEtkinlikler',
-    sectionDeleteFunction: 'DeleteDuyurularEtkinlikler',
-    sectionNumFunction: 'GetDuyurularEtkinliklerNum',
-    sectionOpenModalButton: 'DuyurularEtkinliklerOpenModal',
-    sectionAddUpdateSubmitButton: 'DuyurularEtkinliklerAddUpdateSubmit',
-    sectionEditButton: 'item-edit',
-    sectionDeleteButton: 'item-delete',
-    sectionIsFirst: true,
-
+    sectionObjects: {
+        Form: 'form',
+        Modal: 'modal',
+    },
+    sectionControllers: {
+        Normal: baseurl + 'Duyurular-Etkinlikler/',
+        Portal: baseurl + 'Portal/Admin/Duyurular-Etkinlikler/',
+    },
+    sectionNames: {
+        Normal: 'Duyurular Etkinlikler',
+        Upper: 'DuyurularEtkinlikler',
+        Lower: 'duyurularEtkinlikler',
+    },
+    sectionShowBases: {
+        Sections: 'showDuyurularEtkinlikler',
+        Num: 'showNum',
+        Modal: 'showSectionsModal',
+    },
+    sectionFunctions: {
+        Get: 'GetDuyurularEtkinlikler',
+        Add: 'AddDuyurularEtkinlikler',
+        Update: 'UpdateDuyurularEtkinlikler',
+        Edit: 'EditDuyurularEtkinlikler',
+        Delete: 'DeleteDuyurularEtkinlikler',
+    },
+    sectionButtons: {
+        OpenModal: 'DuyurularEtkinliklerOpenModal',
+        Submit: 'DuyurularEtkinliklerSubmit',
+    },
     sectionDatas: {
-        Resimler: GetResimlerData(),
+        DuyurularEtkinlikler: {
+            Data: new Array(),
+            Num: 0,
+        },
+
         Okullar: GetOkullarData(),
-    }
+        Resimler: GetResimlerData(),
+    },
+    sectionSPs: {
+        Okul: 'Okul',
+        AnaResim: 'AnaResim',
+        DigerResimler: 'DigerResimler',
+    },
+    sectionIsFirst: true,
 };
 
 $(function() {
 
     //Refresh Page
-    RefreshHtmls();
-    RefreshData(1);
+    RefreshData(1, 1, 1);
 
 
     //Button that opens add/update modal
-    $('#' + vars.sectionOpenModalButton).click(function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var formAction = vars.sectionPortalController + vars.sectionAddFunction;
-            $(vars.form).attr('action', formAction);
-            ResetForm(vars.form);
-            $('.nav-tabs a[href="#' + formTabs.Turkce + '"]').tab('show');
-            $(vars.modal).modal('show');
-        }
-        $link.data('lockedAt', +new Date());
-    });
+    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
+                vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+                vars.sectionObjects.Form, vars.sectionObjects.Modal);
+
+
 
     //Button for posting data for add/update
-    $('#' + vars.sectionAddUpdateSubmitButton).click(function(e) {
+    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
         var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var url = vars.form.attr('action');
-            var data = vars.form.serializeArray();
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+            var url = vars.sectionObjects.Form.attr('action');
+            var data = vars.sectionObjects.Form.serializeArray();
             data.push({
                 name: 'English',
                 value: String(en)
@@ -66,36 +79,60 @@ $(function() {
                     ResetFormErrors();
                     if (response.success) {
                         ResetSelectpicker();
-                        if (response.type == 'add') {
-                            $(vars.modal).modal('hide');
-                            RefreshData();
+                        var trArray;
+                        var newSayfa = response.sayfa;
+                        var willRefresh = false;
 
-                        } else if (response.type == 'update') {
+                        if (response.type == 'add') {
+                            willRefresh = true;
+                        } else {
                             var no = response.data.No;
-                            var trInside = GetHtmlTr(response.data);
-                            $(vars.modal).modal('hide');
-                            $('tr .' + vars.sectionEditButton + '[data=' + no + ']').parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
-                                $('tr .' + vars.sectionEditButton + '[data=' + no + ']').parents('tr:first').html(trInside);
-                                RefreshData();
-                                $(this).css('background-color', '#EDEDED').fadeIn();
+                            var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
+                            var oldSayfa = editBtn.parents('.tab-pane.fade.active.in').attr('id');
+
+                            var newSayfaTemp = new Array();
+                            for (var i = 0, length = newSayfa.length; i < length; i++) {
+                                newSayfaTemp[i] = GetOkullarData(0, newSayfa[i]);
+                            }
+                            var compareSayfa = newSayfaTemp.filter(function(sayfa) {
+                                return sayfa[0].ShowID == oldSayfa;
                             });
+
+                            if (compareSayfa.length > 0) {
+                                var curData = GetCurData(response.data);
+                                trArray = new Array('ozel-Tarih', 'Baslik');
+                                var trInside = GetHtmlTr(curData, trArray);
+                                editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
+                                    editBtn.parents('tr:first').html(trInside);
+                                    $(this).css('background-color', '#EDEDED').fadeIn();
+                                });
+                            } else {
+                                willRefresh = true;
+                            }
+
                         }
+                        $(vars.sectionObjects.Modal).modal('hide');
                         iziSuccess();
+                        if (willRefresh) {
+                            setTimeout(function() {
+                                RefreshData(1, 1, 1)
+                            }, 310);
+                        }
                     } else {
                         var ajaxGroup;
                         if (response.messages.length != 0) {
                             ShowFormErrors(response.messages);
                         } else {
-                            RefreshData(1)
+                            RefreshData(1, 1, 1)
 
-                            $(vars.modal).modal('hide');
+                            $(vars.sectionObjects.Modal).modal('hide');
                             iziError();
                         }
                     }
                 },
                 error: function() {
-                    RefreshData(1)
-                    $(vars.modal).modal('hide');
+                    RefreshData(1, 1, 1)
+                    $(vars.sectionObjects.Modal).modal('hide');
                     iziError();
                 }
             });
@@ -105,48 +142,50 @@ $(function() {
     });
 
     //Button for editing
-    $(vars.sectionShowBase).on('click', '.' + vars.sectionEditButton, function(e) {
+    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
         var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var No = $(this).attr('data');
-            $(vars.form).attr('action', vars.sectionPortalController + vars.sectionUpdateFunction);
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+            var no = $(this).attr('data');
+            var sayfa = $(this).parents('.tab-pane.fade.active.in').attr('id')
+            $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
             $.ajax({
                 type: 'ajax',
                 method: 'post',
-                url: vars.sectionPortalController + vars.sectionEditFunction,
+                url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
                 data: {
-                    No: No
+                    No: no
                 },
                 async: false,
                 dataType: 'json',
                 success: function(result) {
-                    ResetForm(vars.form);
-                    if (result.success) {
-                        var Okul_KoduArray = result.data.Okul_Kodu.split(',');
-                        var tr_DigerResimlerArray = result.data.tr_DigerResimler.split(',');
-                        var en_DigerResimlerArray = result.data.en_DigerResimler.split(',');
-                        $('input[name=No]').val(result.data.No);
-                        $('input[name=tr_Baslik]').val(result.data.tr_Baslik);
-                        $('input[name=en_Baslik]').val(result.data.en_Baslik);
-                        $('#tr_AnaResimSelect').selectpicker('val', result.data.tr_AnaResim);
-                        $('#tr_DigerResimlerSelect').selectpicker('val', tr_DigerResimlerArray);
-                        $('#en_AnaResimSelect').selectpicker('val', result.data.en_AnaResim);
-                        $('#en_DigerResimlerSelect').selectpicker('val', en_DigerResimlerArray);
-                        $('textarea[name=tr_Yazi]').val(result.data.tr_Yazi);
-                        $('textarea[name=en_Yazi]').val(result.data.en_Yazi);
-                        $('#Okul_KoduSelect').selectpicker('val', Okul_KoduArray);
-                        $('input[name=Tarih]').val(result.data.Tarih);
+                    setTimeout(function() {
+                        ResetForm(vars.sectionObjects.Form);
+                        if (result.success) {
+                            var OkulArray = result.data.Okul.split(',');
+                            var tr_DigerResimlerArray = result.data.tr_DigerResimler.split(',');
+                            var en_DigerResimlerArray = result.data.en_DigerResimler.split(',');
+                            $('input[name=No]').val(result.data.No);
+                            $('#tr_Baslik').val(result.data.tr_Baslik);
+                            $('#en_Baslik').val(result.data.en_Baslik);
+                            $('#tr_' + vars.sectionSPs.AnaResim + 'Select').selectpicker('val', result.data.tr_AnaResim);
+                            $('#tr_' + vars.sectionSPs.DigerResimler + 'Select').selectpicker('val', tr_DigerResimlerArray);
+                            $('#en_' + vars.sectionSPs.AnaResim + 'Select').selectpicker('val', result.data.en_AnaResim);
+                            $('#en_' + vars.sectionSPs.DigerResimler + 'Select').selectpicker('val', en_DigerResimlerArray);
+                            $('#tr_Yazi').val(result.data.tr_Yazi);
+                            $('#en_Yazi').val(result.data.en_Yazi);
+                            $('#' + vars.sectionSPs.Okul + 'Select').selectpicker('val', OkulArray);
+                            $('#Tarih').val(result.data.Tarih);
 
-                        $('.nav-tabs a[href="#' + formTabs['Turkce'] + '"]').tab('show');
-                        $(vars.modal).modal('show');
-                    } else {
-                        RefreshData(1)
-                        iziError();
-                    }
-
+                            $('.nav-tabs a[href="#' + formTabs['Turkce'] + '"]').tab('show');
+                            $(vars.sectionObjects.Modal).modal('show');
+                        } else {
+                            RefreshData(1, 1, 1)
+                            iziError();
+                        }
+                    }, 15);
                 },
                 error: function() {
-                    RefreshData(1)
+                    RefreshData(1, 1, 1)
                     iziError();
                 }
             });
@@ -156,93 +195,23 @@ $(function() {
     });
 
     //Button for deleting
-    $(vars.sectionShowBase).on('click', '.' + vars.sectionDeleteButton, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var btn = $(this);
-            var No = $(this).attr('data');
-
-            iziToast.question({
-                timeout: 15000,
-                close: false,
-                overlay: true,
-                toastOnce: true,
-                id: 'iziDelete',
-                zindex: 999,
-                title: formLang.delTitle,
-                message: formLang.delMessage,
-                position: 'center',
-                buttons: [
-                    ['<button><b>' + formLang.delEvetBtn + '</b></button>', function(instance, toast) {
-
-                        url = vars.sectionPortalController + vars.sectionDeleteFunction;
-                        $.ajax({
-                            type: 'ajax',
-                            method: 'post',
-                            async: false,
-                            url: url,
-                            data: {
-                                No: No
-                            },
-                            dataType: 'json',
-                            success: function(result) {
-                                if (result.success) {
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-
-                                    $(btn).parents('tr:first').css('background-color', '#ccc').fadeOut('slow', function() {
-                                        $(this).remove();
-                                        RefreshData()
-                                    });
-
-                                    iziSuccess();
-                                } else {
-                                    RefreshData(1)
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-                                    iziError();
-                                }
-                            },
-                            error: function() {
-                                RefreshData(1)
-                                instance.hide(toast, {
-                                    transitionOut: 'fadeOutDown'
-                                }, 'button');
-                                iziError();
-                            }
-                        });
-
-                    }, true],
-                    ['<button>' + formLang.delHayirBtn + '</button>', function(instance, toast) {
-
-                        instance.hide(toast, {
-                            transitionOut: 'fadeOutDown'
-                        }, 'button');
-
-                    }]
-                ],
-            });
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
+    FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+            RefreshData,"1, 1, 1");
 });
 
-function GetOkullar() {
+function GetOkullarSelect() {
+    var i, data = vars.sectionDatas.Okullar,
+        length = data.length,
+        html;
 
-    var i;
-    var html = '';
-    var tr_ID = 'Okul_KoduSelect';
-    var tr_section = 'Okul_Kodu';
+    var tr_ID = vars.sectionSPs.Okul + 'Select';
+    var tr_section = vars.sectionSPs.Okul;
 
     html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '[]" id="' + tr_ID + '" title="' + formLang.OkulSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
 
-    for (var i = 0; i < vars.sectionDatas.Okullar.length; i++) {
-
-        html += '<option data-tokens="' + vars.sectionDatas.Okullar[i].Ad + '" value="' + vars.sectionDatas.Okullar[i].Kod + '">' + vars.sectionDatas.Okullar[i].Ad + '</option>';
-
+    for (i = 0; i < length; i++) {
+        html += '<option data-tokens="' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
     }
 
     html += '</select>'
@@ -250,111 +219,123 @@ function GetOkullar() {
     RefreshSelectpicker();
 }
 
-function GetResimler() {
-    
-            var i;
-            var tr_AnaID = 'tr_AnaResimSelect';
-            var tr_AnaSection = 'tr_AnaResim';
-            var en_AnaID = 'en_AnaResimSelect';
-            var en_AnaSection = 'en_AnaResim';
+function GetResimlerSelect() {
+    setTimeout(function() {
+        var i, data = vars.sectionDatas.Resimler,
+            length = data.length;
 
-            var tr_DigerID = 'tr_DigerResimlerSelect';
-            var tr_DigerSection = 'tr_DigerResimler';
-            var en_DigerID = 'en_DigerResimlerSelect';
-            var en_DigerSection = 'en_DigerResimler';
+        var tr_AnaID = 'tr_' + vars.sectionSPs.AnaResim + 'Select';
+        var tr_AnaSection = 'tr_' + vars.sectionSPs.AnaResim;
+        var en_AnaID = 'en_' + vars.sectionSPs.AnaResim + 'Select';
+        var en_AnaSection = 'en_' + vars.sectionSPs.AnaResim;
 
-            var tr_Anahtml = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_AnaSection + '" id="' + tr_AnaID + '" title="' + formLang.AnaResimSec + '" data-liveSearchNormalize="true">';
-            var tr_Digerhtml = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_DigerSection + '[]" id="' + tr_DigerID + '" title="' + formLang.DigerResimlerSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
+        var tr_DigerID = 'tr_' + vars.sectionSPs.DigerResimler + 'Select';
+        var tr_DigerSection = 'tr_' + vars.sectionSPs.DigerResimler;
+        var en_DigerID = 'en_' + vars.sectionSPs.DigerResimler + 'Select';
+        var en_DigerSection = 'en_' + vars.sectionSPs.DigerResimler;
 
-            var en_Anahtml = '<select class="form-control selectpicker" data-live-search="true" name="' + en_AnaSection + '" id="' + en_AnaID + '" title="' + formLang.AnaResimSec + '" data-liveSearchNormalize="true">' + '<option data-tokens="' + formLang.AnaResimSecTokens + '" value="0">' + formLang.AnaResimSecUse + '</option>';
-            var en_Digerhtml = '<select class="form-control selectpicker" data-live-search="true" name="' + en_DigerSection + '[]" id="' + en_DigerID + '" title="' + formLang.DigerResimlerSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">' + '<option data-tokens="' + formLang.DigerResimlerSecTokens + '" value="0">' + formLang.DigerResimlerSecUse + '</option>';
+        var tr_Anahtml = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_AnaSection + '" id="' + tr_AnaID + '" title="' + formLang.AnaResimSec + '" data-liveSearchNormalize="true">';
+        var tr_Digerhtml = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_DigerSection + '[]" id="' + tr_DigerID + '" title="' + formLang.DigerResimlerSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
 
+        var en_Anahtml = '<select class="form-control selectpicker" data-live-search="true" name="' + en_AnaSection + '" id="' + en_AnaID + '" title="' + formLang.AnaResimSec + '" data-liveSearchNormalize="true">' + '<option data-tokens="' + formLang.AnaResimSecTokens + '" value="0">' + formLang.AnaResimSecUse + '</option>';
+        var en_Digerhtml = '<select class="form-control selectpicker" data-live-search="true" name="' + en_DigerSection + '[]" id="' + en_DigerID + '" title="' + formLang.DigerResimlerSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">' + '<option data-tokens="' + formLang.DigerResimlerSecTokens + '" value="0">' + formLang.DigerResimlerSecUse + '</option>';
+        var lastParts = '';
 
-            var lastParts = '';
-            var data = vars.sectionDatas.Resimler.Data;
-            for (i = 0; i < data.length; i++) {
-                lastParts += '<option data-tokens="' + data[i].Kategoriler + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategoriler + '" value="' + data[i].RKategoriler + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategoriler + ')</option>';
-            }
+        lastParts = vars.sectionDatas.Resimler.Html;
 
-            lastParts += '</select>';
-            tr_Anahtml += lastParts
-            tr_Digerhtml += lastParts
+        lastParts += '</select>';
 
-            en_Anahtml += lastParts
-            en_Digerhtml += lastParts
-            $('#' + tr_AnaSection).html(tr_Anahtml);
-            $('#' + tr_DigerSection).html(tr_Digerhtml);
+        tr_Anahtml += lastParts;
+        tr_Digerhtml += lastParts;
 
-            $('#' + en_AnaSection).html(en_Anahtml);
-            $('#' + en_DigerSection).html(en_Digerhtml);
+        en_Anahtml += lastParts;
+        en_Digerhtml += lastParts;
+        $('#' + tr_AnaSection).html(tr_Anahtml);
+        $('#' + tr_DigerSection).html(tr_Digerhtml);
 
-            RefreshSelectpicker();
-        
+        $('#' + en_AnaSection).html(en_Anahtml);
+        $('#' + en_DigerSection).html(en_Digerhtml);
+        RefreshSelectpicker();
+    }, 5);
 }
 
-function GetDuyurularEtkinliklerNum() {
-    var url = vars.sectionController + vars.sectionNumFunction;
+function GetSectionsNum() {
+    $('#' + vars.sectionShowBases.Num).html(vars.sectionDatas.DuyurularEtkinlikler.Num);
+}
 
+function CreateSectionsTable() {
+    var i, length;
+    if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('.datatable').DataTable().destroy();
+    }
+
+    for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
+        $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.DuyurularEtkinlikler.Data[i]);
+    }
+
+    ShortenContent6();
+
+    if (!vars.sectionIsFirst) {
+        CreateDataTables();
+    }
+    vars.sectionIsFirst = false;
+}
+
+function GetSectionsData() {
+    vars.sectionDatas.DuyurularEtkinlikler = {
+        Data: new Array(),
+        Num: 0,
+    }
+
+    var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
     $.ajax({
         type: 'ajax',
         method: 'post',
         url: url,
-        async: false,
-        dataType: 'json',
-        success: function(data) {
-            var html = data;
-            $('#num').html(html);
+        data: {
+            English: en,
         },
-        error: function() {
-            iziError();
-        }
-    });
-}
-
-//functions
-
-function GetDuyurularEtkinlikler() {
-    var url = vars.sectionController + vars.sectionGetFunction;
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
         async: false,
         dataType: 'json',
-        success: function(data) {
-            var i;
-            var okulKodu;
-            var htmls = new Array();
+        success: function(result) {
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.DuyurularEtkinlikler;
+                vars.sectionDatas.DuyurularEtkinlikler = cache;
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.DuyurularEtkinlikler;
+                vars.sectionDatas.DuyurularEtkinlikler = cache;
+            } else {
+                var i, j, data = result.data,
+                    length, length2, htmls = {};
+                var curData, trInside, trArray;
 
-            for (var i = 0; i < vars.sectionDatas.Okullar.length; i++) {
-                htmls[vars.sectionDatas.Okullar[i].ShowID] = '';
-            }
+                for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
+                    htmls[vars.sectionDatas.Okullar[i].Kod] = '';
+                }
 
-            for (i = 0; i < data.length; i++) {
-                okulKodu = data[i].Okul_Kodu.split(',');
+                for (i = 0, length = data.length; i < length; i++) {
+                    curData = GetCurData(data[i]);
 
-                for (var j = 0; j < okulKodu.length; j++) {
-                    for (var k = 0; k < vars.sectionDatas.Okullar.length; k++) {
-                        if (okulKodu[j] == k) {
-                            var trInside = GetHtmlTr(data[i]);
-                            htmls[vars.sectionDatas.Okullar[k].ShowID] += '<tr>' + trInside + '</tr>';
-                        }
+                    okul = curData.Okul.split(',');
+
+                    for (j = 0, length2 = okul.length; j < length2; j++) {
+                        var okulTemp = vars.sectionDatas.Okullar.filter(function(curOkul) {
+                            return curOkul.Kod == okul[j];
+                        });
+
+                        trArray = new Array('ozel-Tarih', 'Baslik');
+                        trInside = GetHtmlTr(curData, trArray);
+                        htmls[okul[j]] += '<tr>' + trInside + '</tr>';
                     }
                 }
-            }
+                vars.sectionDatas.DuyurularEtkinlikler.Data = htmls;
+                vars.sectionDatas.DuyurularEtkinlikler.Num = length;
 
-            if ($.fn.DataTable.isDataTable('.datatable')) {
-                $('.datatable').DataTable().destroy();
+                var theCacheData = {
+                    DuyurularEtkinlikler: vars.sectionDatas.DuyurularEtkinlikler,
+                }
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
-
-            for (var j = 0; j < vars.sectionDatas.Okullar.length; j++) {
-                $('#show' + vars.sectionNameUpper + 'Data' + vars.sectionDatas.Okullar[j].ShowID).html(htmls[vars.sectionDatas.Okullar[j].ShowID]);
-            }
-
-            if (!vars.sectionIsFirst) {
-                CreateDataTables();
-            }
-            vars.sectionIsFirst = false;
         },
         error: function() {
             iziError();
@@ -362,56 +343,44 @@ function GetDuyurularEtkinlikler() {
     });
 }
 
-function GetHtmlTr(data) {
+function GetHtmlTr(data, trArray) {
+    var i;
+    var newHtml = '';
+    var length = trArray.length;
     var no = data.No;
-    var tarih = data.Tarih.split('-');
-    tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-    var trEnNames = new Array(
-        'Baslik',
-    );
+    for (i = 0; i < length; i++) {
+        var trArrayTemp = trArray[i].split('-');
+        if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "Tarih") {
+            var tarih = data.Tarih.split('-');
+            tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-    var trEnDatas = new Array();
-    trEnDatas = {
-        Baslik: '',
-    }
-
-    for (var i = 0; i < trEnNames.length; i++) {
-        var trData = 'tr_' + trEnNames[i];
-        var enData = 'en_' + trEnNames[i];
-        if (en) {
-            if (data[enData] == "") {
-                trEnDatas[trEnNames[i]] = data[trData];
-            } else {
-                trEnDatas[trEnNames[i]] = data[enData];
-            }
+            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
         } else {
-            trEnDatas[trEnNames[i]] = data[trData];
+            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
         }
     }
-
-    var newHtml =
-        '<td class="shorten_content6">' + tarih + '</td>' +
-        '<td class="shorten_content6">' + trEnDatas.Baslik + '</td>' +
+    newHtml +=
         '<td>' +
-        '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + vars.sectionEditButton + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+        '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
         '</td>' +
         '<td>' +
-        '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + vars.sectionDeleteButton + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+        '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
         '</td>';
+
     return newHtml;
 }
 
-function GetAddUpdateModalHtml() {
+function GetSectionsModalHtml() {
 
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNameLower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
+    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog">' +
         '<div class="modal-content">' +
         '<div class="modal-header" align="center">' +
         '<img class="maxW150" src="' + logoUrl + '">' +
         modalOpts.ModalCloseButton +
         '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNameLower + '-form" class="form-horizontal" action="' + vars.sectionPortalController + vars.sectionAddFunction + '">' +
+        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
         '<div class="modal-body">' +
         '<ul class="nav nav-tabs" role="tablist">' +
         '<li role="presentation" class="active"><a class="hvr-wobble-top" href="#' + formTabs.Turkce + '" aria-controls="' + formTabs.Turkce + '" role="tab" data-toggle="tab">' + formLang.Turkce + '</a></li>' +
@@ -426,15 +395,15 @@ function GetAddUpdateModalHtml() {
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.AnaResim + '</label>' +
-        '<div id="tr_AnaResim"></div>' +
+        '<div id="tr_' + vars.sectionSPs.AnaResim + '"></div>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.DigerResimler + '</label>' +
-        '<div id="tr_DigerResimler"></div>' +
+        '<div id="tr_' + vars.sectionSPs.DigerResimler + '"></div>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.Yazi + '</label> <br>' +
-        '<textarea name="tr_Yazi" id="tr_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="5"></textarea>' +
+        '<textarea name="tr_Yazi" id="tr_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="4"></textarea>' +
         '</div>' +
         '</div>' +
         '<div role="tabpanel" class="tab-pane fade" id="' + formTabs.Ingilizce + '">' +
@@ -444,20 +413,20 @@ function GetAddUpdateModalHtml() {
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.AnaResim + '</label>' +
-        '<div id="en_AnaResim"></div>' +
+        '<div id="en_' + vars.sectionSPs.AnaResim + '"></div>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.DigerResimler + '</label>' +
-        '<div id="en_DigerResimler"></div>' +
+        '<div id="en_' + vars.sectionSPs.DigerResimler + '"></div>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.Yazi + '</label>' +
-        '<textarea name="en_Yazi" id="en_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="5"></textarea>' +
+        '<textarea name="en_Yazi" id="en_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="4"></textarea>' +
         '</div>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Okullar + '</label>' +
-        '<div id="Okul_Kodu"></div>' +
+        '<label>' + formLang.Okul + '</label>' +
+        '<div id="' + vars.sectionSPs.Okul + '"></div>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.Tarih + '</label>' +
@@ -466,34 +435,33 @@ function GetAddUpdateModalHtml() {
         '</div>' +
         '</div>' +
         '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionAddUpdateSubmitButton + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
+        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
         '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
         '</div>' +
         '</form> ' +
         '</div>' +
         '</div>' +
         '</div>';
-    $('#showAddUpdateModal').html(html);
-    vars.form = $('#' + vars.sectionNameLower + '-form');
-    vars.modal = $('#' + vars.sectionNameLower + '-modal');
+    $('#' + vars.sectionShowBases.Modal).html(html);
+    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
 }
 
-function GetDuyurularEtkinliklerHtml() {
+function GetSectionsHtml() {
     var html = '';
-    var isFirstJ = true;
-    var data = vars.sectionDatas.Okullar;
-    console.log(data);
+    var thei = true;
+    var i = 0,
+        data = vars.sectionDatas.Okullar,
+        length = data.length;
 
-    html += '<section id="' + vars.sectionNameLower + '" class="marginTB25">' +
+    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
         '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+        '<div class="col-lg-12 page-header text-center">' +
         '<h2>' +
-        
-        '<button id="' + vars.sectionOpenModalButton + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionOpenModalButton + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-
-        vars.sectionNameNormal +
-        '<span id="num" class="badge"></span>' +
+        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
+        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
+        vars.sectionNames.Normal +
+        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
         '</div>' +
         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
@@ -502,13 +470,13 @@ function GetDuyurularEtkinliklerHtml() {
         '<div class="panel-heading">' +
         '<ul class="nav nav-tabs">';
 
-    isFirstJ = true;
-    for (var j = 0; j < data.length; j++) {
-        if (isFirstJ) {
-            html += '<li class="active"><a href="#' + data[j].ShowID + '" data-toggle="tab">' + data[j].Ad + '</a></li>';
-            isFirstJ = false;
+    thei = true;
+    for (i = 0; i < length; i++) {
+        if (thei) {
+            html += '<li class="active"><a href="#' + data[i].ShowID + '" data-toggle="tab">' + data[i].Ad + '</a></li>';
+            thei = false;
         } else {
-            html += '<li><a href="#' + data[j].ShowID + '" data-toggle="tab">' + data[j].Ad + '</a></li>';
+            html += '<li><a href="#' + data[i].ShowID + '" data-toggle="tab">' + data[i].Ad + '</a></li>';
         }
     }
 
@@ -517,13 +485,13 @@ function GetDuyurularEtkinliklerHtml() {
         '<div class="panel-body">' +
         '<div class="tab-content">';
 
-    isFirstJ = true;
-    for (var j = 0; j < data.length; j++) {
-        if (isFirstJ) {
-            html += '<div class="tab-pane fade in active" id="' + data[j].ShowID + '">';
-            isFirstJ = false;
+    thei = true;
+    for (i = 0; i < length; i++) {
+        if (thei) {
+            html += '<div class="tab-pane fade in active" id="' + data[i].ShowID + '">';
+            thei = false;
         } else {
-            html += '<div class="tab-pane fade" id="' + data[j].ShowID + '">';
+            html += '<div class="tab-pane fade" id="' + data[i].ShowID + '">';
         }
         html += '<div class="table-responsive">' +
             '<table class="table table-bordered table-hover datatable">' +
@@ -533,7 +501,7 @@ function GetDuyurularEtkinliklerHtml() {
             '<th class="text-center">' + formLang.Duzenle + '</th>' +
             '<th class="text-center">' + formLang.Sil + '</th>' +
             '</thead>' +
-            '<tbody id="show' + vars.sectionNameUpper + 'Data' + data[j].ShowID + '">' +
+            '<tbody id="show' + vars.sectionNames.Upper + 'Data' + data[i].ShowID + '">' +
             '</tbody>' +
             '</table>' +
             '</div>' +
@@ -546,36 +514,34 @@ function GetDuyurularEtkinliklerHtml() {
         '</div>' +
         '</div>' +
         '</div>' +
-        '<div id="showAddUpdateModal"></div>' +
+        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
         '</div>' +
         '</section>';
 
-    $('#show' + vars.sectionNameUpper).html(html);
-}
-
-function RefreshData(refreshSide = 0) {
-    GetDuyurularEtkinlikler();
-    RefreshSideData(refreshSide)
+    $('#' + vars.sectionShowBases.Sections).html(html);
 }
 
 var isFirst = true;
 
-function RefreshSideData(refresh = 0) {
-    GetDuyurularEtkinliklerNum();
-    $(function() {
+function RefreshData(main = 1, html = 0, side = 0) {
+    if (main == 1) {
+        GetSectionsData();
+    }
+    if (html != 0) {
+        GetSectionsHtml()
+        GetSectionsModalHtml()
+        CreateSectionsTable()
+    }
+    if (side != 0) {
+        GetOkullarSelect();
+        GetResimlerSelect();
+    }
+
+    setTimeout(function() {
         if (!isFirst) {
             ShortenContent6();
         }
-        if (refresh = 1) {
-            GetOkullar();
-            GetResimler();
-        }
         isFirst = false;
-
-    });
-}
-
-function RefreshHtmls() {
-    GetDuyurularEtkinliklerHtml()
-    GetAddUpdateModalHtml()
+    }, 5);
+    GetSectionsNum();
 }

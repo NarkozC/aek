@@ -137,14 +137,12 @@ function GetKadro() {
                 var cache = result.cachedataTR.KadroData;
                 vars.sectionDatas.KadroData = cache;
             } else {
-                var data = result.data;
-                vars.sectionDatas.KadroData.Num = data.length;
-                var i, j, k;
-                var length, len, klen;
-                var curIndex = 0;
-                var grupsCounter = 0;
-                var curContent;
-                var curNamedSub;
+                var data = result.data,
+                    length = data.length,
+                    curIndex = 0,
+                    grupsCounter = 0;
+                var i, j, k, len, klen, curContent, curNamedSub;
+                vars.sectionDatas.KadroData.Num = length;
 
                 for (i = 0, length = data.length; i < length; i++) {
                     curContent = GetCurData(data[i]);
@@ -221,14 +219,11 @@ function GetKadroGrup() {
                 var cache = result.cachedataTR.KadroGrupData;
                 vars.sectionDatas.KadroGrupData = cache;
             } else {
-                var data = result.data;
-                vars.sectionDatas.KadroGrupData.Num = data.length;
-                var data2;
-                var length, len, nsaLen;
-                var i, m, k;
-                var curContent;
-                var curContent2;
-                var namedSubsArray = new Array("kadro", "yonetim-kurulu", "okul-aile-birligi", "okul-aile-birligi-galeri")
+                var data = result.data,
+                    length = data.length,
+                    namedSubsArray = new Array("kadro", "yonetim-kurulu", "okul-aile-birligi", "okul-aile-birligi-galeri");
+                var i, m, k, data2, len, nsaLen, curContent, curContent2;
+                vars.sectionDatas.KadroGrupData.Num = length
 
                 for (i = 0, length = data.length; i < length; i++) {
                     curContent = GetCurData(data[i]);
@@ -312,28 +307,27 @@ function GetKadroHtml() {
                 if (vars.sectionIsFirst) {
                     gotCache = false;
                 } else {
-                    var sectionID = vars.sectionDatas.KadroData.SectionID;
-                    var data = vars.sectionDatas.KadroGrupData.Subs[sectionID];
-                    var sData = new Array();
-                    var sSectionID = '';
-                    var break_on = 4;
-                    var oneLeft = 'F';
-                    var its13 = false; 
-                    var i, j, k;
-                    var counter = 0;
-                    var length = data.length;
-                    var sLength;
+                    var sectionID = vars.sectionDatas.KadroData.SectionID,
+                        data = vars.sectionDatas.KadroGrupData.Subs[sectionID],
+                        sData = new Array(),
+                        sSectionID = '',
+                        break_on = 4,
+                        oneLeft = 'F',
+                        its13 = false,
+                        counter = 0,
+                        length = data.length,
+                        subHtml = '',
+                        curSSIDData = new Array(),
+                        curSSIDDataCounter = 0;
+                    var i, j, k, sLength,
+                        curContent,
+                        curData,
+                        curDataArray;
                     var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
                         '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
                         '</div>';
-                    var subHtml = '';
-                    var curContent;
-                    var curData;
-                    var curSSIDData = new Array();
-                    var curSSIDDataCounter = 0;
-                    var curDataArray;
 
                     for (i = 0; i < length; i++) {
                         curSSIDDataCounter = 0;
@@ -521,7 +515,7 @@ function GetYonetimKurulu() {
                         '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
                         '</div>';
-                    var curData;
+                    var curData, curDataArray;
 
                     html += '<div class="container dark-bg shadow borderRad25 wow ' + Animation + ' LGMCWOS" data-wow-delay="' + wowDelay + '">';
                     if (length == 13) {
@@ -542,6 +536,10 @@ function GetYonetimKurulu() {
                     }
                     for (i = 0; i < length; i++) {
                         curData = GetCurData(data[i]);
+                        curDataArray = new Array('Resim', 'AdSoyad', 'UzunAciklama', 'ozel-Aciklama')
+                        curData = GetOrganizedHtml(curData, curDataArray)
+
+
                         if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
                             html += '<div class="row">';
                         } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
@@ -570,10 +568,10 @@ function GetYonetimKurulu() {
                             html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         }
                         html += '<div class="hvr-float-shadow thumbnail">' +
-                            '<a class="LGM" href="' + imagesDir + curData.Resim + '" data-sub-html="<strong>' + curData.AdSoyad + '<br><small>' + curData.UzunAciklama + '</small></strong>">' +
-                            '<img class="img-responsive img-center w250" src="' + imagesDir + curData.Resim + '">' +
-                            '<h4>' + curData.AdSoyad + '</h4>' +
-                            '<p>' + curData.Aciklama + '</p>' +
+                            '<a class="LGM" href="' + imagesDir + curData[0] + '" data-sub-html="<strong>' + curData[1] + '<br><small>' + curData[2] + '</small></strong>">' +
+                            '<img class="img-responsive img-center w250" src="' + imagesDir + curData[0] + '">' +
+                            '<h4>' + curData[1] + '</h4>' +
+                            '<p>' + curData[3] + '</p>' +
                             '</a>' +
                             '</div>' +
                             '</div>';
@@ -678,7 +676,7 @@ function GetOkulAileBirligi() {
                         '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
                         '</div>';
-                    var curData;
+                    var curData, curDataArray;
                     html += '<div class="container dark-bg shadow borderRad25 wow ' + Animation + ' LGMCWOS" data-wow-delay="' + wowDelay + '">';
                     if (length == 13) {
                         break_on = 3;
@@ -697,7 +695,10 @@ function GetOkulAileBirligi() {
                         oneLeft = 'T3';
                     }
                     for (i = 0; i < length; i++) {
-                        curData = data[i];
+                        curData = GetCurData(data[i]);
+                        curDataArray = new Array('Resim', 'AdSoyad', 'ozel-Aciklama')
+                        curData = GetOrganizedHtml(curData, curDataArray)
+                        
                         if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
                             html += '<div class="row">';
                         } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
@@ -726,10 +727,10 @@ function GetOkulAileBirligi() {
                             html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         }
                         html += '<div class="hvr-float-shadow thumbnail">' +
-                            '<a class="LGM" href="' + imagesDir + curData.Resim + '" data-sub-html="<strong>' + curData.AdSoyad + '<br><small>' + curData.Aciklama + '</small></strong>">' +
-                            '<img class="img-responsive img-center w250" src="' + imagesDir + curData.Resim + '">' +
-                            '<h4>' + curData.AdSoyad + '</h4>' +
-                            '<p>' + curData.Aciklama + '</p>' +
+                            '<a class="LGM" href="' + imagesDir + curData[0] + '" data-sub-html="<strong>' +curData[1] + '<br><small>' + curData[2] + '</small></strong>">' +
+                            '<img class="img-responsive img-center w250" src="' + imagesDir + curData[0] + '">' +
+                            '<h4>' + curData[1] + '</h4>' +
+                            '<p>' + curData[2] + '</p>' +
                             '</a>' +
                             '</div>' +
                             '</div>';
@@ -884,34 +885,6 @@ function GetOrganizedHtml(data, trArray, mainOrSub = '') {
         }
     }
     return newHtml;
-}
-
-function Cache(who, url, data) {
-    var theCacheData;
-    if (en) {
-        theCacheData = {
-            CacheEN: data
-        }
-    } else {
-        theCacheData = {
-            CacheTR: data
-        }
-    }
-    theCacheData['English'] = en;
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
-        data: theCacheData,
-        async: false,
-        dataType: 'json',
-        success: function(response) {
-            console.log('cache success on:' + who)
-        },
-        error: function() {
-            iziError();
-        }
-    });
 }
 
 function RefreshData() {

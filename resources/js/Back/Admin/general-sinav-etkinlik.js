@@ -652,7 +652,7 @@ function GetSinavEtkinlikHtml() {
         '<div class="col-lg-12 page-header text-center wow ' + SinavEtkinlikAnimation + '" data-wow-delay="' + SinavEtkinlikAnimationDelay + 's">' +
         '<h2>' +
         '<button id="' + vars.sectionOpenModalButton + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionOpenModalButton + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
+        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
         vars.sectionNameNormal +
         '<span id="num" class="badge"></span>' +
         '</h2>' +

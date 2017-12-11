@@ -40,11 +40,13 @@ $(document).ready(function() {
 });
 
 function render() {
+    $('#page').hide();
     var timeoutId = window.setTimeout(renderCB, renderTime);
 }
 
 function renderCB() {
     window.setTimeout(function() {
+        
         if ($("#anasayfaP").length != 0) {
             $('body').css('padding-top', "0px");
         } else {
@@ -55,6 +57,7 @@ function renderCB() {
             }
         }
         $('#loader-container').fadeOut();
+        $('#page').fadeIn();
     }, renderCBTime);
 }
 
@@ -262,7 +265,8 @@ $(document).ready(function() {
 */
 var imagesDir = baseurl + 'resources/images/';
 var logoUrl = imagesDir + 'aek-logo.png';
-
+var loaderGif = 'Genel/aek-loader.gif';
+var loaderGifImg = '<img src="' + imagesDir + loaderGif + '" class="img-responsive img-center maxW100 wow ' + Animation + '" wow-delay="' + wowDelay + '" alt="Loader">'
 
 
 
@@ -409,6 +413,10 @@ if (en) {
         Adres: "Address",
         Tc: "Identity",
         Basvur: "Apply",
+        ReadMore: "Read More",
+        Bekle: 'Please Wait...',
+        Tum: 'All',
+        Kapat: 'Close',
     };
 
 } else {
@@ -512,7 +520,10 @@ if (en) {
         Adres: "Adres",
         Tc: "Tc Kimlik No",
         Basvur: "Başvur",
-
+        ReadMore: "Devamını Oku",
+        Bekle: 'Lütfen Bekleyin...',
+        Tum: 'Tüm',
+        Kapat: 'Kapat',
     };
 }
 
@@ -780,12 +791,12 @@ function GetSubelerData(getS = 1, kod = "1") {
     return subelerD;
 }
 
-function GetResimlerData(getHtml = 0) {
+function GetResimlerData() {
     var controller = baseurl + 'Portal/Admin/Genel-Resimler/';
     var getFunction = 'GetResimler';
     var resimlerD = {
-        Data: new Array(),
-        Html: ''
+        // Data: new Array(),
+        Html: '',
     };
 
     var url = controller + getFunction;
@@ -809,12 +820,13 @@ function GetResimlerData(getHtml = 0) {
                 var i, length, html = '';;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    resimlerD.Data[i] = data[i];
+                    // resimlerD.Data[i] = data[i];
                     resimlerD.Html += '<option data-tokens="' + data[i].RKategoriler + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategoriler + '" value="' + data[i].RKategoriler + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategoriler + ')</option>';
                 }
                 var theCacheData = {
                     Resimler: resimlerD
                 }
+                console.log(theCacheData);
                 setTimeout(Cache('GetResimlerData', url, theCacheData), 1)
             }
 
@@ -922,6 +934,48 @@ function GetAylarData(getS = 1, kod = "E") {
     return curData;
 }
 
+function GetKategorilerData(getS = 1, kod = "E") {
+    var controller = baseurl + 'Portal/Admin/Genel-Kategoriler/';
+    var getFunction = 'GetKategoriler';
+    var curData = new Array();
+
+    var url = controller + getFunction;
+    $.ajax({
+        type: 'ajax',
+        method: 'post',
+        url: url,
+        data: {
+            English: en,
+        },
+        async: false,
+        dataType: 'json',
+        success: function(result) {
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.Kategoriler;
+                curData = cache;
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.Kategoriler;
+                curData = cache;
+            } else {
+                var i, length;
+                var data = result.data;
+                for (i = 0, length = data.length; i < length; i++) {
+                    curData[i] = GetCurData(data[i]);
+                }
+                var theCacheData = {
+                    Kategoriler: curData
+                }
+                setTimeout(Cache('GetKategorilerData', url, theCacheData), 1)
+            }
+        },
+        error: function() {
+            iziError();
+        }
+    });
+
+    return curData;
+}
+
 function Cache(who, url, data) {
     var theCacheData;
     if (en) {
@@ -1003,7 +1057,6 @@ function ShowFormErrors(messages) {
     $.each(messages, function(key, value) {
         var ajaxGroup;
         var element
-        console.log(key);
         if (key == "No") {
             element = $('[name="' + key + '"]');
         } else {
@@ -1059,3 +1112,322 @@ function ResetForm(form) {
     $('.text-danger').remove();
     $('.ajax-group').removeClass('has-error').removeClass('has-success');
 }
+
+
+
+
+
+
+
+
+
+/*
+=====================================
+  ---------- Shorten Content ------
+=====================================
+*/
+$(function() { /* to make sure the script runs after page load */
+
+    window.ShortenContent = function() {
+        $('.shorten_content').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 115; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content +
+                    '<a href="javascript:;" class="btn btn-danger btn-sm read_more">Devamını Oku</a>' +
+                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
+                    '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
+
+
+
+
+                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
+                    $(this).parent().find('a.read_more').show();
+
+                });
+
+                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
+                    $(this).parent().find('a.read_less').show();
+
+                });
+
+                $('#yorumlar a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+                    $('#yorumlar-carousel').carousel('pause');
+                });
+
+                $('#yorumlar a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+                    $('#yorumlar-carousel').carousel('cycle');
+                });
+
+
+
+            }
+
+        });
+    }
+
+    ShortenContent();
+
+    window.ShortenContent2 = function() {
+        $('.shorten_content2').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 50; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content +
+                    '<a href="javascript:;" class="btn btn-danger btn-sm read_more">Devamını Oku</a>' +
+                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
+                    '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
+
+                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
+                    $(this).parent().find('a.read_less').show();
+
+                });
+
+                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
+                    $(this).parent().find('a.read_more').show();
+
+                });
+
+            }
+
+        });
+    }
+
+    ShortenContent2();
+
+    window.ShortenContent3 = function() {
+        $('.shorten_content3').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 200; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
+
+            }
+
+        });
+    }
+
+    ShortenContent3();
+
+    window.ShortenContent4 = function() {
+        $('.shorten_content4').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 40; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content +
+                    '<a href="javascript:;" class="btn btn-danger btn-xs read_more">Devamını Oku</a>' +
+                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
+                    '<a href="javascript:;" class="btn btn-danger btn-xs read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
+
+                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
+                    $(this).parent().find('a.read_less').show();
+
+                });
+
+                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
+                    $(this).parent().find('a.read_more').show();
+
+                });
+
+            }
+
+        });
+    }
+
+    ShortenContent4();
+
+    window.ShortenContent6 = function() {
+        $('.shorten_content6').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 50; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content +
+                    '<a href="javascript:;" class="btn btn-danger btn-sm read_more">Devamını Oku</a>' +
+                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
+                    '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
+
+
+                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
+                    $(this).parent().find('a.read_more').show();
+
+                });
+
+                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
+                    $(this).parent().find('a.read_less').show();
+
+                });
+
+            }
+
+        });
+    }
+
+    ShortenContent6();
+
+    window.ShortenContent7 = function() {
+        $('.shorten_content7').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 22; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content +
+                    '<a href="javascript:;" class="btn btn-danger btn-xs read_more">Devamını Oku</a>' +
+                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
+                    '<a href="javascript:;" class="btn btn-danger btn-xs read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
+
+                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
+                    $(this).parent().find('a.read_less').show();
+
+                });
+
+                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
+
+                    event.preventDefault(); /* prevent the a from changing the url */
+                    $(this).hide(); /* hide the read more button */
+                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
+                    $(this).parent().find('a.read_more').show();
+
+                });
+
+            }
+
+        });
+    }
+
+    ShortenContent7();
+
+    window.ShortenContent8 = function() {
+        $('.shorten_content8').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 200; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
+
+            }
+
+        });
+    }
+
+    ShortenContent8();
+
+    window.ShortenContent9 = function() {
+        $('.shorten_content9').each(function(event) { /* select all divs with the item class */
+
+            var max_length = 35; /* set the max content length before a read more link will be added */
+
+            if ($(this).html().length > max_length) { /* check for content length */
+
+                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+                var long_content = $(this).html().substr(max_length);
+
+                $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
+
+            }
+
+        });
+    }
+
+    ShortenContent9();
+
+
+
+    $(document).ready(function() {
+        $(document).ready(function() {
+            if (en == true) {
+                $('.read_more').html('Read More');
+                $('.read_less').html('Read Less');
+            }
+        });
+    });
+
+});
+
+
+window.ShortenContent5 = function() {
+    $('.shorten_content5').each(function(event) { /* select all divs with the item class */
+
+        var max_length = 50; /* set the max content length before a read more link will be added */
+
+        if ($(this).html().length > max_length) { /* check for content length */
+
+            var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
+            var long_content = $(this).html().substr(max_length);
+
+            $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
+
+        }
+
+    });
+}
+
+ShortenContent5();

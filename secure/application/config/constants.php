@@ -132,6 +132,8 @@ define('FORM_LANG_TR', array(
 					'OOSinif' => 'Okumakta Olduğu Sınıf',
 					'Bolum' => 'Bölüm',
 					'SinavTarihi' => 'Sınav Tarihi',
+					'BasSaat' => 'Başlangıç Saati',
+        			'BitSaat' => 'Bitiş Saati',
 					));
 
 define('FORM_LANG_EN', array(
@@ -156,6 +158,8 @@ define('FORM_LANG_EN', array(
 					'Ad' => 'Name',
 					'Sinif' => 'Class',
 					'Yil' => 'Year',
+					'BasSaat' => 'Start Time',
+        			'BitSaat' => 'End Time',
 					));
 
 define('FORM_LANGUAGES', array(

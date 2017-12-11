@@ -80,7 +80,7 @@
           <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Etkinlik-Takvimi">Etkinlik Takvimi</a></li>
           <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Genel-Resimler">Resimler</a></li>
           <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Kadro">Kadro</a></li>
-          <!--<li><a data-basliklar="A" class="ajax" id="anasayfa-nav" href="<?php echo base_url(); ?>Portal/Admin/Resimler">Resimler</a></li>-->
+          <li><a data-basliklar="GET" class="ajax" href="<?php echo base_url(); ?>Portal/Admin/Popup">Popup</a></li>
 
 <!-- GOOD ANIMATIONS
 BounceRightToLeft

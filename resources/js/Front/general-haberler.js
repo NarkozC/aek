@@ -122,7 +122,7 @@ function AllHaberler() {
                             if (page != '') {
                                 curData.Link = baseurl + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
                             } else {
-                                curData.Link = baseurl + 'en/' + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                                curData.Link = baseurl + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
                             }
                         }
                         var dateAr = curData.Tarih.split('-');

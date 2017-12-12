@@ -191,11 +191,11 @@ function GetSinavTarihleriSelect(sinif = 0) {
         var i, length;
         var data = vars.sectionDatas.SinavTarihleri.Data[sinif];
         $('#OOSinif').parents('.ajax-group:first').find('.text-danger:first').remove();
+        $('#SinavTarihi').parents('.ajax-group:first').removeClass('has-error').find('.text-danger:first').remove();
         if (data == undefined) {
             messages = {
                 SinavTarihi: '<p style="margin:10px 0px;" class="text-danger">Bu sınıf için sınav tarihi bulunmamaktadır.</p>'
             }
-            $('#SinavTarihi').parents('.ajax-group:first').find('.text-danger:first').remove();
             ShowFormErrors(messages);
 
             $('body').append('<a href="#SinavTarihi" id="smoothScrollTemp"></a>');
@@ -203,14 +203,17 @@ function GetSinavTarihleriSelect(sinif = 0) {
                 speed: 600,
                 offset: -125
             }).trigger("click").remove();
-        }
-        length = data.length;
+            GetSinavTarihleriSelect();
+        } else {
+            length = data.length;
 
-        html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinavTarihiSec + '" data-liveSearchNormalize="true">';
-        for (i = 0; i < length; i++) {
-            html += '<option data-tokens="' + data[i].Tarih + '" value="' + data[i].Sinif + '-' + data[i].Tarih + '">' + data[i].Tarih + '</option>';
+            html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinavTarihiSec + '" data-liveSearchNormalize="true">';
+            for (i = 0; i < length; i++) {
+                html += '<option data-tokens="' + data[i].Tarih + '" value="' + data[i].Sinif + '-' + data[i].Tarih + '">' + data[i].Tarih + '</option>';
+            }
+            html += '</select>';
         }
-        html += '</select>';
+
     }
 
     $('#' + section).html(html);

@@ -264,11 +264,11 @@ function ModalAnim(x) {
     $('.modal .modal-dialog').attr('class', 'modal-dialog  ' + x + '  animated');
 };
 $('body').on('show.bs.modal', '.ajax-modal', function(e) {
-    var anim = "bounceInRight"
+    var anim = "fadeInRight"
     ModalAnim(anim);
 })
 $('body').on('hide.bs.modal', '.ajax-modal', function(e) {
-    var anim = "bounceOutRight"
+    var anim = "fadeOutLeft"
     ModalAnim(anim);
 })
 

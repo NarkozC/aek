@@ -22,7 +22,8 @@ var vars = {
     sectionDatas: {
         Iletisim: {
             Data: new Array(),
-            FData: new Array(),
+            FHtml: '',
+            BHtml: '',
             Num: 0,
         },
 
@@ -120,21 +121,22 @@ function GetIletisim() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Iletisim;
                 vars.sectionDatas.Iletisim = cache;
-                $('#' + vars.sectionShowBases.Sections).html(cache.FData);
+                $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Iletisim;
                 vars.sectionDatas.Iletisim = cache;
-                $('#' + vars.sectionShowBases.Sections).html(cache.FData);
+                $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
-                var html = '',
+                var fHtml = '',
+                    bHtml = '',
                     data = result.data,
                     length = data.length;
-                var i, curData;
+                var i, curData, trArray, trInside;
 
-                html += '<section id="' + vars.sectionNames.Lower + '">' +
+                fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
                     '<div class="container">' +
                     '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-                    '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
+                    '<h2 data-baslik="B_' + vars.sectionNames.Upper + '">' + vars.sectionNames.Normal + '</h2>' +
                     '</div>' +
                     '</div>' +
                     '<div class="container">';
@@ -142,8 +144,13 @@ function GetIletisim() {
                 for (i = 0; i < length; i++) {
                     curData = GetCurData(data[i]);
                     data[i] = curData;
+
+                    trArray = new Array('Ad');
+                    trInside = GetHtmlTr(curData, trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
+
                     if (curData.Kod == "Kolej") {
-                        html += '<div class="col-xs-offset-0 col-sm-offset-0 col-md-offset-1 col-lg-offset-0 col-xs-12 col-sm-12 col-md-10 col-lg-3 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+                        fHtml += '<div class="col-xs-offset-0 col-sm-offset-0 col-md-offset-1 col-lg-offset-0 col-xs-12 col-sm-12 col-md-10 col-lg-3 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow">' +
                             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page-header text-center" data-wow-delay="">' +
                             '<h4>' + curData.Ad + '</h4>' +
@@ -211,7 +218,7 @@ function GetIletisim() {
                             '</div>' +
                             '</div>';
                     } else if (curData.Kod == "Maps") {
-                        html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
+                        fHtml += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
                             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                             '<iframe class="iltGM" frameborder="0" style="border:0" ' +
                             'src="' + curData.Maps + '" allowfullscreen></iframe>' +
@@ -221,7 +228,7 @@ function GetIletisim() {
 
                 }
 
-                html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '" id="' + vars.sectionShowBases.Contact + '">' +
+                fHtml += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '" id="' + vars.sectionShowBases.Contact + '">' +
                     '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow">' +
                     '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                     '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 page-header text-center">' +
@@ -252,10 +259,11 @@ function GetIletisim() {
                     '</div>' +
                     '</section>';
 
-                $('#'+vars.sectionShowBases.Sections).html(html);
+                $('#' + vars.sectionShowBases.Sections).html(fHtml);
                 vars.sectionObjects.Form = $('#' + vars.sectionNameLower + '-form');
 
-                vars.sectionDatas.Iletisim.FData = html;
+                vars.sectionDatas.Iletisim.FHtml = fHtml;
+                vars.sectionDatas.Iletisim.BHtml = bHtml;
                 vars.sectionDatas.Iletisim.Data = data;
                 vars.sectionDatas.Iletisim.Num = length;
                 var theCacheData = {
@@ -270,4 +278,23 @@ function GetIletisim() {
         }
     });
 
+}
+
+function GetHtmlTr(data, trArray) {
+    var i;
+    var newHtml = '';
+    var length = trArray.length;
+    var no = data.No;
+    var listOrder = data.ListOrder
+
+    for (i = 0; i < length; i++) {
+        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+    }
+
+    newHtml +=
+        '<td>' +
+        '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+        '</td>';
+
+    return newHtml;
 }

@@ -11,6 +11,7 @@ var vars = {
         Normal: 'Haberler',
         Upper: 'Haberler',
         Lower: 'haberler',
+        Kod: 'GH'
     },
     sectionShowBases: {
         Sections: 'showHaberler',
@@ -503,7 +504,7 @@ function GetSectionsHtml() {
         '<h2>' +
         '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
         '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal +
+        '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
         '</div>' +

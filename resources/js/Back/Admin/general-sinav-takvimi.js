@@ -11,6 +11,7 @@ var vars = {
         Normal: 'Sınav Takvimi',
         Upper: 'SinavTakvimi',
         Lower: 'sinavTakvimi',
+        Kod: 'GST',
     },
     sectionShowBases: {
         Sections: 'showSinavTakvimi',
@@ -251,7 +252,7 @@ function GetYillarSelect() {
 
 function GetDerslerSelect() {
     setTimeout(function() {
-        var i, data = vars.sectionDatas.Dersler,
+        var i, data = vars.sectionDatas.Dersler.Data,
             length = data.length;
 
         var tr_ID = vars.sectionSPs.Ders + 'Select';
@@ -271,7 +272,7 @@ function GetDerslerSelect() {
 }
 
 function GetSubelerSelect() {
-    var i, data = vars.sectionDatas.Subeler,
+    var i, data = vars.sectionDatas.Subeler.Data,
         odata = vars.sectionDatas.Okullar,
         length = data.length,
         html = '';
@@ -299,7 +300,7 @@ function GetSubelerSelect() {
     $('#' + tr_section).on('click', '#SelectTumOkul', function(e) {
         var $link = $(e.target);
         if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var theArrayTemp = vars.sectionDatas.Subeler;
+            var theArrayTemp = vars.sectionDatas.Subeler.Data;
             var theArray = new Array();
             for (var i = 0, length = theArrayTemp.length; i < length; i++) {
                 theArray[i] = theArrayTemp[i].Kod;
@@ -314,7 +315,7 @@ function GetSubelerSelect() {
     $('#' + tr_section).on('click', '#SSube' + vars.sectionDatas.Okullar[1].ShowID, function(e) {
         var $link = $(e.target);
         if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var theArrayTemp = vars.sectionDatas.Subeler.filter(function(sube) {
+            var theArrayTemp = vars.sectionDatas.Subeler.Data.filter(function(sube) {
                 return sube.Okul == "1";
             });
             var theArray = new Array();
@@ -332,7 +333,7 @@ function GetSubelerSelect() {
     $('#' + tr_section).on('click', '#SSube' + vars.sectionDatas.Okullar[2].ShowID, function(e) {
         var $link = $(e.target);
         if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var theArrayTemp = vars.sectionDatas.Subeler.filter(function(sube) {
+            var theArrayTemp = vars.sectionDatas.Subeler.Data.filter(function(sube) {
                 return sube.Okul == "2";
             });
             var theArray = new Array();
@@ -350,7 +351,7 @@ function GetSubelerSelect() {
     $('#' + tr_section).on('click', '#SSube' + vars.sectionDatas.Okullar[3].ShowID, function(e) {
         var $link = $(e.target);
         if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var theArrayTemp = vars.sectionDatas.Subeler.filter(function(sube) {
+            var theArrayTemp = vars.sectionDatas.Subeler.Data.filter(function(sube) {
                 return sube.Okul == "3";
             });
             var theArray = new Array();
@@ -429,7 +430,7 @@ function GetSectionsData() {
                 for (i = 0, length = data.length; i < length; i++) {
                     curData = GetCurData(data[i]);
 
-                    curData.Ders = vars.sectionDatas.Dersler.filter(function(ders) {
+                    curData.Ders = vars.sectionDatas.Dersler.Data.filter(function(ders) {
                         return ders.Kod == curData.Ders;
                     });
                     if (curData.Ders[0] != undefined) {
@@ -478,7 +479,7 @@ function GetHtmlTr(data, trArray) {
 
             newHtml += '<td class="shorten_content6">' + tarih + '</td>';
         } else if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "Ders") {
-            var dersTemp = vars.sectionDatas.Dersler.filter(function(ders) {
+            var dersTemp = vars.sectionDatas.Dersler.Data.filter(function(ders) {
                 return ders.Kod == data.Ders;
             });
             if (dersTemp.length > 0) {
@@ -574,7 +575,7 @@ function GetSectionsHtml() {
         '<h2>' +
         '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
         '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal +
+        '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
         '</div>' +

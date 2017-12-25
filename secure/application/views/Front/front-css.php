@@ -15,5 +15,6 @@
 <link rel="stylesheet" href="<?php echo base_url(); ?>resources/unitegallery/themes/video/skin-right-thumb.css"/>
 <link href="https://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic" rel="stylesheet" type="text/css" />
 <link rel="stylesheet" href="<?php echo base_url(); ?>resources/css/iziModal.min.css"/>
+<link rel="stylesheet" href="<?php echo base_url(); ?>resources/css/layerslider.css"/>
 
 <link rel="stylesheet" href="<?php echo base_url(); ?>resources/css/style.css">

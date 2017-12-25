@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <title>Çözümleriniz İçin Veli - Öğretmen Görüşme Takvimi | AEK</title>
+  <title>Çözümleriniz İçin Veli-Öğretmen Görüşme Takvimi | AEK</title>
 <?php $this->view('Front/front-navbar.php'); ?>
 
 

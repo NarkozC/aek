@@ -75,7 +75,6 @@ $(function() {
                 async: false,
                 dataType: 'json',
                 success: function(response) {
-                    console.log(response);
                     ResetFormErrors();
                     if (response.success) {
                         ResetForm(vars.sectionObjects.Form);
@@ -186,7 +185,7 @@ function GetSinavTarihleriSelect(sinif = 0) {
     var id = vars.secionSPs.SinavTarihi + 'Select',
         section = vars.secionSPs.SinavTarihi;
     if (sinif == 0) {
-        html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinavTarihiSec + '" data-liveSearchNormalize="true" disabled></select>';
+        html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.SinavTarihiSec + '" data-liveSearchNormalize="true"></select>';
     } else {
         var i, length;
         var data = vars.sectionDatas.SinavTarihleri.Data[sinif];
@@ -227,7 +226,7 @@ function GetSectionsHtml() {
     html += '<section id="' + vars.sectionNames.Lower + '">' +
         '<div class="container">' +
         '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-        '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
+        '<h2 data-baslik="B_' + vars.sectionNames.Upper + '">' + vars.sectionNames.Normal + '</h2>' +
         '</div>' +
         '</div>' +
         '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +

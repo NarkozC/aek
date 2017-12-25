@@ -10,6 +10,11 @@ var vars = {
         YonetimKurulu: "Yönetim Kurulu",
         OkulAileBirligi: "Okul Aile Birliği"
     },
+    sectionShowNamesUpper: {
+        Kadro: "Kadro",
+        YonetimKurulu: "YonetimKurulu",
+        OkulAileBirligi: "OkulAileBirligi"
+    },
     sectionBaslikIDs: {
         Kadro: "GK",
         YonetimKurulu: "GYK",
@@ -19,7 +24,8 @@ var vars = {
         CurPageData: {
             ControllerName: "",
             ShowName: "",
-            BaslikID: ""
+            BaslikID: "",
+            UpperName: "",
         },
         KadroData: {
             Grups: {},
@@ -78,6 +84,7 @@ $(function() {
                 vars.sectionDatas['CurPageData']['ControllerName'] = vars.sectionControllerNames[vars.sectionIndexNames[i]];
                 vars.sectionDatas['CurPageData']['ShowName'] = vars.sectionShowNames[vars.sectionIndexNames[i]];
                 vars.sectionDatas['CurPageData']['BaslikID'] = vars.sectionBaslikIDs[vars.sectionIndexNames[i]];
+                vars.sectionDatas['CurPageData']['UpperName'] = vars.sectionShowNamesUpper[vars.sectionIndexNames[i]];
             }
         }
     }, 1)
@@ -325,7 +332,7 @@ function GetKadroHtml() {
                         curDataArray;
                     var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
-                        '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
+                        '<h2 data-baslik="B_' + vars.sectionDatas['CurPageData']['UpperName'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
                         '</div>';
 
@@ -512,7 +519,7 @@ function GetYonetimKurulu() {
                     var length = data.length;
                     var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
-                        '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
+                        '<h2 data-baslik="B_' + vars.sectionDatas['CurPageData']['UpperName'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
                         '</div>';
                     var curData, curDataArray;
@@ -673,7 +680,7 @@ function GetOkulAileBirligi() {
                     var length = data.length;
                     var html = '<div class="container wow ' + AnimationHeader + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="col-lg-12 page-header paddingL0">' +
-                        '<h2 data-basliklar="' + vars.sectionDatas['CurPageData']['BaslikID'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
+                        '<h2 data-baslik="B_' + vars.sectionDatas['CurPageData']['UpperName'] + '">' + vars.sectionDatas['CurPageData']['ShowName'] + '</h2>' +
                         '</div>' +
                         '</div>';
                     var curData, curDataArray;

@@ -126,8 +126,8 @@ class Iletisim extends CI_Controller {
 									Mesaj: ".$Mesaj;
 
 						$this->email->from('aek.k12.tr@gmail.com', 'Ankara Eğitim Kurumları');
-						$this->email->to('sasiogludogucan@gmail.com'); //$users
-						// $this->email->to($MAdres);
+						// $this->email->to('sasiogludogucan@gmail.com'); //$users
+						$this->email->to($MAdres);
 						$this->email->subject("Mesaj | AEK");
 						$this->email->message($message);
 

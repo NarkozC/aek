@@ -32,7 +32,7 @@ function GetBirimlerLojistikHizmetler(){
         html += '<section id="lojistik-hizmetler">'+
         		'<div class="container wow bounceInDown" data-wow-delay="'+wowDelay+'">'+
                 '<div class="col-lg-12 page-header paddingL0">'+
-                '<h2 data-basliklar="GBLH">Lojistik Hizmetler</h2>'+
+                '<h2 data-baslik="GBLH">Lojistik Hizmetler</h2>'+
                 '</div>'+
                 '</div>'+
                 '<div class="container">';

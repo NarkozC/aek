@@ -115,7 +115,7 @@ function GetAylikYemekListesiGallery(okul = '#anaokulu') {
             for (j = 0; j < length2; j++) {
                 html += '<img src="' + imagesDir + curData[j].Resim + '"' +
                     ' data-image="' + imagesDir + curData[j].Resim + '"' +
-                    ' data-baslik="' + curData[j].Baslik + '">';
+                    ' data-baslik="B_' + curData[j].Baslik + '">';
             }
             html += '</div>';
             $('#' + data[i].ShowID).html(html);
@@ -135,7 +135,7 @@ function GetAylikYemekListesiHtml() {
     html += '<section id="' + vars.sectionNames.Lower + '">' +
         '<div class="container">' +
         '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-        '<h2 id="' + vars.sectionShowBases.Baslik + '" class="text-center" data-basliklar="' + vars.sectionGalleryCode + '">' + vars.sectionNames.Normal + '</h2>' +
+        '<h2 id="' + vars.sectionShowBases.Baslik + '" class="text-center" data-baslik="B_' + vars.sectionGalleryCode + '">' + vars.sectionNames.Normal + '</h2>' +
         '</div>' +
         '</div>' +
         '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +

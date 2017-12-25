@@ -4,9 +4,6 @@
 kurumlardan örnek olarak ilkokula basıldığında navdaki başlık "Özel Ankara Eğitim Kurumları"ndan "Özel Ankara Eğitim Kurumları İlkokulu" şeklinde olacak
 
 
-4x4ler dinamikleştirilecek
-
-
 06.11.17
 --galeriye video eklemenin nasıl yapılacağı--
 combobox ile video/resim seçilecek
@@ -15,9 +12,6 @@ videoyu yüklerken isim,youtube linki,kategori istenecek
 --kullanırken ise--
 resim ile beraber video seçilebilecek normal bir element gibi
 mesela galeride karar verirken uzantısına bakacak
-
-
-
 
 
 sınav başvurusu için portaldan bir şekilde excele geçicek wtf

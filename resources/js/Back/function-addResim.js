@@ -188,7 +188,7 @@ function GetAllAddResim() {
     });
 
     function GetKategorilerSelect() {
-        var i, data = rVars.sectionDatas.Kategoriler,
+        var i, data = rVars.sectionDatas.Kategoriler.Data,
             length = data.length,
             html;
 

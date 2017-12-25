@@ -61,7 +61,7 @@ class Haberler extends CI_Controller {
           $this->form_validation->set_rules('en_DigerResimler[]', FORM_LANG_TR['DigerResimler'], 'trim|strip_tags|xss_clean');
           $this->form_validation->set_rules('en_Yazi', FORM_LANG_TR['Yazi'], 'trim');
 
-          $this->form_validation->set_rules('Okul[]', FORM_LANG_TR['Okullar'], 'required|trim|strip_tags|xss_clean');
+          $this->form_validation->set_rules('Okul[]', FORM_LANG_TR['Okul'], 'required|trim|strip_tags|xss_clean');
           $this->form_validation->set_rules('Tarih', FORM_LANG_TR['Tarih'], 'required|trim|strip_tags|xss_clean');
         }
         $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');

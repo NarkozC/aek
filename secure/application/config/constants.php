@@ -134,6 +134,11 @@ define('FORM_LANG_TR', array(
 					'SinavTarihi' => 'Sınav Tarihi',
 					'BasSaat' => 'Başlangıç Saati',
         			'BitSaat' => 'Bitiş Saati',
+        			'Donem' => 'Dönem',
+        			'Gun' => 'Gün',
+        			'Saat' => 'Saat',
+        			'Link' => 'Link',
+        			'Level' => 'Level',
 					));
 
 define('FORM_LANG_EN', array(
@@ -160,6 +165,11 @@ define('FORM_LANG_EN', array(
 					'Yil' => 'Year',
 					'BasSaat' => 'Start Time',
         			'BitSaat' => 'End Time',
+        			'Donem' => 'Period',
+        			'Gun' => 'Day',
+        			'Saat' => 'Time',
+        			'Link' => 'Link',
+        			'Level' => 'Level',
 					));
 
 define('FORM_LANGUAGES', array(

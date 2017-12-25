@@ -1,3 +1,6 @@
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" type="image/x-icon" href="<?php echo base_url(); ?>resources/images/aek-logo.png" />
   <!-- CSSs -->
   <?php $this->view('Back/back-css.php'); ?>
@@ -10,7 +13,7 @@
   <script src="<?php echo base_url(); ?>resources/js/jssor.slider.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/headerscript.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/Back/portal-helper.js"></script>
-  <script src="<?php echo base_url(); ?>resources/js/Back/general-navbar.js"></script>
+  <script src="<?php echo base_url(); ?>resources/js/Back/genel-navbar.js"></script>
 
 </head>
 <body>

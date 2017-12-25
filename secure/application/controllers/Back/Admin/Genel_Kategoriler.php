@@ -8,6 +8,7 @@ class Genel_Kategoriler extends CI_Controller {
 
     $this->data = array('success' => false, 'messages' => array(), 'type' => 'add', 'cached' => false, 'data' => '', 'cachedataTR' => '', 'cachedataEN' => '', 'cacheTime' => 172800,
                         'cacheKeys' => array(
+
                           'GetKategorilerTR' => md5('GetKategorilerCacheTR'),
                           'GetKategorilerEN' => md5('GetKategorilerCacheEN'),
                         ),
@@ -18,9 +19,8 @@ class Genel_Kategoriler extends CI_Controller {
 
   public function index()
   {
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      $this->load->view('Back/General/Kategoriler-view');
+    if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+      $this->load->view('Back/Admin/Kategoriler-view');
     } else {
       redirect('Portal');
     }
@@ -72,157 +72,247 @@ class Genel_Kategoriler extends CI_Controller {
     }
   }
 
-  public function GetKategorilerNum(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      $result = $this->General_Model->GetKategorilerNum();
-      echo json_encode($result);
+  public function AddKategoriler(){
+    if(! $this->input->is_ajax_request()) {
+      redirect('404');
     } else {
-      redirect('Portal');
-    }
-  }
+      if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+        $en = $_POST["English"];
+        if ($en == "true") {
+          $this->config->set_item('language', FORM_LANGUAGES['Ingilizce']);
+          $this->form_validation->set_rules('Isim', FORM_LANG_EN['Isim'], 'required|trim|max_length[255]|strip_tags|xss_clean');      
+        } else {
+          $this->form_validation->set_rules('Isim', FORM_LANG_TR['Isim'], 'required|trim|max_length[255]|strip_tags|xss_clean');     
+        }
+        $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+        if ($this->form_validation->run()) {
+          $Isim = $this->input->post('Isim');
+          $Isim = TurkceToIngilizce($Isim);
+          
+          $ModelData = array(
+                        'Isim'    => $Isim,
+                        );
+          $this->data['ModelData'] = $ModelData;
+          $result = $this->General_Model->AddKategoriler($ModelData);
+          $this->data['result'] = $result;
+          if ($result) {
+            $cacheKeys = array('Kategoriler');
+            for ($i=0; $i < sizeof($cacheKeys); $i++) { 
+              $cacheKeyTR = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'TR'];
+              $cacheKeyEN = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'EN'];
+              
+              $gotCacheTR = $this->cache->get($cacheKeyTR);
+              $gotCacheEN = $this->cache->get($cacheKeyEN);
 
-  public function AddKategori(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      //validate
-      $this->form_validation->set_rules('Isim', FORM_LANG_TR['Isim'], 'required|trim|max_length[65]|strip_tags|xss_clean');
-      $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
-      if ($this->form_validation->run()) {
-        $Isim = $this->input->post('Isim');
-        $Isim = $this->General_Model->TurkceToIngilizce($Isim);
-        $result = $this->General_Model->AddKategori($Isim);
-        if ($result) {
-          $this->data['success'] = true;
-        }
-      } else {
-        //show errors
-        foreach ($_POST as $key => $value) {
-          $this->data['messages'][$key] = form_error($key);
-        }
-      }
+              if ($gotCacheTR) {
+                $this->cache->delete($cacheKeyTR);
+              }
+              if ($gotCacheEN) {
+                $this->cache->delete($cacheKeyEN);
+              }
+            }
+            $this->data['data'] = $this->General_Model->EditKategoriler('0');
+            $this->data['success'] = true;
+          }
+        } else {
+          foreach ($_POST as $key => $value) {
+            $this->data['messages'][$key] = form_error($key);
+          
+        }}
+      
       echo json_encode($this->data);
-    } else {
-      redirect('Portal');
-    }
-
-  }
-
-  public function EditKategori(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
-      if ($this->form_validation->run()) {
-        $this->data['data'] = $this->General_Model->EditKategori();
-        if ($this->data['data']) {
-          $this->data['success'] = true;
-        }
-      }
-      echo json_encode($this->data);
-    } else {
-      redirect('Portal');
-    }
-  }
-
-  public function UpdateKategori(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      //validate
-      $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_rules('Isim', FORM_LANG_TR['Isim'], 'required|trim|max_length[65]|strip_tags|xss_clean');
-      $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
-      if ($this->form_validation->run()) {
-        $Isim = $this->input->post('Isim');
-        $Isim = $this->General_Model->TurkceToIngilizce($Isim);
-        $result = $this->General_Model->UpdateKategori($Isim);
-        $this->data['type'] = 'update';
-        if($result){
-          $this->data['data'] = $this->General_Model->EditKategori();
-          $this->data['success'] = true;
-        }
       } else {
-        //show errors
-        if (form_error('No')) {
-          $this->data['NoV'] = true;
-          $this->data['messages']['No'] = form_error('No');
+        redirect('Portal');
+      }
+    }
+  }
+
+  public function UpdateKategoriler(){
+    if(! $this->input->is_ajax_request()) {
+      redirect('404');
+    } else {
+      if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+        $en = $_POST["English"];
+        if ($en == "true") {
+          $this->config->set_item('language', FORM_LANGUAGES['Ingilizce']);
+          $this->form_validation->set_rules('No', FORM_LANG_EN['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+          $this->form_validation->set_rules('Isim', FORM_LANG_EN['Isim'], 'required|trim|max_length[255]|strip_tags|xss_clean');    
+        } else {
+          $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+          $this->form_validation->set_rules('Isim', FORM_LANG_TR['Isim'], 'required|trim|max_length[255]|strip_tags|xss_clean');       
+        }
+        $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+        if ($this->form_validation->run()) {
+          $Isim = $this->input->post('Isim');
+          $Isim = TurkceToIngilizce($Isim);
+          
+          $ModelData = array(
+                        'Isim'    => $Isim,
+                        );
+          $this->data['ModelData'] = $ModelData;
+          $result = $this->General_Model->UpdateKategoriler($ModelData);
+          $this->data['type'] = 'update';
+          if($result){
+            $cacheKeys = array('Kategoriler');
+            for ($i=0; $i < sizeof($cacheKeys); $i++) { 
+              $cacheKeyTR = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'TR'];
+              $cacheKeyEN = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'EN'];
+              
+              $gotCacheTR = $this->cache->get($cacheKeyTR);
+              $gotCacheEN = $this->cache->get($cacheKeyEN);
+
+              if ($gotCacheTR) {
+                $this->cache->delete($cacheKeyTR);
+              }
+              if ($gotCacheEN) {
+                $this->cache->delete($cacheKeyEN);
+              }
+            }
+            $this->data['data'] = $this->General_Model->EditKategoriler();
+            $this->data['success'] = true;
+          }
         } else {
           foreach ($_POST as $key => $value) {
             $this->data['messages'][$key] = form_error($key);
           }
         }
+        echo json_encode($this->data);
+      } else {
+        redirect('Portal');
       }
-      echo json_encode($this->data);
-    } else {
-      redirect('Portal');
-    }
-
-    
-  }
-
-  public function UpKategori(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_rules('ListOrder', FORM_LANG_TR['ListOrder'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
-      if ($this->form_validation->run()) {
-        $result = $this->General_Model->UpKategori();
-        if($result){
-          $this->data['success'] = true;
-        }
-      }
-      echo json_encode($this->data);
-    } else {
-      redirect('Portal');
     }
   }
 
-  public function DownKategori(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_rules('ListOrder', FORM_LANG_TR['ListOrder'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
-      if ($this->form_validation->run()) {
-        $result = $this->General_Model->DownKategori();
-        if($result){
-          $this->data['success'] = true;
-        }
-      }
-      echo json_encode($this->data);
+  public function EditKategoriler(){
+    if(! $this->input->is_ajax_request()) {
+      redirect('404');
     } else {
-      redirect('Portal');
-    }
-  }
-
-  public function DeleteKategori(){
-    // check if logged in
-    if($this->session->userdata('logged_in')) {
-      $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
-      $this->form_validation->set_rules('Isim', FORM_LANG_TR['Isim'], 'required|trim|max_length[65]|strip_tags|xss_clean');
-      $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
-      if ($this->form_validation->run()) {
-        $response = $this->General_Model->GetKategorilerWhereKategoriler($this->input->post('Isim'));
-        if (empty($response)) {
-          $result = $this->General_Model->DeleteKategori();
-          if($result){
+      if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+        $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+        $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+        if ($this->form_validation->run()) {
+          $this->data['data'] = $this->General_Model->EditKategoriler();
+          if ($this->data['data']) {
             $this->data['success'] = true;
-            $this->data['isFolderHasFiles'] = false;
+          }
+        }
+        echo json_encode($this->data);
+      } else {
+        redirect('Portal');
+      }
+    }
+  }
+
+  public function DeleteKategoriler(){
+    if(! $this->input->is_ajax_request()) {
+      redirect('404');
+    } else {
+      if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+        $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+        $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+        if ($this->form_validation->run()) {
+          $result = $this->General_Model->DeleteKategoriler();
+          if($result){
+            $cacheKeys = array('Kategoriler');
+            for ($i=0; $i < sizeof($cacheKeys); $i++) { 
+              $cacheKeyTR = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'TR'];
+              $cacheKeyEN = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'EN'];
+              
+              $gotCacheTR = $this->cache->get($cacheKeyTR);
+              $gotCacheEN = $this->cache->get($cacheKeyEN);
+
+              if ($gotCacheTR) {
+                $this->cache->delete($cacheKeyTR);
+              }
+              if ($gotCacheEN) {
+                $this->cache->delete($cacheKeyEN);
+              }
+            }
+            $this->data['success'] = true;
+          }
+        }
+        echo json_encode($this->data);
+      } else {
+        redirect('Portal');
+      }
+    }
+  }
+
+  public function UpKategoriler(){
+    if(! $this->input->is_ajax_request()) {
+      redirect('404');
+    } else {
+      if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+        $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+        $this->form_validation->set_rules('ListOrder', FORM_LANG_TR['ListOrder'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+        $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+        if ($this->form_validation->run()) {
+
+          $result = $this->General_Model->UpKategoriler();
+          if($result){
+            $cacheKeys = array('Kategoriler');
+            for ($i=0; $i < sizeof($cacheKeys); $i++) { 
+              $cacheKeyTR = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'TR'];
+              $cacheKeyEN = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'EN'];
+              
+              $gotCacheTR = $this->cache->get($cacheKeyTR);
+              $gotCacheEN = $this->cache->get($cacheKeyEN);
+
+              if ($gotCacheTR) {
+                $this->cache->delete($cacheKeyTR);
+              }
+              if ($gotCacheEN) {
+                $this->cache->delete($cacheKeyEN);
+              }
+            }
+            $this->data['success'] = true;
           }
         } else {
-          foreach ($response as $key => $value) {
-            $this->data['data'][$key] = $value;
+          foreach ($_POST as $key => $value) {
+            $this->data['messages'][$key] = form_error($key);
           }
-          $this->data['isFolderHasFiles'] = true;
-          $this->data['success'] = true;
         }
-        
+        echo json_encode($this->data);
+      } else {
+        redirect('Portal');
       }
-      echo json_encode($this->data);
-    } else {
-      redirect('Portal');
     }
   }
-  
+
+  public function DownKategoriler(){
+    if(! $this->input->is_ajax_request()) {
+      redirect('404');
+    } else {
+      if($this->session->userdata('logged_in') && $this->session->userdata('Admin')) {
+        $this->form_validation->set_rules('No', FORM_LANG_TR['No'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+        $this->form_validation->set_rules('ListOrder', FORM_LANG_TR['ListOrder'], 'required|trim|numeric|max_length[11]|strip_tags|xss_clean');
+        $this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+        if ($this->form_validation->run()) {
+          $result = $this->General_Model->DownKategoriler();
+          if($result){
+            $cacheKeys = array('Kategoriler');
+            for ($i=0; $i < sizeof($cacheKeys); $i++) { 
+              $cacheKeyTR = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'TR'];
+              $cacheKeyEN = $this->data['cacheKeys']['Get'.$cacheKeys[$i].'EN'];
+              
+              $gotCacheTR = $this->cache->get($cacheKeyTR);
+              $gotCacheEN = $this->cache->get($cacheKeyEN);
+
+              if ($gotCacheTR) {
+                $this->cache->delete($cacheKeyTR);
+              }
+              if ($gotCacheEN) {
+                $this->cache->delete($cacheKeyEN);
+              }
+            }
+            $this->data['success'] = true;
+          }
+        }
+        echo json_encode($this->data);
+      } else {
+        redirect('Portal');
+      }
+    }
+  }
+
 }

@@ -7,11 +7,11 @@ class Egitim_Sistemimiz extends CI_Controller {
 		parent::__construct();
 		$this->data = array('cached' => false, 'data' => '', 'cachedataTR' => '', 'cachedataEN' => '', 'cacheTime' => 172800,
 						'cacheKeys' => array(
-                          'GetEgitimSistemiTR' => md5('GetEgitimSistemiCacheTR'),
-                          'GetEgitimSistemiEN' => md5('GetEgitimSistemiCacheEN'),
+                          'GetEgitimSistemimizTR' => md5('GetEgitimSistemimizCacheTR'),
+                          'GetEgitimSistemimizEN' => md5('GetEgitimSistemimizCacheEN'),
 
-                          'GetEgitimSistemiHtmlTR' => md5('GetEgitimSistemiHtmlCacheTR'),
-                          'GetEgitimSistemiHtmlEN' => md5('GetEgitimSistemiHtmlCacheEN'),
+                          'GetEgitimSistemimizHtmlTR' => md5('GetEgitimSistemimizHtmlCacheTR'),
+                          'GetEgitimSistemimizHtmlEN' => md5('GetEgitimSistemimizHtmlCacheEN'),
                         ),
 
 		);
@@ -20,22 +20,22 @@ class Egitim_Sistemimiz extends CI_Controller {
 
 	public function index()
 	{
-		$this->load->view('Front/EgitimSistemi-view');
+		$this->load->view('Front/EgitimSistemimiz-view');
 	}
 
-	public function GetEgitimSistemi(){
+	public function GetEgitimSistemimiz(){
 		if(! $this->input->is_ajax_request()) {
 		    redirect('404');
 		} else {
 			$this->data['cachePostTR'] = $this->input->post('CacheTR');
 			$this->data['cachePostEN'] = $this->input->post('CacheEN');
-			$cacheKeyTR = $this->data['cacheKeys']['GetEgitimSistemiTR'];
-            $cacheKeyEN = $this->data['cacheKeys']['GetEgitimSistemiEN'];
+			$cacheKeyTR = $this->data['cacheKeys']['GetEgitimSistemimizTR'];
+            $cacheKeyEN = $this->data['cacheKeys']['GetEgitimSistemimizEN'];
 			$this->data['English'] = $this->input->post('English');
 			$this->data['NeedData'] = $this->input->post('NeedData');
 
 			if ($this->data['NeedData'] == "true") {
-				$this->data['data'] = $this->General_Model->GetEgitimSistemi();
+				$this->data['data'] = $this->General_Model->GetEgitimSistemimiz();
 			} else {
 				if ($this->data['cachePostTR'] != null) {
 					$this->cache->save($cacheKeyTR, $this->data['cachePostTR'], $this->data['cacheTime']);
@@ -57,9 +57,9 @@ class Egitim_Sistemimiz extends CI_Controller {
 					}
 					if ($this->data['English'] != null) {
 						if ($this->data['English'] == "true" && !$gotCacheEN) {
-							$this->data['data'] = $this->General_Model->GetEgitimSistemi();
+							$this->data['data'] = $this->General_Model->GetEgitimSistemimiz();
 						} else if($this->data['English'] == "false" && !$gotCacheTR) {
-							$this->data['data'] = $this->General_Model->GetEgitimSistemi();
+							$this->data['data'] = $this->General_Model->GetEgitimSistemimiz();
 						}
 					}
 					
@@ -69,19 +69,18 @@ class Egitim_Sistemimiz extends CI_Controller {
 		}
 	}
 
-	public function GetEgitimSistemiNum(){
+	public function GetEgitimSistemimizNum(){
 		if(! $this->input->is_ajax_request()) {
 		    redirect('404');
 		} else {
 			// check if logged in
 			if($this->session->userdata('logged_in')) {
-				$result = $this->General_Model->GetEgitimSistemiNum();
+				$result = $this->General_Model->GetEgitimSistemimizNum();
 				echo json_encode($result);
 			} else {
 				redirect('Portal');
 			}
 		}
 	}
-
 
 }

@@ -46,14 +46,24 @@ function render() {
 
 function renderCB() {
     window.setTimeout(function() {
-        
+        var isMobile = window.matchMedia("only screen and (max-width: 766px)");
+        var isTablet = window.matchMedia("only screen and (max-width: 992px)");
+
         if ($("#anasayfaP").length != 0) {
             $('body').css('padding-top', "0px");
         } else {
             if (!portal) {
-                $('body').css('padding-top', "170px");
+                if (isMobile.matches || isTablet.matches) {
+                    $('body').css('padding-top', "60px");
+                } else {
+                    $('body').css('padding-top', "170px");
+                }
             } else {
-                $('body').css('padding-top', "100px");
+                if (isMobile.matches || isTablet.matches) {
+                    $('body').css('padding-top', "60px");
+                } else {
+                    $('body').css('padding-top', "100px");
+                }
             }
         }
         $('#loader-container').fadeOut();
@@ -273,12 +283,37 @@ var loaderGifImg = '<img src="' + imagesDir + loaderGif + '" class="img-responsi
 /*
 ------------ Modal -----------
 */
-var modalOpts = new Array();
-
-modalOpts = {
+var modalOpts = {
     ModalCloseButton: '<button type="button" class="close hvr-icon-spin" data-dismiss="modal" aria-label="Close"></button>',
 }
 
+
+/*
+------------ Modal -----------
+*/
+var settingsOpts = {
+    Objects: {
+        Form: 'form',
+        Modal: 'modal',
+    },
+    Names: {
+        Upper: 'Settings',
+        Lower: 'settings',
+        Kod: 'settingsBtn',
+    },
+    Controllers: {
+        Portal: baseurl + 'Portal/Admin/Genel-Settings/',
+        Normal: baseurl + 'Genel-Settings/',
+    },
+    Functions: {
+        Get: 'GetSettings',
+        Update: 'UpdateSettings',
+    },
+    Buttons: {
+        Submit: 'SubmitSettings',
+    }
+
+};
 
 
 /*
@@ -393,12 +428,14 @@ if (en) {
         Donem: "Period",
         DonemSec: "Select Period...",
         Gun: "Day",
+        GunSec: "Select Day...",
         Saat: "Time",
         Goster: "Show",
         Yazdir: "Print",
         Cinsiyet: "Gender",
         CinsiyetSec: "Select Gender...",
         SinavTarihi: "Exam Date",
+        SinavTarihiSec: "Select Exam Date...",
         DogumTarihi: "Date Of Birth",
         DogumYeri: "Place Of Birth",
         OOSinif: "Current Class",
@@ -409,7 +446,7 @@ if (en) {
         AnneEmail: "Mother's E-mail",
         BabaAd: "Father's Name",
         BabaTel: "Father's Mobile Phone",
-        AnneEmail: "Father's E-mail",
+        BabaEmail: "Father's E-mail",
         Adres: "Address",
         Tc: "Identity",
         Basvur: "Apply",
@@ -419,6 +456,22 @@ if (en) {
         Kapat: 'Close',
         BasSaat: 'Start Time',
         BitSaat: 'End Time',
+        EnBaslik: 'English Header',
+        TrBaslik: 'Turkish Header',
+        Link: 'Link',
+        DetaylarIcin: 'For Details',
+        GMaps: 'Google Maps',
+        YolTarifi: 'Directions',
+        Tel: 'Phone',
+        Facebook: 'Facebook',
+        Twitter: 'Twitter',
+        Instagram: 'Instagram',
+        Level: 'Level',
+        LevelSec: "Select Level...",
+        IsLink: 'Is Link?',
+        IsLinkInBaseurl: 'Is Link From This Website?',
+        UstBirim: 'Parent Unit',
+        UstBirimSec: "Select Parent Unit...",
     };
 
 } else {
@@ -501,6 +554,7 @@ if (en) {
         Donem: "Dönem",
         DonemSec: "Dönem Seç...",
         Gun: "Gün",
+        GunSec: "Gün Seç...",
         Saat: "Saat",
         Goster: "Göster",
         Yazdir: "Yazdır",
@@ -528,6 +582,22 @@ if (en) {
         Kapat: 'Kapat',
         BasSaat: 'Başlangıç Saati',
         BitSaat: 'Bitiş Saati',
+        EnBaslik: 'İngilizce Başlık',
+        TrBaslik: 'Türkçe Başlık',
+        Link: 'Link',
+        DetaylarIcin: 'Detaylar İçin',
+        GMaps: 'Google Maps',
+        YolTarifi: 'Yol Tarifi',
+        Tel: 'Telefon',
+        Facebook: 'Facebook',
+        Twitter: 'Twitter',
+        Instagram: 'Instagram',
+        Level: 'Level',
+        LevelSec: "Level Seç...",
+        IsLink: 'Link Mi?',
+        IsLinkInBaseurl: 'Link Bu Siteden Mi?',
+        UstBirim: 'Üst Birim',
+        UstBirimSec: "Üst Birim Seç...",
     };
 }
 
@@ -652,9 +722,36 @@ function GetGunlerData(getG = 1, kod = "0") {
 }
 
 function GetDerslerData(getD = 1, kod = "matematik") {
+
+    function GetHtmlTr(data, trArray) {
+        var i;
+        var newHtml = '';
+        var length = trArray.length;
+        var no = data.No;
+
+        for (i = 0; i < length; i++) {
+            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        }
+
+        newHtml +=
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+            '</td>';
+
+        return newHtml;
+    }
+
+
     var controller = baseurl + 'Genel-Dersler/';
     var getFunction = 'GetDersler';
-    var derslerD = new Array();
+    var derslerD = {
+        Data: new Array(),
+        BHtml: '',
+        Num: 0,
+    };
 
     var url = controller + getFunction;
     $.ajax({
@@ -674,15 +771,27 @@ function GetDerslerData(getD = 1, kod = "matematik") {
                 var cache = result.cachedataTR.Dersler;
                 derslerD = cache;
             } else {
-                var i, length;
-                var data = result.data;
-                for (i = 0, length = data.length; i < length; i++) {
-                    derslerD[i] = GetCurData(data[i]);
+                var bHtml = '',
+                    data = result.data,
+                    length = data.length;
+                var i, curData, trInside, trArray;
+
+                for (i = 0; i < length; i++) {
+                    curData = GetCurData(data[i]);
+
+                    trArray = new Array('Ad');
+                    trInside = GetHtmlTr(curData, trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
+
+                    derslerD.Data[i] = curData;
                 }
+
+                derslerD.BHtml = bHtml;
+                derslerD.Num = length;
                 var theCacheData = {
-                    Dersler: derslerD
+                    Dersler: derslerD,
                 }
-                setTimeout(Cache('GetDerslerData', url, theCacheData), 1)
+                setTimeout(Cache('GetDerslerData', url, theCacheData), 1);
             }
             if (getD != 1) {
                 var derslerTemp = derslerD.filter(function(ders) {
@@ -748,9 +857,35 @@ function GetSiniflarData(getS = 1, kod = "1") {
 }
 
 function GetSubelerData(getS = 1, kod = "1") {
+
+    function GetHtmlTr(data, trArray) {
+        var i;
+        var newHtml = '';
+        var length = trArray.length;
+        var no = data.No;
+
+        for (i = 0; i < length; i++) {
+            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        }
+
+        newHtml +=
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+            '</td>';
+
+        return newHtml;
+    }
+
     var controller = baseurl + 'Genel-Subeler/';
     var getFunction = 'GetSubeler';
-    var subelerD = new Array();
+    var subelerD = {
+        Data: new Array(),
+        BHtml: '',
+        Num: 0,
+    };
 
     var url = controller + getFunction;
     $.ajax({
@@ -770,15 +905,27 @@ function GetSubelerData(getS = 1, kod = "1") {
                 var cache = result.cachedataTR.Subeler;
                 subelerD = cache;
             } else {
-                var i, length;
-                var data = result.data;
-                for (i = 0, length = data.length; i < length; i++) {
-                    subelerD[i] = GetCurData(data[i]);
+                var bHtml = '',
+                    data = result.data,
+                    length = data.length;
+                var i, curData, trInside, trArray;
+
+                for (i = 0; i < length; i++) {
+                    curData = GetCurData(data[i]);
+
+                    trArray = new Array('Kod');
+                    trInside = GetHtmlTr(curData, trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
+
+                    subelerD.Data[i] = curData;
                 }
+
+                subelerD.BHtml = bHtml;
+                subelerD.Num = length;
                 var theCacheData = {
-                    Subeler: subelerD
+                    Subeler: subelerD,
                 }
-                setTimeout(Cache('GetSubelerData', url, theCacheData), 1)
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
             if (getS != 1) {
                 var subelerTemp = subelerD.filter(function(sube) {
@@ -830,7 +977,6 @@ function GetResimlerData() {
                 var theCacheData = {
                     Resimler: resimlerD
                 }
-                console.log(theCacheData);
                 setTimeout(Cache('GetResimlerData', url, theCacheData), 1)
             }
 
@@ -939,9 +1085,43 @@ function GetAylarData(getS = 1, kod = "E") {
 }
 
 function GetKategorilerData(getS = 1, kod = "E") {
+
+    function GetHtmlTr(data, trArray) {
+        var i;
+        var newHtml = '';
+        var length = trArray.length;
+        var no = data.No;
+        var listOrder = data.ListOrder
+
+        for (i = 0; i < length; i++) {
+            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        }
+
+        newHtml +=
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonUp + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconUp + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonDown + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconDown + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+            '</td>';
+
+        return newHtml;
+    }
+
+
     var controller = baseurl + 'Portal/Admin/Genel-Kategoriler/';
     var getFunction = 'GetKategoriler';
-    var curData = new Array();
+    var curDataG = {
+        Data: new Array(),
+        BHtml: '',
+        Num: 0,
+    }
 
     var url = controller + getFunction;
     $.ajax({
@@ -956,20 +1136,72 @@ function GetKategorilerData(getS = 1, kod = "E") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Kategoriler;
-                curData = cache;
+                curDataG = cache;
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Kategoriler;
+                curDataG = cache;
+            } else {
+                var bHtml = '',
+                    data = result.data,
+                    length = data.length;
+                var i, curData, trInside, trArray;
+
+                for (i = 0; i < length; i++) {
+                    curData = GetCurData(data[i]);
+
+                    trArray = new Array('Isim');
+                    trInside = GetHtmlTr(curData, trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
+
+                    curDataG.Data[i] = curData;
+                }
+
+                curDataG.BHtml = bHtml;
+                curDataG.Num = length;
+                var theCacheData = {
+                    Kategoriler: curDataG,
+                }
+                setTimeout(Cache('GetKategorilerData', url, theCacheData), 1);
+            }
+        },
+        error: function() {
+            iziError();
+        }
+    });
+
+    return curDataG;
+}
+
+function GetSettingsData() {
+    var curData = new Array();
+
+    var url = settingsOpts.Controllers.Normal + settingsOpts.Functions.Get;
+    $.ajax({
+        type: 'ajax',
+        method: 'post',
+        url: url,
+        data: {
+            English: en,
+        },
+        async: false,
+        dataType: 'json',
+        success: function(result) {
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.Settings;
+                curData = cache;
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.Settings;
                 curData = cache;
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    curData[i] = GetCurData(data[i]);
+                    curData[i] = data[i];
                 }
                 var theCacheData = {
-                    Kategoriler: curData
+                    Settings: curData
                 }
-                setTimeout(Cache('GetKategorilerData', url, theCacheData), 1)
+                setTimeout(Cache('GetSettingsData', url, theCacheData), 1)
             }
         },
         error: function() {
@@ -1058,9 +1290,11 @@ function GetCurData(data) {
 ------------ Show Form Errors -----------
 */
 function ShowFormErrors(messages) {
+    var i = 0;
     $.each(messages, function(key, value) {
         var ajaxGroup;
         var element
+        var key = key.replace("[]", "");
         if (key == "No") {
             element = $('[name="' + key + '"]');
         } else {
@@ -1070,7 +1304,6 @@ function ShowFormErrors(messages) {
         ajaxGroup.addClass(value.length > 0 ? 'has-error' : 'has-success')
 
         $(ajaxGroup).append(value);
-        // ajaxGroup.after(value);
     });
 }
 

@@ -14,8 +14,8 @@
   <script src="<?php echo base_url(); ?>resources/js/jquery.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/jssor.slider.min.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/headerscript.js"></script>
-  <script src="<?php echo base_url(); ?>resources/js/Front/general-popup.js"></script>
-  <script src="<?php echo base_url(); ?>resources/js/Front/general-navbar.js"></script>
+  <script src="<?php echo base_url(); ?>resources/js/Front/genel-popup.js"></script>
+  <script src="<?php echo base_url(); ?>resources/js/Front/genel-navbar.js"></script>
 </head>
 <body>
 <div id="loader-container">
@@ -83,15 +83,3 @@
     </div>
   </nav>
   <!-- end AekNavbar-->
-
-  <br>
-  <section id="popup">
-
-  </section>
-<!--
-  <div id="showNavYan"></div>
-  <script src="<?php echo base_url(); ?>resources/js/Front/nav-yan.js"></script>
-  <div style="position: relative;z-index: 99999999;background-color: red;">
-    <a id="dek-side-navbar-button" href="#dek-side-navbar" style="position: fixed;z-index: 99;background-color: #e6e6e6; right: 0;bottom: 50%;margin-right: 0px;border-top-left-radius: 15px;border-bottom-left-radius: 15px;padding: 10px;"><i class="fa fa-lg fa-arrow-left" aria-hidden="true"></i></a>
-  </div>
---> 

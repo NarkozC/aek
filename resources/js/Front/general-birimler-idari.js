@@ -32,7 +32,7 @@ function GetBirimlerIdari(){
         html += '<section id="idari-birimler">'+
         		'<div class="container wow bounceInDown" data-wow-delay="'+wowDelay+'">'+
                 '<div class="col-lg-12 page-header paddingL0">'+
-                '<h2 data-basliklar="GBI">İdari Birimler</h2>'+
+                '<h2 data-baslik="GBI">İdari Birimler</h2>'+
                 '</div>'+
                 '</div>'+
                 '<div class="container">';

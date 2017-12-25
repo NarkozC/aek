@@ -139,7 +139,9 @@ function CheckLogin() {
 =====================================
 */
 $(function() {
-    DoubleClickFC()
+    setTimeout(function() {
+        DoubleClickFC()
+    }, 300);
 });
 var DoubleClickFC = function() {
     $('.ug-gallery-wrapper').off('dblclick');
@@ -476,6 +478,19 @@ $(window).scroll(Navbar);
 
 $(document).ready(function() {
     Navbar();
+    setTimeout(function() {
+        if ($('#showBanner').length > 0) {
+            var height = $('body').height()
+
+            $('#layerslider').layerSlider({
+                skinsPath: baseurl + 'resources/layersliderSkins/',
+                skin: 'v6',
+                type: 'fullwidth',
+                height: height,
+            });
+        }
+    }, 650);
+    
 });
 
 function Navbar() {
@@ -540,39 +555,4 @@ $(document).ready(function() {
     $(document).on('click touchstart', '.navbar .dropdown-menu', function(e) {
         e.stopPropagation();
     })
-});
-
-
-
-
-
-/*
-=====================================
-  ---------- Unite Gallery --------
-=====================================
-*/
-jQuery(document).ready(function() {
-    setTimeout(function() {
-        if ($('#BannerA').length != 0) {
-            UG = jQuery("#BannerA").unitegallery({
-                gallery_theme: "slider",
-                slider_control_zoom: false,
-            });
-            // var container = $('#BannerA').parents('div.container:first');
-            // var margin = $(container).css('margin-left')
-            // margin = margin.split('px');
-            // margin = Number(margin[0]) / 2;
-
-            // $(container).css('margin-left', margin);
-            // $(container).css('margin-right', margin);
-            // setTimeout(function() {
-            //     bannerWidth = $('#BannerA').parents('div.container:first').width();
-            //     console.log(bannerWidth);
-            //     UG.resize(bannerWidth)
-            // }, 10);
-            bannerWidth = $('#BannerA').parents('div.container:first').width();
-            UG.resize(bannerWidth)
-        }
-    }, 100);
-    
 });

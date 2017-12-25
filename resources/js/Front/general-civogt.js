@@ -3,7 +3,7 @@ var vars = {
         Normal: 'Çözümleriniz İçin Veli Öğretmen Görüşme Takvimi',
         Upper: 'Civogt',
         Lower: 'civogt',
-        Kod: 'GCIVOGT',
+        Kod: 'GCivogt',
     },
     sectionControllers: {
         Normal: baseurl + 'CIVOGT/',
@@ -23,6 +23,7 @@ var vars = {
         Yillar: GetYillarData(),
         Siniflar: GetSiniflarData(),
         Subeler: GetSubelerData(),
+        Settings: GetSettingsData(),
     },
     sectionFunctions: {
         Get: 'GetCivogt',
@@ -50,6 +51,13 @@ var vars = {
 };
 
 $(function() {
+
+    for (var i = 0, data = vars.sectionDatas.Settings, length = data.length; i < length; i++) {
+        if (data[i].ControllerName == vars.sectionNames.Upper) {
+            vars.sectionDatas.Settings = data[i];
+        }
+    }
+
 
     //Refresh Page
     RefreshData(1, 1, 1);
@@ -162,7 +170,7 @@ function GetSinif(okul = -1) {
 
 function GetSube(sinif = -1) {
     var i, length;
-    var data = vars.sectionDatas.Subeler;
+    var data = vars.sectionDatas.Subeler.Data;
 
     $('#' + vars.sectionButtons.ShowTable).prop('disabled', true);
     if (sinif == -1) {
@@ -197,7 +205,6 @@ function CreateTable() {
         values = vars.sectionSPsValues,
         data = vars.sectionDatas.Civogt.Data;
 
-    console.log(data);
 
     var yilF = data.filter(function(civogt) {
         return civogt.Yil == values.Yil;
@@ -266,7 +273,7 @@ function GetCivogtData() {
                 for (i = 0, length = data.length; i < length; i++) {
                     curData = data[i];
 
-                    var curDers = vars.sectionDatas.Dersler.filter(function(ders) {
+                    var curDers = vars.sectionDatas.Dersler.Data.filter(function(ders) {
                         return ders.Kod == curData.Ders;
                     });
 
@@ -301,17 +308,18 @@ function GetCivogtData() {
 
 
 function GetCivogtHtml() {
+    var setData = vars.sectionDatas.Settings;
     var html = '';
 
     html += '<section id="' + vars.sectionNames.Lower + '">' +
         '<div class="container">' +
         '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-        '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
+        '<h2 data-baslik="B_' + vars.sectionNames.Upper + '">' + vars.sectionNames.Normal + '</h2>' +
         '</div>' +
         '</div>' +
         '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +
         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-        '<img src="' + imagesDir + 'Genel/CIVOGS-2.png" class="img-responsive img-center">' +
+        '<img src="' + imagesDir + setData.Deger4 + '" class="img-responsive img-center">' +
         '</div>' +
         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
 

@@ -11,6 +11,7 @@ var vars = {
         Normal: 'Duyurular Etkinlikler',
         Upper: 'DuyurularEtkinlikler',
         Lower: 'duyurularEtkinlikler',
+        Kod: 'GDE',
     },
     sectionShowBases: {
         Sections: 'showDuyurularEtkinlikler',
@@ -31,6 +32,8 @@ var vars = {
     sectionDatas: {
         DuyurularEtkinlikler: {
             Data: new Array(),
+            FData: new Array(),
+            FHtml: new Array(),
             Num: 0,
         },
 
@@ -53,8 +56,8 @@ $(function() {
 
     //Button that opens add/update modal
     FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-                vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-                vars.sectionObjects.Form, vars.sectionObjects.Modal);
+        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+        vars.sectionObjects.Form, vars.sectionObjects.Modal);
 
 
 
@@ -196,8 +199,8 @@ $(function() {
 
     //Button for deleting
     FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
-            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
-            RefreshData,"1, 1, 1");
+        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+        RefreshData, "1, 1, 1");
 });
 
 function GetOkullarSelect() {
@@ -284,6 +287,8 @@ function CreateSectionsTable() {
 function GetSectionsData() {
     vars.sectionDatas.DuyurularEtkinlikler = {
         Data: new Array(),
+        FData: new Array(),
+        FHtml: new Array(),
         Num: 0,
     }
 
@@ -306,7 +311,7 @@ function GetSectionsData() {
                 vars.sectionDatas.DuyurularEtkinlikler = cache;
             } else {
                 var i, j, data = result.data,
-                    length, length2, htmls = {};
+                    length, length2, htmls = {}, fHtml = '', fData = new Array();
                 var curData, trInside, trArray;
 
                 for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
@@ -327,7 +332,46 @@ function GetSectionsData() {
                         trInside = GetHtmlTr(curData, trArray);
                         htmls[okul[j]] += '<tr>' + trInside + '</tr>';
                     }
+
+
+
+                    if (en) {
+                        curData.Link = baseurl + 'en/'+page+'/Haber/' + curData.SectionID;
+                    } else {
+                        curData.Link = baseurl + page +'/Haber/' + curData.SectionID;
+                    }
+                    var dateAr = curData.Tarih.split('-');
+                    curData.Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];
+                    fData[i] = curData;
+
+                    fHtml +=
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad25 marginB35 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
+                        '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- hidden-xs-sm-md -->' +
+                        '<div class="col-lg-4">' +
+                        '<a href="' + curData.Link + '"><img alt="' + curData.Baslik + '" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="' + imagesDir + curData.AnaResim + '"></a>' +
+                        '</div>' +
+                        '<div class="col-lg-8">' +
+                        '<h3><a href="' + curData.Link + '">' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></a></h3>' +
+                        '<p class="shorten_content8">' + curData.Yazi + '</p>' +
+                        '<br>' +
+                        '</div>' +
+                        '<a href="' + curData.Link + '" class="btn btn-sm btn-danger borderRad10" style="position:absolute;bottom:20px;right:20px">' + formLang.ReadMore + '</a>' +
+                        '</div>' +
+                        '<div class="row visible-md visible-sm visible-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- visible-xs-sm-md -->' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12">' +
+                        '<h3 class="text-center"><a href="' + curData.Link + '">' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></a></h3>' +
+                        '<a href="' + curData.Link + '"><img alt="' + curData.Baslik + '" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="' + imagesDir + curData.AnaResim + '"></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 marginTop10">' +
+                        '<p class="shorten_content8">' + curData.Yazi + '</p>' +
+                        '<br><a href="' + curData.Link + '" style="position:absolute;bottom:0;"><span class="btn btn-sm btn-danger pull-right marginR15 borderRad10">' + formLang.ReadMore + '</span></a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
                 }
+
+                vars.sectionDatas.DuyurularEtkinlikler.FHtml = fHtml;
+                vars.sectionDatas.DuyurularEtkinlikler.FData = fData;
                 vars.sectionDatas.DuyurularEtkinlikler.Data = htmls;
                 vars.sectionDatas.DuyurularEtkinlikler.Num = length;
 
@@ -460,7 +504,7 @@ function GetSectionsHtml() {
         '<h2>' +
         '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
         '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal +
+        '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
         '</div>' +

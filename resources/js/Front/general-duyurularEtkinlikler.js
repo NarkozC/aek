@@ -8,7 +8,7 @@ function AllDuyurularEtkinlikler() {
         },
         sectionNames: {
             Normal: 'Duyurular Etkinlikler',
-            Upper: 'Duyurular-Etkinlikler',
+            Upper: 'DuyurularEtkinlikler',
             Lower: 'duyurularEtkinlikler',
             Kod: 'GDE',
             UpperSingle: 'DuyuruEtkinlik',
@@ -183,7 +183,7 @@ function AllDuyurularEtkinlikler() {
             html += '<section id="' + vars.sectionNames.Lower + '">' +
                 '<div class="container">' +
                 '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-                '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
+                '<h2 data-baslik="B_' + vars.sectionNames.Upper + '">' + vars.sectionNames.Normal + '</h2>' +
                 '</div>';
 
             html += '<div id="' + vars.sectionShowBases.SectionsData + '"></div>' +
@@ -302,7 +302,7 @@ function AllDuyurularEtkinlikler() {
     }
 
     function GetGH() {
-        var UG = jQuery("#" + vars.sectionNames.Kod).unitegallery({
+        UG = jQuery("#" + vars.sectionNames.Kod).unitegallery({
             thumb_fixed_size: false,
             thumb_image_overlay_effect: true,
             thumb_image_overlay_type: "blur",
@@ -322,7 +322,7 @@ function AllDuyurularEtkinlikler() {
             '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 marginTop15 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad10 paddingLR5">' +
             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">' +
-            '<a href="' + vars.sectionControllers.Normal + '"><h3 data-basliklar="' + vars.sectionNames.Kod + '" class="page-header">' + vars.sectionNames.Normal + '</h3></a>' +
+            '<a href="' + vars.sectionControllers.Normal + '"><h3 data-baslik="B_' + vars.sectionNames.Upper + '" class="page-header">' + vars.sectionNames.Normal + '</h3></a>' +
             '</div>';
 
         for (i = 0; i <= 2; i++) {
@@ -342,7 +342,7 @@ function AllDuyurularEtkinlikler() {
         }
         html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">' +
             '<div class="page-header"></div>' +
-            '<a href="' + vars.sectionControllers.Normal + '"><button type="button" class="btn btn-danger btn-md">' + formLang.Tum + ' <span data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</span></button></a>' +
+            '<a href="' + vars.sectionControllers.Normal + '"><button type="button" class="btn btn-danger btn-md">' + formLang.Tum + ' <span data-baslik="B_' + vars.sectionNames.Upper + '">' + vars.sectionNames.Normal + '</span></button></a>' +
             '</div>' +
             '</div>' +
             '</div>' +

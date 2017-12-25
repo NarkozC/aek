@@ -91,7 +91,7 @@ function GetOkullarSelect() {
 }
 
 function GetSubelerSelect(okul = -1) {
-    var i, length, data = vars.sectionDatas.Subeler,
+    var i, length, data = vars.sectionDatas.Subeler.Data,
         html = '';
 
     var tr_ID = vars.sectionSPs.Sube + 'Select';
@@ -246,7 +246,7 @@ function GetEtkinlikTakvimiHtml() {
     html += '<section id="' + vars.sectionNames.Lower + '">' +
         '<div class="container">' +
         '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
-        '<h2 data-basliklar="' + vars.sectionNames.Kod + '">' + vars.sectionNames.Normal + '</h2>' +
+        '<h2 data-baslik="B_' + vars.sectionNames.Upper + '">' + vars.sectionNames.Normal + '</h2>' +
         '</div>' +
         '</div>' +
         '<div class="container wow ' + Animation + ' dark-bg shadow borderRad10" data-wow-delay="' + wowDelay + '">' +

@@ -77,6 +77,7 @@ function FunDelete(sBase, sButton, url, refreshFun, refreshPars) {
                                 if (rowCount == 1) {
                                     refreshFun(refreshPars);
                                 }
+                                $(vars.sectionObjects.Modal).modal('hide');
                             }
                         });
 

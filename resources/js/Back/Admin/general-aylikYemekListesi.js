@@ -54,8 +54,8 @@ $(function() {
 
     //Button that opens add/update modal
     FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-                vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-                vars.sectionObjects.Form, vars.sectionObjects.Modal);
+        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+        vars.sectionObjects.Form, vars.sectionObjects.Modal);
 
 
 
@@ -91,6 +91,7 @@ $(function() {
                 async: false,
                 dataType: 'json',
                 success: function(response) {
+                    console.log(response)
                     ResetFormErrors();
                     if (response.success) {
                         ResetSelectpicker();
@@ -205,8 +206,8 @@ $(function() {
 
     //Button for deleting
     FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
-            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
-            RefreshData,"1, 1, 1");
+        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+        RefreshData, "1, 1, 1");
 });
 
 function GetOkullarSelect() {
@@ -268,7 +269,7 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.AylikYemekListesi.Data[i]);
     }
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -297,9 +298,13 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.AylikYemekListesi;
                 vars.sectionDatas.AylikYemekListesi = cache;
+                vars.sectionDatas.AylikYemekListesi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.AylikYemekListesi.FData = JSON.parse(cache.FData);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.AylikYemekListesi;
                 vars.sectionDatas.AylikYemekListesi = cache;
+                vars.sectionDatas.AylikYemekListesi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.AylikYemekListesi.FData = JSON.parse(cache.FData);
             } else {
                 var data = result.data,
                     html = new Array(),
@@ -331,10 +336,14 @@ function GetSectionsData() {
                 vars.sectionDatas.AylikYemekListesi.Data = htmls;
                 vars.sectionDatas.AylikYemekListesi.Num = length;
 
+                vars.sectionDatas.AylikYemekListesi.Data = JSON.stringify(vars.sectionDatas.AylikYemekListesi.Data);
+                vars.sectionDatas.AylikYemekListesi.FData = JSON.stringify(vars.sectionDatas.AylikYemekListesi.FData);
                 var theCacheData = {
                     AylikYemekListesi: vars.sectionDatas.AylikYemekListesi,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.AylikYemekListesi.Data = JSON.parse(vars.sectionDatas.AylikYemekListesi.Data);
+                vars.sectionDatas.AylikYemekListesi.FData = JSON.parse(vars.sectionDatas.AylikYemekListesi.FData);
             }
         },
         error: function() {
@@ -350,7 +359,7 @@ function GetHtmlTr(data, trArray) {
     var no = data.No;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     newHtml +=
         '<td>' +
@@ -484,8 +493,6 @@ function GetSectionsHtml() {
             '</div>';
     }
 
-
-
     html += '</div>' +
         '</div>' +
         '</div>' +
@@ -515,7 +522,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

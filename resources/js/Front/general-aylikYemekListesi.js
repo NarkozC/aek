@@ -33,7 +33,7 @@ $(function() {
     $('.panel-heading .nav-tabs').on('click', 'li', function(e) {
         $('.panel-body .tab-content .tab-pane.active').html('');
 
-        okul = $(this).find('a').attr('href');
+        var okul = $(this).find('a').attr('href');
         RefreshData(0, 0, 1, okul)
     });
 });
@@ -53,9 +53,13 @@ function GetAylikYemekListesiData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.AylikYemekListesi;
                 vars.sectionDatas.AylikYemekListesi = cache;
+                vars.sectionDatas.AylikYemekListesi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.AylikYemekListesi.FData = JSON.parse(cache.FData);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.AylikYemekListesi;
                 vars.sectionDatas.AylikYemekListesi = cache;
+                vars.sectionDatas.AylikYemekListesi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.AylikYemekListesi.FData = JSON.parse(cache.FData);
             } else {
                 var data = result.data,
                     html = new Array(),
@@ -87,10 +91,16 @@ function GetAylikYemekListesiData() {
                 vars.sectionDatas.AylikYemekListesi.Data = htmls;
                 vars.sectionDatas.AylikYemekListesi.Num = length;
 
-                var theCacheData = {
-                    AylikYemekListesi: vars.sectionDatas.AylikYemekListesi,
+                if (length < cacheLimit) {
+                    vars.sectionDatas.AylikYemekListesi.Data = JSON.stringify(vars.sectionDatas.AylikYemekListesi.Data);
+                    vars.sectionDatas.AylikYemekListesi.FData = JSON.stringify(vars.sectionDatas.AylikYemekListesi.FData);
+                    var theCacheData = {
+                        AylikYemekListesi: vars.sectionDatas.AylikYemekListesi,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.AylikYemekListesi.Data = JSON.parse(vars.sectionDatas.AylikYemekListesi.Data);
+                    vars.sectionDatas.AylikYemekListesi.FData = JSON.parse(vars.sectionDatas.AylikYemekListesi.FData);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -115,7 +125,7 @@ function GetAylikYemekListesiGallery(okul = '#anaokulu') {
             for (j = 0; j < length2; j++) {
                 html += '<img src="' + imagesDir + curData[j].Resim + '"' +
                     ' data-image="' + imagesDir + curData[j].Resim + '"' +
-                    ' data-baslik="B_' + curData[j].Baslik + '">';
+                    ' data-baslik="' + curData[j].Baslik + '">';
             }
             html += '</div>';
             $('#' + data[i].ShowID).html(html);
@@ -209,7 +219,7 @@ function GetHtmlTr(data, trArray) {
     var no = data.No;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     newHtml +=
         '<td>' +

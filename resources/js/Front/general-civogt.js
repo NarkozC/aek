@@ -6,7 +6,7 @@ var vars = {
         Kod: 'GCivogt',
     },
     sectionControllers: {
-        Normal: baseurl + 'CIVOGT/',
+        Normal: baseurl + 'Civogt/',
     },
     sectionShowBases: {
         Sections: 'showCivogt',
@@ -240,7 +240,7 @@ function CreateTable() {
     CreateDataTables()
 
     setTimeout(function() {
-        ShortenContent6();
+        ShortenContent();
     }, 1);
 
 
@@ -261,9 +261,11 @@ function GetCivogtData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Civogt;
                 vars.sectionDatas.Civogt = cache;
+                vars.sectionDatas.Civogt.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Civogt;
                 vars.sectionDatas.Civogt = cache;
+                vars.sectionDatas.Civogt.Data = JSON.parse(cache.Data);
             } else {
                 var i;
                 var length;
@@ -292,10 +294,17 @@ function GetCivogtData() {
                     vars.sectionDatas.Civogt.Data[vars.sectionDatas.Civogt.Num] = curData;
                     vars.sectionDatas.Civogt.Num++;
                 }
-                var theCacheData = {
-                    Civogt: vars.sectionDatas.Civogt,
+
+                if (vars.sectionDatas.Civogt.Num < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Civogt.Data);
+                    vars.sectionDatas.Civogt.Data = myJSON;
+                    var theCacheData = {
+                        Civogt: vars.sectionDatas.Civogt,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Civogt.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetCivogtData', url, theCacheData), 1)
+
             }
 
         },
@@ -374,7 +383,7 @@ function GetHtmlTr(data, trArray) {
     var i;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     return newHtml;
 }

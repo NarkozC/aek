@@ -140,9 +140,15 @@ function GetKadro() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.KadroData;
                 vars.sectionDatas.KadroData = cache;
+                vars.sectionDatas.KadroData.Grups = JSON.parse(vars.sectionDatas.KadroData.Grups);
+                vars.sectionDatas.KadroData.GrupsName = JSON.parse(vars.sectionDatas.KadroData.GrupsName);
+                vars.sectionDatas.KadroData.GrupsCounter = JSON.parse(vars.sectionDatas.KadroData.GrupsCounter);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.KadroData;
                 vars.sectionDatas.KadroData = cache;
+                vars.sectionDatas.KadroData.Grups = JSON.parse(vars.sectionDatas.KadroData.Grups);
+                vars.sectionDatas.KadroData.GrupsName = JSON.parse(vars.sectionDatas.KadroData.GrupsName);
+                vars.sectionDatas.KadroData.GrupsCounter = JSON.parse(vars.sectionDatas.KadroData.GrupsCounter);
             } else {
                 var data = result.data,
                     length = data.length,
@@ -179,10 +185,19 @@ function GetKadro() {
 
                     }
                 }
-                var theCacheData = {
-                    KadroData: vars.sectionDatas.KadroData,
+
+                if (length < cacheLimit) {
+                    vars.sectionDatas.KadroData.Grups = JSON.stringify(vars.sectionDatas.KadroData.Grups);
+                    vars.sectionDatas.KadroData.GrupsName = JSON.stringify(vars.sectionDatas.KadroData.GrupsName);
+                    vars.sectionDatas.KadroData.GrupsCounter = JSON.stringify(vars.sectionDatas.KadroData.GrupsCounter);
+                    var theCacheData = {
+                        KadroData: vars.sectionDatas.KadroData,
+                    }
+                    setTimeout(Cache('GetKadroData', url, theCacheData), 1);
+                    vars.sectionDatas.KadroData.Grups = JSON.parse(vars.sectionDatas.KadroData.Grups);
+                    vars.sectionDatas.KadroData.GrupsName = JSON.parse(vars.sectionDatas.KadroData.GrupsName);
+                    vars.sectionDatas.KadroData.GrupsCounter = JSON.parse(vars.sectionDatas.KadroData.GrupsCounter);
                 }
-                setTimeout(Cache('GetKadro', url, theCacheData), 1);
             }
 
         },
@@ -222,9 +237,23 @@ function GetKadroGrup() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.KadroGrupData;
                 vars.sectionDatas.KadroGrupData = cache;
+                vars.sectionDatas.KadroGrupData.Mains = JSON.parse(vars.sectionDatas.KadroGrupData.Mains);
+                vars.sectionDatas.KadroGrupData.SubSubs = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubs);
+                vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                vars.sectionDatas.KadroGrupData.Subs = JSON.parse(vars.sectionDatas.KadroGrupData.Subs);
+                vars.sectionDatas.KadroGrupData.SubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubsCounter);
+                vars.sectionDatas.KadroGrupData.Tabs = JSON.parse(vars.sectionDatas.KadroGrupData.Tabs);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.KadroGrupData;
                 vars.sectionDatas.KadroGrupData = cache;
+                vars.sectionDatas.KadroGrupData.Mains = JSON.parse(vars.sectionDatas.KadroGrupData.Mains);
+                vars.sectionDatas.KadroGrupData.SubSubs = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubs);
+                vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                vars.sectionDatas.KadroGrupData.Subs = JSON.parse(vars.sectionDatas.KadroGrupData.Subs);
+                vars.sectionDatas.KadroGrupData.SubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubsCounter);
+                vars.sectionDatas.KadroGrupData.Tabs = JSON.parse(vars.sectionDatas.KadroGrupData.Tabs);
             } else {
                 var data = result.data,
                     length = data.length,
@@ -276,10 +305,26 @@ function GetKadroGrup() {
                     }
                 }
 
-                var theCacheData = {
-                    KadroGrupData: vars.sectionDatas.KadroGrupData,
+                if (vars.sectionDatas.KadroGrupData.Num < cacheLimit) {
+                    vars.sectionDatas.KadroGrupData.Mains = JSON.stringify(vars.sectionDatas.KadroGrupData.Mains);
+                    vars.sectionDatas.KadroGrupData.SubSubs = JSON.stringify(vars.sectionDatas.KadroGrupData.SubSubs);
+                    vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.stringify(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                    vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.stringify(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                    vars.sectionDatas.KadroGrupData.Subs = JSON.stringify(vars.sectionDatas.KadroGrupData.Subs);
+                    vars.sectionDatas.KadroGrupData.SubsCounter = JSON.stringify(vars.sectionDatas.KadroGrupData.SubsCounter);
+                    vars.sectionDatas.KadroGrupData.Tabs = JSON.stringify(vars.sectionDatas.KadroGrupData.Tabs);
+                    var theCacheData = {
+                        KadroGrupData: vars.sectionDatas.KadroGrupData,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.KadroGrupData.Mains = JSON.parse(vars.sectionDatas.KadroGrupData.Mains);
+                    vars.sectionDatas.KadroGrupData.SubSubs = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubs);
+                    vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                    vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                    vars.sectionDatas.KadroGrupData.Subs = JSON.parse(vars.sectionDatas.KadroGrupData.Subs);
+                    vars.sectionDatas.KadroGrupData.SubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubsCounter);
+                    vars.sectionDatas.KadroGrupData.Tabs = JSON.parse(vars.sectionDatas.KadroGrupData.Tabs);
                 }
-                setTimeout(Cache("GetKadroGrup", url, theCacheData), 1)
             }
         },
         error: function() {
@@ -305,7 +350,6 @@ function GetKadroHtml() {
                 var cache = result.cachedataEN.KadroDataHtml;
                 vars.sectionDatas.KadroData.Html = cache;
                 $(showID).html(cache);
-
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.KadroDataHtml;
                 vars.sectionDatas.KadroData.Html = cache;
@@ -321,6 +365,7 @@ function GetKadroHtml() {
                         break_on = 4,
                         oneLeft = 'F',
                         its13 = false,
+                        its10 = false,
                         counter = 0,
                         length = data.length,
                         subHtml = '',
@@ -353,16 +398,20 @@ function GetKadroHtml() {
                         }
 
                         if (curSSIDData == []) {
-                            console.log(sSectionID + ' doesnt have any members');
+                            // console.log(sSectionID + ' doesnt have any members');
                         } else {
                             curContent = data[i];
                             oneLeft = 'F';
                             its13 = false;
+                            its10 = false;
                             break_on = 4;
                             counter = 0;
                             if (curSSIDDataCounter == 13) {
                                 break_on = 3;
                                 its13 = true;
+                            } else if (curSSIDDataCounter == 10) {
+                                break_on = 4;
+                                its10 = true;
                             } else if (curSSIDDataCounter % 4 == 0) {
                                 break_on = 4;
                             } else if (curSSIDDataCounter % 3 == 0) {
@@ -445,6 +494,8 @@ function GetKadroHtml() {
                                 }
                                 if (break_on == 4 && oneLeft == 'T3' && counter == curSSIDDataCounter - 3) {
                                     break_on = 3;
+                                } else if (break_on == 4 && counter == curSSIDDataCounter - 2 && its10 == true) {
+                                    break_on = 2;
                                 } else if (break_on == 3 && oneLeft == 'T4' && counter == curSSIDDataCounter - 2) {
                                     break_on = 2;
                                 } else if (break_on == 3 && its13 == true && counter == curSSIDDataCounter - 4) {
@@ -461,15 +512,12 @@ function GetKadroHtml() {
                     }
                     $(showID).html(html);
                     vars.sectionDatas.KadroData.Html = html;
+
                     var theCacheData = {
                         KadroDataHtml: vars.sectionDatas.KadroData.Html,
                     }
                     setTimeout(Cache("KadroHtml", url, theCacheData), 1)
                 }
-
-
-
-
 
             }
         },
@@ -705,7 +753,7 @@ function GetOkulAileBirligi() {
                         curData = GetCurData(data[i]);
                         curDataArray = new Array('Resim', 'AdSoyad', 'ozel-Aciklama')
                         curData = GetOrganizedHtml(curData, curDataArray)
-                        
+
                         if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
                             html += '<div class="row">';
                         } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
@@ -734,7 +782,7 @@ function GetOkulAileBirligi() {
                             html += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginT10 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
                         }
                         html += '<div class="hvr-float-shadow thumbnail">' +
-                            '<a class="LGM" href="' + imagesDir + curData[0] + '" data-sub-html="<strong>' +curData[1] + '<br><small>' + curData[2] + '</small></strong>">' +
+                            '<a class="LGM" href="' + imagesDir + curData[0] + '" data-sub-html="<strong>' + curData[1] + '<br><small>' + curData[2] + '</small></strong>">' +
                             '<img class="img-responsive img-center w250" src="' + imagesDir + curData[0] + '">' +
                             '<h4>' + curData[1] + '</h4>' +
                             '<p>' + curData[2] + '</p>' +

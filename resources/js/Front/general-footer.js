@@ -45,14 +45,15 @@ function GetAllFooter() {
             async: false,
             dataType: 'json',
             success: function(result) {
-                console.log(result)
                 if (en && result.cachedataEN != "") {
                     var cache = result.cachedataEN.Footer;
                     vars.sectionDatas.Footer = cache;
+                    vars.sectionDatas.Footer.Data = JSON.parse(cache.Data);
                     $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
                 } else if (!en && result.cachedataTR != "") {
                     var cache = result.cachedataTR.Footer;
                     vars.sectionDatas.Footer = cache;
+                    vars.sectionDatas.Footer.Data = JSON.parse(cache.Data);
                     $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
                 } else {
                     var fhtml = '',
@@ -93,10 +94,14 @@ function GetAllFooter() {
                     vars.sectionDatas.Footer.BHtml = bHtml;
 
                     $('#' + vars.sectionShowBases.Sections).html(fhtml);
+
+                    var myJSON = JSON.stringify(vars.sectionDatas.Footer.Data);
+                    vars.sectionDatas.Footer.Data = myJSON;
                     var theCacheData = {
                         Footer: vars.sectionDatas.Footer,
                     }
-                    setTimeout(Cache('GetFooterData', url, theCacheData), 1);
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Footer.Data = JSON.parse(myJSON);
                 }
             },
             error: function() {
@@ -112,7 +117,7 @@ function GetAllFooter() {
         var no = data.No;
 
         for (i = 0; i < length; i++) {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
 
         newHtml +=

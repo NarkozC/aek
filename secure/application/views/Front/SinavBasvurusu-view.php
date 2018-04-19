@@ -8,6 +8,7 @@
 <style type="text/css">
 	#showSinavBasvurusu .row{
 		margin: 0px;
+		margin-bottom: 10px;
 	}
 </style>
 

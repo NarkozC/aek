@@ -47,10 +47,12 @@ function GetEovtcData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Eovtc;
                 vars.sectionDatas.Eovtc = cache;
+                vars.sectionDatas.Eovtc.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Eovtc;
                 vars.sectionDatas.Eovtc = cache;
+                vars.sectionDatas.Eovtc.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var data = result.data,
@@ -100,10 +102,15 @@ function GetEovtcData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                var theCacheData = {
-                    Eovtc: vars.sectionDatas.Eovtc,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Eovtc.Data);
+                    vars.sectionDatas.Eovtc.Data = myJSON;
+                    var theCacheData = {
+                        Eovtc: vars.sectionDatas.Eovtc,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Eovtc.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
 
             GetGallery()
@@ -145,7 +152,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

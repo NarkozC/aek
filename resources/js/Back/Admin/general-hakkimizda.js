@@ -312,7 +312,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Hakkimizda.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -341,9 +341,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Hakkimizda;
                 vars.sectionDatas.Hakkimizda = cache;
+                vars.sectionDatas.Hakkimizda.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Hakkimizda;
                 vars.sectionDatas.Hakkimizda = cache;
+                vars.sectionDatas.Hakkimizda.Data = JSON.parse(cache.Data);
             } else {
                 var fhtml = '',
                     bHtml = '',
@@ -382,14 +384,17 @@ function GetSectionsData() {
                     vars.sectionDatas.Hakkimizda.Data[i] = curData;
                 }
                 fhtml += '</section>';
-
+                
                 vars.sectionDatas.Hakkimizda.FHtml = fhtml;
                 vars.sectionDatas.Hakkimizda.BHtml = bHtml;
-                vars.sectionDatas.Hakkimizda.Num = length;
+
+                var myJSON = JSON.stringify(vars.sectionDatas.Hakkimizda.Data);
+                vars.sectionDatas.Hakkimizda.Data = myJSON;
                 var theCacheData = {
                     Hakkimizda: vars.sectionDatas.Hakkimizda,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Hakkimizda.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -406,7 +411,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -536,7 +541,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

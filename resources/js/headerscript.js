@@ -17,9 +17,7 @@ var verifyCallbackireCaptcha = function(response) {
 $(document).ready(function() {
     setTimeout(function() {
         if ($('#ireCaptcha').length != 0) {
-            $.loadScript('https://www.google.com/recaptcha/api.js?onload=CaptchaCallback&render=explicit', function() {
-                console.log('captcha loaded');
-            });
+            $.loadScript('https://www.google.com/recaptcha/api.js?onload=CaptchaCallback&render=explicit', function() {});
         }
     }, 10)
 });
@@ -110,6 +108,7 @@ var isexistscparam2 = false;
 var portal = false;
 var kg = "None";
 var en = false;
+var isLocalhost = false;
 
 if (pathComponents[2] == 'localhost') { //Localhost Web
     language = pathComponents[4];
@@ -193,14 +192,16 @@ if (cparam2 != null && cparam2 != "") {
     isexistscparam2 = true;
 }
 
-console.log('en:' + en)
-console.log('portal:' + portal)
-console.log('page:' + page)
-console.log('cfunction:' + cfunction)
-console.log('cparam1:' + cparam1)
-console.log('cparam2:' + cparam2)
-console.log('kg:' + kg)
-
+if (pathComponents[2] == 'aek' || pathComponents[2] == 'localhost') {
+    isLocalhost = true;
+    console.log('en:' + en)
+    console.log('portal:' + portal)
+    console.log('page:' + page)
+    console.log('cfunction:' + cfunction)
+    console.log('cparam1:' + cparam1)
+    console.log('cparam2:' + cparam2)
+    console.log('kg:' + kg)
+}
 
 $(document).ready(function() {
 
@@ -274,10 +275,11 @@ $(document).ready(function() {
 ------------ General -----------
 */
 var imagesDir = baseurl + 'resources/images/';
+var pdfsDir = baseurl + 'resources/pdfs/';
 var logoUrl = imagesDir + 'aek-logo.png';
 var loaderGif = 'Genel/aek-loader.gif';
 var loaderGifImg = '<img src="' + imagesDir + loaderGif + '" class="img-responsive img-center maxW100 wow ' + Animation + '" wow-delay="' + wowDelay + '" alt="Loader">'
-
+var cacheLimit = 6000;
 
 
 /*
@@ -328,10 +330,12 @@ tableOpts = {
     IconAddImage: 'fa fa-picture-o',
     IconUp: 'fa fa-arrow-up',
     IconDown: 'fa fa-arrow-down',
+    IconDownload: 'fa fa-download',
     ButtonEdit: 'item-edit',
     ButtonDelete: 'item-delete',
     ButtonUp: 'item-up',
     ButtonDown: 'item-down',
+    ButtonDownload: 'item-download',
 }
 
 
@@ -407,6 +411,7 @@ if (en) {
         Dosya: "File",
         GrupName: "Group Name",
         AdSoyad: "Name Surname",
+        ShAdSoyad: "Your Name Surname",
         Sayfa: "Page",
         SayfaSec: "Select Page...",
         GrupSectionID: "Group",
@@ -423,6 +428,7 @@ if (en) {
         TipSec: "Select Type...",
         BizeUlasin: "Contact Us",
         Email: "E-mail",
+        ShEmail: "Your E-mail",
         Mesaj: "Message",
         Gonder: "Send",
         Donem: "Period",
@@ -440,17 +446,19 @@ if (en) {
         DogumYeri: "Place Of Birth",
         OOSinif: "Current Class",
         OOOkul: "Current School",
-        Bolum: "Bölüm",
-        AnneAd: "Mother's Name",
+        Bolum: "Section",
+        BolumSec: "Select Section...",
+        AnneAd: "Mother's Name and Surname",
         AnneTel: "Mother's Mobile Phone",
         AnneEmail: "Mother's E-mail",
-        BabaAd: "Father's Name",
+        BabaAd: "Father's Name and Surname",
         BabaTel: "Father's Mobile Phone",
         BabaEmail: "Father's E-mail",
         Adres: "Address",
         Tc: "Identity",
         Basvur: "Apply",
         ReadMore: "Read More",
+        ReadLess: "Read Less",
         Bekle: 'Please Wait...',
         Tum: 'All',
         Kapat: 'Close',
@@ -463,15 +471,46 @@ if (en) {
         GMaps: 'Google Maps',
         YolTarifi: 'Directions',
         Tel: 'Phone',
+        ShTel: 'Your Phone',
+        AltTel: 'Alternative Phone',
         Facebook: 'Facebook',
         Twitter: 'Twitter',
         Instagram: 'Instagram',
+        Youtube: 'Youtube',
         Level: 'Level',
         LevelSec: "Select Level...",
         IsLink: 'Is Link?',
         IsLinkInBaseurl: 'Is Link From This Website?',
         UstBirim: 'Parent Unit',
         UstBirimSec: "Select Parent Unit...",
+        Indir: "Download",
+        Kod: "Code",
+        IGIsim: 'Name Displayed When Downloading',
+        Ilkokul: 'İlkokul',
+        Ortaokul: 'Ortaokul',
+        Lise: 'Anadolu Lisesi',
+        IGIIlkokul: 'Name Displayed When Downloading - Primary School',
+        IGIOrtaokul: 'Name Displayed When Downloading - Secondary School',
+        IGILise: 'Name Displayed When Downloading - Anatolian High School',
+        Pdf: 'Pdf',
+        PdfSec: 'Select Pdf...',
+        SmsMailKabul: 'I agree to be notified via SMS and E-mail',
+        IsNamesSame: 'Is Names Same?',
+        KimVKisBil: 'Identity and Personal Information',
+        IlBil: 'Contact Information',
+        MedeniHal: 'Marital Status',
+        MedeniHalSec: 'Select Marital Status...',
+        EngelDurumu: 'Disability Situation',
+        Cv: 'Cv',
+        ShCv: 'Resimli Cv',
+        Pozisyon: 'Position',
+        ShPozisyon: 'Your Position',
+        PozisyonSec: 'Select Position...',
+        Brans: 'Branch',
+        ShBrans: 'Your Branch',
+        ShMOO: 'Graduated School',
+        Indir: 'Download',
+        BasTarihi: 'Application Date',
     };
 
 } else {
@@ -533,6 +572,7 @@ if (en) {
         Dosya: "Dosya",
         GrupName: "Grup İsmi",
         AdSoyad: "Ad Soyad",
+        ShAdSoyad: "Adınız Soyadınız",
         Sayfa: "Sayfa",
         SayfaSec: "Sayfa Seç...",
         GrupSectionID: "Grup",
@@ -549,6 +589,7 @@ if (en) {
         TipSec: "Tip Seç...",
         BizeUlasin: "Bize Ulaşın",
         Email: "E-posta",
+        ShEmail: "E-postanız",
         Mesaj: "Mesaj",
         Gonder: "Gönder",
         Donem: "Dönem",
@@ -563,20 +604,23 @@ if (en) {
         SinavTarihi: "Sınav Tarihi",
         SinavTarihiSec: "Sınav Tarihi Seç...",
         DogumTarihi: "Doğum Tarihi",
+        ShDogumTarihi: "Doğum Tarihiniz",
         DogumYeri: "Doğum Yeri",
         OOSinif: "Okumakta Olduğu Sınıf",
         OOOkul: "Okumakta Olduğu Okul",
         Bolum: "Bölüm",
-        AnneAd: "Anne Adı",
+        BolumSec: "Bölüm Seç...",
+        AnneAd: "Anne Adı ve Soyadı",
         AnneTel: "Anne Cep Telefonu",
         AnneEmail: "Anne E-posta",
-        BabaAd: "Baba Adı",
+        BabaAd: "Baba Adı ve Soyadı",
         BabaTel: "Baba Cep Telefonu",
         BabaEmail: "Baba E-posta",
         Adres: "Adres",
-        Tc: "Tc Kimlik No",
+        Tc: "TC Kimlik No",
         Basvur: "Başvur",
         ReadMore: "Devamını Oku",
+        ReadLess: "Kısalt",
         Bekle: 'Lütfen Bekleyin...',
         Tum: 'Tüm',
         Kapat: 'Kapat',
@@ -589,15 +633,55 @@ if (en) {
         GMaps: 'Google Maps',
         YolTarifi: 'Yol Tarifi',
         Tel: 'Telefon',
+        ShTel: 'Telefonunuz',
+        AltTel: 'Alternatif Telefon',
+        ShAltTel: 'Alternatif Telefonunuz',
         Facebook: 'Facebook',
         Twitter: 'Twitter',
         Instagram: 'Instagram',
+        Youtube: 'Youtube',
         Level: 'Level',
         LevelSec: "Level Seç...",
         IsLink: 'Link Mi?',
         IsLinkInBaseurl: 'Link Bu Siteden Mi?',
         UstBirim: 'Üst Birim',
         UstBirimSec: "Üst Birim Seç...",
+        Indir: "İndir",
+        Kod: "Kod",
+        IGIsim: 'İndirilirken Gösterilecek İsim',
+        Ilkokul: 'İlkokul',
+        Ortaokul: 'Ortaokul',
+        Lise: 'Anadolu Lisesi',
+        IGIIlkokul: 'İndirilirken Gösterilecek İsim - İlkokul',
+        IGIOrtaokul: 'İndirilirken Gösterilecek İsim - Ortaokul',
+        IGILise: 'İndirilirken Gösterilecek İsim - Anadolu Lisesi',
+        Pdf: 'Pdf',
+        PdfSec: 'Pdf Seç...',
+        SmsMailKabul: 'SMS ve E-posta yoluyla bilgilendirilmeyi kabul ediyorum.',
+        IsNamesSame: 'İsimler Aynı Mı?',
+        KimVKisBil: 'Kimlik ve Kişisel Bilgiler',
+        IlBil: 'İletişim Bilgileri',
+        MedeniHal: 'Medeni Hal',
+        MedeniHalSec: 'Medeni Hal Seç...',
+        EngelDurumu: 'Engel Durumu',
+        EngelDurumuSec: 'Engel Durumu Seç...',
+        Cv: 'Cv',
+        ShCv: 'Resimli Cv',
+        Pozisyon: 'Pozisyon',
+        ShPozisyon: 'Başvurduğunuz Pozisyon',
+        PozisyonSec: 'Pozisyon Seç...',
+        Brans: 'Branş',
+        ShBrans: 'Branşınız',
+        MOO: 'Mezun Olduğu Okul',
+        ShMOO: 'Mezun Olduğunuz Okul',
+        OTS: 'Okul Tecrübe Süresi',
+        ShOTS: 'Okul Tecrübe Süreniz',
+        DTS: 'Dershane Tecrübe Süresi',
+        ShDTS: 'Dershane Tecrübe Süreniz',
+        YTS: 'Yönetici Tecrübe Süresi',
+        ShYTS: 'Yönetici Tecrübe Süreniz',
+        Indir: 'İndir',
+        BasTarihi: 'Başvuru Tarihi',
     };
 }
 
@@ -625,10 +709,10 @@ function GetYillarData() {
     return yillar;
 }
 
-function GetOkullarData(getO = 1, kod = "0") {
+function GetOkullarData() {
     var controller = baseurl + 'Genel-Okullar/';
     var getFunction = 'GetOkullar';
-    var okullarD = new Array();
+    var funData = new Array();
 
     var url = controller + getFunction;
     $.ajax({
@@ -643,26 +727,26 @@ function GetOkullarData(getO = 1, kod = "0") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Okullar;
-                okullarD = cache;
+                funData = JSON.parse(cache);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Okullar;
-                okullarD = cache;
+                funData = JSON.parse(cache);
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    okullarD[i] = GetCurData(data[i]);
+                    funData[i] = GetCurData(data[i]);
                 }
-                var theCacheData = {
-                    Okullar: okullarD
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData);
+                    funData = myJSON;
+                    var theCacheData = {
+                        Okullar: funData,
+                    }
+                    setTimeout(Cache('GetOkullarData', url, theCacheData), 1);
+                    funData = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetOkullarData', url, theCacheData), 1)
-            }
-            if (getO != 1) {
-                var okullarTemp = okullarD.filter(function(okul) {
-                    return okul.Kod == kod;
-                });
-                okullarD = okullarTemp;
             }
         },
         error: function() {
@@ -670,13 +754,13 @@ function GetOkullarData(getO = 1, kod = "0") {
         }
     });
 
-    return okullarD;
+    return funData;
 }
 
-function GetGunlerData(getG = 1, kod = "0") {
+function GetGunlerData() {
     var controller = baseurl + 'Genel-Gunler/';
     var getFunction = 'GetGunler';
-    var gunlerD = new Array();
+    var funData = new Array();
 
     var url = controller + getFunction;
     $.ajax({
@@ -691,26 +775,26 @@ function GetGunlerData(getG = 1, kod = "0") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Gunler;
-                gunlerD = cache;
+                funData = JSON.parse(cache);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Gunler;
-                gunlerD = cache;
+                funData = JSON.parse(cache);
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    gunlerD[i] = GetCurData(data[i]);
+                    funData[i] = GetCurData(data[i]);
                 }
-                var theCacheData = {
-                    Gunler: gunlerD
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData);
+                    funData = myJSON;
+                    var theCacheData = {
+                        Gunler: funData,
+                    }
+                    setTimeout(Cache('GetGunlerData', url, theCacheData), 1);
+                    funData = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetGunlerData', url, theCacheData), 1)
-            }
-            if (getG != 1) {
-                var gunlerTemp = gunlerD.filter(function(gun) {
-                    return gun.Kod == kod;
-                });
-                gunlerD = gunlerTemp;
             }
         },
         error: function() {
@@ -718,10 +802,10 @@ function GetGunlerData(getG = 1, kod = "0") {
         }
     });
 
-    return gunlerD;
+    return funData;
 }
 
-function GetDerslerData(getD = 1, kod = "matematik") {
+function GetDerslerData() {
 
     function GetHtmlTr(data, trArray) {
         var i;
@@ -730,7 +814,7 @@ function GetDerslerData(getD = 1, kod = "matematik") {
         var no = data.No;
 
         for (i = 0; i < length; i++) {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
 
         newHtml +=
@@ -747,7 +831,7 @@ function GetDerslerData(getD = 1, kod = "matematik") {
 
     var controller = baseurl + 'Genel-Dersler/';
     var getFunction = 'GetDersler';
-    var derslerD = {
+    var funData = {
         Data: new Array(),
         BHtml: '',
         Num: 0,
@@ -766,10 +850,12 @@ function GetDerslerData(getD = 1, kod = "matematik") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Dersler;
-                derslerD = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Dersler;
-                derslerD = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else {
                 var bHtml = '',
                     data = result.data,
@@ -783,21 +869,21 @@ function GetDerslerData(getD = 1, kod = "matematik") {
                     trInside = GetHtmlTr(curData, trArray);
                     bHtml += '<tr>' + trInside + '</tr>';
 
-                    derslerD.Data[i] = curData;
+                    funData.Data[i] = curData;
                 }
 
-                derslerD.BHtml = bHtml;
-                derslerD.Num = length;
-                var theCacheData = {
-                    Dersler: derslerD,
+                funData.BHtml = bHtml;
+                funData.Num = length;
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData.Data);
+                    funData.Data = myJSON;
+                    var theCacheData = {
+                        Dersler: funData,
+                    }
+                    setTimeout(Cache('GetDerslerData', url, theCacheData), 1);
+                    funData.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetDerslerData', url, theCacheData), 1);
-            }
-            if (getD != 1) {
-                var derslerTemp = derslerD.filter(function(ders) {
-                    return ders.Kod == kod;
-                });
-                derslerD = derslerTemp;
             }
         },
         error: function() {
@@ -805,13 +891,13 @@ function GetDerslerData(getD = 1, kod = "matematik") {
         }
     });
 
-    return derslerD;
+    return funData;
 }
 
-function GetSiniflarData(getS = 1, kod = "1") {
+function GetSiniflarData() {
     var controller = baseurl + 'Genel-Siniflar/';
     var getFunction = 'GetSiniflar';
-    var siniflarD = new Array();
+    var funData = new Array();
 
     var url = controller + getFunction;
     $.ajax({
@@ -826,26 +912,26 @@ function GetSiniflarData(getS = 1, kod = "1") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Siniflar;
-                siniflarD = cache;
+                funData = JSON.parse(cache);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Siniflar;
-                siniflarD = cache;
+                funData = JSON.parse(cache);
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    siniflarD[i] = GetCurData(data[i]);
+                    funData[i] = GetCurData(data[i]);
                 }
-                var theCacheData = {
-                    Siniflar: siniflarD
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData);
+                    funData = myJSON;
+                    var theCacheData = {
+                        Siniflar: funData,
+                    }
+                    setTimeout(Cache('GetSiniflarData', url, theCacheData), 1);
+                    funData = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSiniflarData', url, theCacheData), 1)
-            }
-            if (getS != 1) {
-                var siniflarTemp = siniflarD.filter(function(sinif) {
-                    return sinif.Kod == kod;
-                });
-                siniflarD = siniflarTemp;
             }
         },
         error: function() {
@@ -853,10 +939,10 @@ function GetSiniflarData(getS = 1, kod = "1") {
         }
     });
 
-    return siniflarD;
+    return funData;
 }
 
-function GetSubelerData(getS = 1, kod = "1") {
+function GetSubelerData() {
 
     function GetHtmlTr(data, trArray) {
         var i;
@@ -865,7 +951,7 @@ function GetSubelerData(getS = 1, kod = "1") {
         var no = data.No;
 
         for (i = 0; i < length; i++) {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
 
         newHtml +=
@@ -881,7 +967,7 @@ function GetSubelerData(getS = 1, kod = "1") {
 
     var controller = baseurl + 'Genel-Subeler/';
     var getFunction = 'GetSubeler';
-    var subelerD = {
+    var funData = {
         Data: new Array(),
         BHtml: '',
         Num: 0,
@@ -900,10 +986,12 @@ function GetSubelerData(getS = 1, kod = "1") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Subeler;
-                subelerD = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Subeler;
-                subelerD = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else {
                 var bHtml = '',
                     data = result.data,
@@ -917,21 +1005,21 @@ function GetSubelerData(getS = 1, kod = "1") {
                     trInside = GetHtmlTr(curData, trArray);
                     bHtml += '<tr>' + trInside + '</tr>';
 
-                    subelerD.Data[i] = curData;
+                    funData.Data[i] = curData;
                 }
 
-                subelerD.BHtml = bHtml;
-                subelerD.Num = length;
-                var theCacheData = {
-                    Subeler: subelerD,
+                funData.BHtml = bHtml;
+                funData.Num = length;
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData.Data);
+                    funData.Data = myJSON;
+                    var theCacheData = {
+                        Subeler: funData,
+                    }
+                    setTimeout(Cache('GetSubelerData', url, theCacheData), 1);
+                    funData.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
-            }
-            if (getS != 1) {
-                var subelerTemp = subelerD.filter(function(sube) {
-                    return sube.Kod == kod;
-                });
-                subelerD = subelerTemp;
             }
         },
         error: function() {
@@ -939,16 +1027,41 @@ function GetSubelerData(getS = 1, kod = "1") {
         }
     });
 
-    return subelerD;
+    return funData;
 }
 
 function GetResimlerData() {
     var controller = baseurl + 'Portal/Admin/Genel-Resimler/';
     var getFunction = 'GetResimler';
-    var resimlerD = {
-        // Data: new Array(),
+    var funData = {
+        Data: new Array(),
         Html: '',
+        BHtml: '',
+        Num: 0,
     };
+
+    function GetHtmlTr(data, trArray) {
+        var i;
+        var newHtml = '';
+        var length = trArray.length;
+        var no = data.No;
+        var dosya = data.RDosya;
+        var kategori = 'images/' + data.RKategori;
+
+        for (i = 0; i < length; i++) {
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
+
+        }
+        newHtml +=
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '" data2="' + dosya + '" data3="' + kategori + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '" data2="' + dosya + '" data3="' + kategori + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+            '</td>';
+
+        return newHtml;
+    }
 
     var url = controller + getFunction;
     $.ajax({
@@ -963,21 +1076,37 @@ function GetResimlerData() {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Resimler;
-                resimlerD = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Resimler;
-                resimlerD = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else {
-                var i, length, html = '';;
-                var data = result.data;
+                var i, length;
+                var data = result.data,
+                    html = '',
+                    bHtml = '';
                 for (i = 0, length = data.length; i < length; i++) {
-                    // resimlerD.Data[i] = data[i];
-                    resimlerD.Html += '<option data-tokens="' + data[i].RKategoriler + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategoriler + '" value="' + data[i].RKategoriler + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategoriler + ')</option>';
+                    funData.Data[i] = data[i];
+
+                    funData.Html += '<option data-tokens="' + data[i].RKategori + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategori + '" value="' + data[i].RKategori + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategori + ')</option>';
+
+                    trArray = new Array('RIsim', 'RKategori');
+                    trInside = GetHtmlTr(funData.Data[i], trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
                 }
-                var theCacheData = {
-                    Resimler: resimlerD
+                funData.BHtml = bHtml;
+                funData.Num = length;
+
+                if (length < cacheLimit) {
+                    funData.Data = JSON.stringify(funData.Data);
+                    var theCacheData = {
+                        Resimler: funData,
+                    }
+                    setTimeout(Cache('GetResimlerData', url, theCacheData), 1);
+                    funData.Data = JSON.parse(funData.Data);
                 }
-                setTimeout(Cache('GetResimlerData', url, theCacheData), 1)
             }
 
         },
@@ -985,13 +1114,13 @@ function GetResimlerData() {
             iziError();
         }
     });
-    return resimlerD;
+    return funData;
 }
 
-function GetCinsiyetlerData(getS = 1, kod = "E") {
+function GetCinsiyetlerData() {
     var controller = baseurl + 'Genel-Cinsiyetler/';
     var getFunction = 'GetCinsiyetler';
-    var cinsiyetlerD = new Array();
+    var funData = new Array();
 
     var url = controller + getFunction;
     $.ajax({
@@ -1006,26 +1135,26 @@ function GetCinsiyetlerData(getS = 1, kod = "E") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Cinsiyetler;
-                cinsiyetlerD = cache;
+                funData = JSON.parse(cache);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Cinsiyetler;
-                cinsiyetlerD = cache;
+                funData = JSON.parse(cache);
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    cinsiyetlerD[i] = GetCurData(data[i]);
+                    funData[i] = GetCurData(data[i]);
                 }
-                var theCacheData = {
-                    Cinsiyetler: cinsiyetlerD
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData);
+                    funData = myJSON;
+                    var theCacheData = {
+                        Cinsiyetler: funData,
+                    }
+                    setTimeout(Cache('GetCinsiyetlerData', url, theCacheData), 1);
+                    funData = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetCinsiyetlerData', url, theCacheData), 1)
-            }
-            if (getS != 1) {
-                var subelerTemp = cinsiyetlerD.filter(function(sube) {
-                    return sube.Kod == kod;
-                });
-                cinsiyetlerD = subelerTemp;
             }
         },
         error: function() {
@@ -1036,10 +1165,10 @@ function GetCinsiyetlerData(getS = 1, kod = "E") {
     return cinsiyetlerD;
 }
 
-function GetAylarData(getS = 1, kod = "E") {
+function GetAylarData() {
     var controller = baseurl + 'Genel-Aylar/';
     var getFunction = 'GetAylar';
-    var curData = new Array();
+    var funData = new Array();
 
     var url = controller + getFunction;
     $.ajax({
@@ -1054,26 +1183,26 @@ function GetAylarData(getS = 1, kod = "E") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Aylar;
-                curData = cache;
+                funData = JSON.parse(cache);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Aylar;
-                curData = cache;
+                funData = JSON.parse(cache);
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    curData[i] = GetCurData(data[i]);
+                    funData[i] = GetCurData(data[i]);
                 }
-                var theCacheData = {
-                    Aylar: curData
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData);
+                    funData = myJSON;
+                    var theCacheData = {
+                        Aylar: funData,
+                    }
+                    setTimeout(Cache('GetAylarData', url, theCacheData), 1);
+                    funData = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetAylarData', url, theCacheData), 1)
-            }
-            if (getS != 1) {
-                var temp = curData.filter(function(ay) {
-                    return ay.Kod == kod;
-                });
-                curData = temp;
             }
         },
         error: function() {
@@ -1081,10 +1210,10 @@ function GetAylarData(getS = 1, kod = "E") {
         }
     });
 
-    return curData;
+    return funData;
 }
 
-function GetKategorilerData(getS = 1, kod = "E") {
+function GetKategorilerData() {
 
     function GetHtmlTr(data, trArray) {
         var i;
@@ -1094,7 +1223,7 @@ function GetKategorilerData(getS = 1, kod = "E") {
         var listOrder = data.ListOrder
 
         for (i = 0; i < length; i++) {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
 
         newHtml +=
@@ -1117,7 +1246,7 @@ function GetKategorilerData(getS = 1, kod = "E") {
 
     var controller = baseurl + 'Portal/Admin/Genel-Kategoriler/';
     var getFunction = 'GetKategoriler';
-    var curDataG = {
+    var funData = {
         Data: new Array(),
         BHtml: '',
         Num: 0,
@@ -1136,10 +1265,12 @@ function GetKategorilerData(getS = 1, kod = "E") {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Kategoriler;
-                curDataG = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Kategoriler;
-                curDataG = cache;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
             } else {
                 var bHtml = '',
                     data = result.data,
@@ -1153,15 +1284,21 @@ function GetKategorilerData(getS = 1, kod = "E") {
                     trInside = GetHtmlTr(curData, trArray);
                     bHtml += '<tr>' + trInside + '</tr>';
 
-                    curDataG.Data[i] = curData;
+                    funData.Data[i] = curData;
                 }
 
-                curDataG.BHtml = bHtml;
-                curDataG.Num = length;
-                var theCacheData = {
-                    Kategoriler: curDataG,
+                funData.BHtml = bHtml;
+                funData.Num = length;
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData.Data);
+                    funData.Data = myJSON;
+                    var theCacheData = {
+                        Kategoriler: funData,
+                    }
+                    setTimeout(Cache('GetKategorilerData', url, theCacheData), 1);
+                    funData.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetKategorilerData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -1169,11 +1306,11 @@ function GetKategorilerData(getS = 1, kod = "E") {
         }
     });
 
-    return curDataG;
+    return funData;
 }
 
 function GetSettingsData() {
-    var curData = new Array();
+    var funData = new Array();
 
     var url = settingsOpts.Controllers.Normal + settingsOpts.Functions.Get;
     $.ajax({
@@ -1188,20 +1325,26 @@ function GetSettingsData() {
         success: function(result) {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Settings;
-                curData = cache;
+                funData = JSON.parse(cache);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Settings;
-                curData = cache;
+                funData = JSON.parse(cache);
             } else {
                 var i, length;
                 var data = result.data;
                 for (i = 0, length = data.length; i < length; i++) {
-                    curData[i] = data[i];
+                    funData[i] = data[i];
                 }
-                var theCacheData = {
-                    Settings: curData
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData);
+                    funData = myJSON;
+                    var theCacheData = {
+                        Settings: funData,
+                    }
+                    setTimeout(Cache('GetSettingsData', url, theCacheData), 1);
+                    funData = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSettingsData', url, theCacheData), 1)
             }
         },
         error: function() {
@@ -1209,7 +1352,182 @@ function GetSettingsData() {
         }
     });
 
-    return curData;
+    return funData;
+}
+
+function GetBolumlerData() {
+    function GetHtmlTr(data, trArray) {
+        var i;
+        var newHtml = '';
+        var length = trArray.length;
+        var no = data.No;
+        var listOrder = data.ListOrder
+
+        for (i = 0; i < length; i++) {
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
+        }
+
+        newHtml +=
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonUp + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconUp + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonDown + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconDown + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+            '</td>';
+
+        return newHtml;
+    }
+
+    var funData = {
+        Data: new Array(),
+        BHtml: '',
+        Num: 0,
+    };
+
+    var url = baseurl + 'Portal/Admin/Genel-Bolumler/GetBolumler';
+    $.ajax({
+        type: 'ajax',
+        method: 'post',
+        url: url,
+        data: {
+            English: en,
+        },
+        async: false,
+        dataType: 'json',
+        success: function(result) {
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.Bolumler;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.Bolumler;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
+            } else {
+                var bHtml = '',
+                    data = result.data,
+                    length = data.length;
+                var i, tempData, trInside, trArray;
+
+                for (i = 0; i < length; i++) {
+                    tempData = GetCurData(data[i]);
+
+                    trArray = new Array('Kod');
+                    trInside = GetHtmlTr(tempData, trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
+
+                    funData.Data[i] = tempData;
+                }
+
+                funData.BHtml = bHtml;
+                funData.Num = length;
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData.Data);
+                    funData.Data = myJSON;
+                    var theCacheData = {
+                        Bolumler: funData,
+                    }
+                    setTimeout(Cache('GetBolumlerData', url, theCacheData), 1);
+                    funData.Data = JSON.parse(myJSON);
+                }
+            }
+        },
+        error: function() {
+            iziError();
+        }
+    });
+
+    return funData;
+}
+
+function GetPdflerData() {
+    function GetHtmlTr(data, trArray) {
+        var i;
+        var newHtml = '';
+        var length = trArray.length;
+        var no = data.No;
+        var dosya = data.Dosya;
+
+        for (i = 0; i < length; i++) {
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
+
+        }
+        newHtml +=
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '" data2="' + dosya + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
+            '</td>' +
+            '<td>' +
+            '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '" data2="' + dosya + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
+            '</td>';
+
+        return newHtml;
+    }
+
+    var funData = {
+        Data: new Array(),
+        Html: '',
+        Num: 0,
+    };
+
+    var url = baseurl + 'Portal/Admin/Genel-Pdfler/GetPdfler';
+    $.ajax({
+        type: 'ajax',
+        method: 'post',
+        url: url,
+        data: {
+            English: en,
+        },
+        async: false,
+        dataType: 'json',
+        success: function(result) {
+            if (en && result.cachedataEN != "") {
+                var cache = result.cachedataEN.Pdfler;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
+            } else if (!en && result.cachedataTR != "") {
+                var cache = result.cachedataTR.Pdfler;
+                funData = cache;
+                funData.Data = JSON.parse(cache.Data);
+            } else {
+                var i, data = result.data,
+                    length, html = '';
+                var tCurData, trInside, trArray;
+
+                for (i = 0, length = data.length; i < length; i++) {
+                    tCurData = GetCurData(data[i]);
+                    funData.Data[i] = tCurData;
+
+                    trArray = new Array('Isim', 'IGIsim');
+                    trInside = GetHtmlTr(tCurData, trArray);
+                    html += '<tr>' + trInside + '</tr>';
+                }
+                funData.Html = html;
+                funData.Num = length;
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(funData.Data);
+                    funData.Data = myJSON;
+                    var theCacheData = {
+                        Pdfler: funData,
+                    }
+                    setTimeout(Cache('GetPdflerData', url, theCacheData), 1);
+                    funData.Data = JSON.parse(myJSON);
+                }
+            }
+        },
+        error: function() {
+            iziError();
+        }
+    });
+
+    return funData;
 }
 
 function Cache(who, url, data) {
@@ -1232,7 +1550,9 @@ function Cache(who, url, data) {
         async: false,
         dataType: 'json',
         success: function(response) {
-            console.log('cache success on:' + who)
+            if (isLocalhost) {
+                console.log('cache success on:' + who)
+            }
         },
         error: function() {
             iziError();
@@ -1290,7 +1610,6 @@ function GetCurData(data) {
 ------------ Show Form Errors -----------
 */
 function ShowFormErrors(messages) {
-    var i = 0;
     $.each(messages, function(key, value) {
         var ajaxGroup;
         var element
@@ -1346,325 +1665,172 @@ function ResetSelectpicker() {
 function ResetForm(form) {
     $(form)[0].reset();
     $('.selectpicker').selectpicker('val', '');
-    $('.text-danger').remove();
-    $('.ajax-group').removeClass('has-error').removeClass('has-success');
+    ResetFormErrors();
 }
-
-
-
-
-
-
 
 
 
 /*
-=====================================
-  ---------- Shorten Content ------
-=====================================
+------------ Make Rows -----------
 */
-$(function() { /* to make sure the script runs after page load */
+function MakeRows(data, insideHtml = '', bo4 = "", bo3 = "", bo2 = "") {
+    var oneLeft = 'F',
+        its13 = false,
+        its10 = false,
+        break_on = 4,
+        counter = 0,
+        length = data.length,
+        html = '';
+    var i, curData, curIHtml;
 
-    window.ShortenContent = function() {
-        $('.shorten_content').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 115; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content +
-                    '<a href="javascript:;" class="btn btn-danger btn-sm read_more">Devamını Oku</a>' +
-                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
-                    '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
-
-
-
-
-                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
-                    $(this).parent().find('a.read_more').show();
-
-                });
-
-                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
-                    $(this).parent().find('a.read_less').show();
-
-                });
-
-                $('#yorumlar a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-                    $('#yorumlar-carousel').carousel('pause');
-                });
-
-                $('#yorumlar a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-                    $('#yorumlar-carousel').carousel('cycle');
-                });
-
-
-
-            }
-
-        });
+    if (bo4 == "") {
+        bo4 = '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
+    }
+    if (bo3 == "") {
+        bo3 = '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
+    }
+    if (bo2 == "") {
+        bo2 = '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
     }
 
-    ShortenContent();
-
-    window.ShortenContent2 = function() {
-        $('.shorten_content2').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 50; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content +
-                    '<a href="javascript:;" class="btn btn-danger btn-sm read_more">Devamını Oku</a>' +
-                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
-                    '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
-
-                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
-                    $(this).parent().find('a.read_less').show();
-
-                });
-
-                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
-                    $(this).parent().find('a.read_more').show();
-
-                });
-
-            }
-
-        });
+    if (length == 13) {
+        break_on = 3;
+        its13 = true;
+    } else if (length == 10) {
+        break_on = 4;
+        its10 = true;
+    } else if (length % 4 == 0) {
+        break_on = 4;
+    } else if (length % 3 == 0) {
+        break_on = 3;
+    } else if (length % 4 == 1) {
+        break_on = 3;
+        oneLeft = 'T4';
+    } else if (length % 2 == 0) {
+        break_on = 2;
+    } else if (length % 3 == 1) {
+        break_on = 4;
+        oneLeft = 'T3';
     }
-
-    ShortenContent2();
-
-    window.ShortenContent3 = function() {
-        $('.shorten_content3').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 200; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
-
-            }
-
+    for (i = 0; i < length; i++) {
+        curData = GetCurData(data[i]);
+        curIHtml = insideHtml
+        curIHtml = curIHtml.replace(/curData\[(.+?)\]/g, function(a, b) {
+            return curData[b];
         });
-    }
 
-    ShortenContent3();
+        if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
+            html += '<div class="row">';
+        } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
 
-    window.ShortenContent4 = function() {
-        $('.shorten_content4').each(function(event) { /* select all divs with the item class */
+        } else if (counter % break_on == 1 && break_on == 3 && oneLeft == 'T3' && counter == length - 3) {
+            html += '<div class="row">';
+        } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
 
-            var max_length = 40; /* set the max content length before a read more link will be added */
+        } else if (counter == Number(length - 4) && break_on == 2 && its13 == true) {
+            html += '<div class="row">';
+        } else if (its13 == true && counter == Number(length - 3)) {
 
-            if ($(this).html().length > max_length) { /* check for content length */
+        } else if (counter == Number(length - 2) && break_on == 2 && its13 == true) {
+            html += '<div class="row">';
+        } else if (its13 == true && counter == length - 1) {
 
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content +
-                    '<a href="javascript:;" class="btn btn-danger btn-xs read_more">Devamını Oku</a>' +
-                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
-                    '<a href="javascript:;" class="btn btn-danger btn-xs read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
-
-                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
-                    $(this).parent().find('a.read_less').show();
-
-                });
-
-                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
-                    $(this).parent().find('a.read_more').show();
-
-                });
-
-            }
-
-        });
-    }
-
-    ShortenContent4();
-
-    window.ShortenContent6 = function() {
-        $('.shorten_content6').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 50; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content +
-                    '<a href="javascript:;" class="btn btn-danger btn-sm read_more">Devamını Oku</a>' +
-                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
-                    '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
-
-
-                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
-                    $(this).parent().find('a.read_more').show();
-
-                });
-
-                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
-                    $(this).parent().find('a.read_less').show();
-
-                });
-
-            }
-
-        });
-    }
-
-    ShortenContent6();
-
-    window.ShortenContent7 = function() {
-        $('.shorten_content7').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 22; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content +
-                    '<a href="javascript:;" class="btn btn-danger btn-xs read_more">Devamını Oku</a>' +
-                    '<span class="more_text" style="display:none;">' + long_content + '</span>' +
-                    '<a href="javascript:;" class="btn btn-danger btn-xs read_less" style="display:none">Kısalt</a>'); /* Alter the html to allow the read more functionality */
-
-                $(this).find('a.read_more').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').show(); /* show the .more_text span */
-                    $(this).parent().find('a.read_less').show();
-
-                });
-
-                $(this).find('a.read_less').click(function(event) { /* find the a.read_more element within the new html and bind the following code to it */
-
-                    event.preventDefault(); /* prevent the a from changing the url */
-                    $(this).hide(); /* hide the read more button */
-                    $(this).parent().find('.more_text').hide(); /* show the .more_text span */
-                    $(this).parent().find('a.read_more').show();
-
-                });
-
-            }
-
-        });
-    }
-
-    ShortenContent7();
-
-    window.ShortenContent8 = function() {
-        $('.shorten_content8').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 200; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
-
-            }
-
-        });
-    }
-
-    ShortenContent8();
-
-    window.ShortenContent9 = function() {
-        $('.shorten_content9').each(function(event) { /* select all divs with the item class */
-
-            var max_length = 35; /* set the max content length before a read more link will be added */
-
-            if ($(this).html().length > max_length) { /* check for content length */
-
-                var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-                var long_content = $(this).html().substr(max_length);
-
-                $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
-
-            }
-
-        });
-    }
-
-    ShortenContent9();
-
-
-
-    $(document).ready(function() {
-        $(document).ready(function() {
-            if (en == true) {
-                $('.read_more').html('Read More');
-                $('.read_less').html('Read Less');
-            }
-        });
-    });
-
-});
-
-
-window.ShortenContent5 = function() {
-    $('.shorten_content5').each(function(event) { /* select all divs with the item class */
-
-        var max_length = 50; /* set the max content length before a read more link will be added */
-
-        if ($(this).html().length > max_length) { /* check for content length */
-
-            var short_content = $(this).html().substr(0, max_length); /* split the content in two parts */
-            var long_content = $(this).html().substr(max_length);
-
-            $(this).html(short_content + '...'); /* Alter the html to allow the read more functionality */
-
+        } else if (counter % break_on == 0) {
+            html += '<div class="row">';
         }
 
-    });
+        if (break_on == 4) {
+            html += bo4;
+        } else if (break_on == 3) {
+            html += bo3;
+        } else if (break_on == 2) {
+            html += bo2;
+        }
+
+        html += curIHtml;
+
+        counter++;
+        if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
+
+        } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
+
+        } else if (its13 == true && counter == Number(length - 3)) {
+
+        } else if (its13 == true && counter == Number(length - 2)) {
+            html += '</div>';
+        } else if (its13 == true && counter == Number(length - 1)) {
+
+        } else if (counter % break_on == 0) {
+            html += '</div>';
+        }
+        if (break_on == 4 && oneLeft == 'T3' && counter == length - 3) {
+            break_on = 3;
+        } else if (break_on == 4 && counter == length - 2 && its10 == true) {
+            break_on = 2;
+        } else if (break_on == 3 && oneLeft == 'T4' && counter == length - 2) {
+            break_on = 2;
+        } else if (break_on == 3 && its13 == true && counter == length - 4) {
+            break_on = 2;
+        }
+    }
+    if (counter % break_on != 0) {
+        html += '</div>';
+    }
+    return html;
 }
 
-ShortenContent5();
+
+
+/*
+------------ ShortenContent -----------
+*/
+$(function() {
+
+    window.ShortenContent = function(length = 50, justShorten = false, isUndo = false) {
+        $('.shorten_content').each(function(event) {
+
+            if ($(this).html().length > length) {
+
+                if (isUndo && $(this).find('.less_text').length > 0) {
+                    var less_text = $(this).find('.less_text').html();
+                    var more_text = $(this).find('.more_text').html();
+                    $(this).html(less_text + more_text)
+                }
+
+                var short_content = $(this).html().substr(0, length);
+                var long_content = $(this).html().substr(length);
+
+                if (justShorten) {
+                    $(this).html(
+                        '<span class="less_text">' + short_content + '...</span>' +
+                        '<span class="more_text" style="display:none;">' + long_content + '</span>'
+                    );
+                } else {
+                    $(this).html(
+                        '<span class="less_text">' + short_content + '</span>' +
+                        '<a href="javascript:;" class="btn btn-danger btn-sm read_more">' + formLang.ReadMore + '</a>' +
+                        '<span class="more_text" style="display:none;">' + long_content + '</span>' +
+                        '<a href="javascript:;" class="btn btn-danger btn-sm read_less" style="display:none">' + formLang.ReadLess + '</a>');
+
+                    $(this).find('a.read_less').click(function(event) {
+                        event.preventDefault();
+                        $(this).hide();
+                        $(this).parent().find('.more_text').hide();
+                        $(this).parent().find('a.read_more').show();
+                    });
+
+                    $(this).find('a.read_more').click(function(event) {
+                        event.preventDefault();
+                        $(this).hide();
+                        $(this).parent().find('.more_text').show();
+                        $(this).parent().find('a.read_less').show();
+                    });
+                }
+
+            }
+
+        });
+    }
+
+    ShortenContent()
+});

@@ -1,6 +1,7 @@
 $(function() {
     AllDuyurularEtkinlikler();
 });
+
 function AllDuyurularEtkinlikler() {
     var vars = {
         sectionControllers: {
@@ -8,7 +9,7 @@ function AllDuyurularEtkinlikler() {
         },
         sectionNames: {
             Normal: 'Duyurular Etkinlikler',
-            Upper: 'DuyurularEtkinlikler',
+            Upper: 'Duyurular-Etkinlikler',
             Lower: 'duyurularEtkinlikler',
             Kod: 'GDE',
             UpperSingle: 'DuyuruEtkinlik',
@@ -83,9 +84,15 @@ function AllDuyurularEtkinlikler() {
                 if (en && result.cachedataEN != "") {
                     var cache = result.cachedataEN.DuyurularEtkinlikler;
                     vars.sectionDatas.DuyurularEtkinlikler = cache;
+                    vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.parse(cache.Data);
+                    vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.parse(cache.FData);
+                    vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.parse(cache.FHtml);
                 } else if (!en && result.cachedataTR != "") {
                     var cache = result.cachedataTR.DuyurularEtkinlikler;
                     vars.sectionDatas.DuyurularEtkinlikler = cache;
+                    vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.parse(cache.Data);
+                    vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.parse(cache.FData);
+                    vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.parse(cache.FHtml);
                 } else {
                     var i, j, data = result.data,
                         length, length2, htmls = {},
@@ -160,10 +167,19 @@ function AllDuyurularEtkinlikler() {
                     vars.sectionDatas.DuyurularEtkinlikler.Data = htmls;
                     vars.sectionDatas.DuyurularEtkinlikler.Num = length;
 
-                    var theCacheData = {
-                        DuyurularEtkinlikler: vars.sectionDatas.DuyurularEtkinlikler,
+                    if (length < cacheLimit) {
+                        vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.stringify(vars.sectionDatas.DuyurularEtkinlikler.Data);
+                        vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.stringify(vars.sectionDatas.DuyurularEtkinlikler.FData);
+                        vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.stringify(vars.sectionDatas.DuyurularEtkinlikler.FHtml);
+                        var theCacheData = {
+                            DuyurularEtkinlikler: vars.sectionDatas.DuyurularEtkinlikler,
+                        }
+                        setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                        vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.parse(vars.sectionDatas.DuyurularEtkinlikler.Data);
+                        vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.parse(vars.sectionDatas.DuyurularEtkinlikler.FData);
+                        vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.parse(vars.sectionDatas.DuyurularEtkinlikler.FHtml);
                     }
-                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+
                 }
             },
             error: function() {
@@ -283,12 +299,14 @@ function AllDuyurularEtkinlikler() {
             '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
             '<h2>' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></h2>' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '</div>' +
+            '<div class="container dark-bg shadow borderRad25 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0">' +
             '<div id="' + vars.sectionNames.Kod + '" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">' +
             DigerResimlerHtml +
             '</div>' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15">' +
             '<p>' + curData.Yazi + '</p>' +
             '</div>' +
             '</div>' +
@@ -363,9 +381,9 @@ function AllDuyurularEtkinlikler() {
                 var tarih = data.Tarih.split('-');
                 tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-                newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+                newHtml += '<td class="shorten_content">' + tarih + '</td>';
             } else {
-                newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+                newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
             }
         }
         newHtml +=

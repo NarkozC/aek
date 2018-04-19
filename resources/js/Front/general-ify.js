@@ -5,12 +5,11 @@ var vars = {
     sectionNames: {
         Normal: 'International Foundation Year',
         Upper: 'Ify',
-        Lower: 'ify',
-        Kod: 'GIFY',
+        Lower: 'aektv',
+        Kod: 'GIfy',
     },
     sectionShowBases: {
         Sections: 'showIfy',
-        Aciklama: 'showGAciklama',
     },
     sectionFunctions: {
         Get: 'GetIfy',
@@ -23,7 +22,6 @@ var vars = {
             Num: 0,
         },
     },
-    sectionIsFirst: true,
 };
 
 
@@ -47,17 +45,19 @@ function GetIfyData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Ify;
                 vars.sectionDatas.Ify = cache;
+                vars.sectionDatas.Ify.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Ify;
                 vars.sectionDatas.Ify = cache;
+                vars.sectionDatas.Ify.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var data = result.data,
                     length = data.length,
                     bHtml = '',
                     fHtml = '';
-                var i, j, rLength, curData, tempCurData, trInside, trArray;
+                var i, curData, trInside, trArray;
 
                 fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
                     '<div class="container">' +
@@ -67,29 +67,21 @@ function GetIfyData() {
                     '</div>' +
 
                     '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-                    '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-                    '<div id="G' + vars.sectionNames.Kod + '" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">';
+                    '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
 
                 for (i = 0; i < length; i++) {
                     curData = GetCurData(data[i]);
                     vars.sectionDatas.Ify.Data[i] = curData;
 
-                    trArray = new Array('Resim');
+                    fHtml += '<div class="video-container"><iframe width="600" height="355" ' +
+                        'src="' + curData.Link + '" frameborder="0" allowfullscreen></iframe></div>';
+
+                    trArray = new Array('Link');
                     trInside = GetHtmlTr(curData, trArray);
                     bHtml += '<tr>' + trInside + '</tr>';
-
-                    tempCurData = curData.Resim.split(',');
-
-                    for (j = 0, rLength = tempCurData.length; j < rLength; j++) {
-                        fHtml += '<img ' +
-                            ' src="' + imagesDir + tempCurData[j] + '" ' +
-                            ' data-aciklama="' + curData.Aciklama + '">';
-                    }
                 }
 
                 fHtml += '</div>' +
-                    '<div id="' + vars.sectionShowBases.Aciklama + '" class="marginT15"></div>' +
-                    '</div>' +
                     '</div>' +
                     '</section>';
 
@@ -100,13 +92,16 @@ function GetIfyData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                var theCacheData = {
-                    Ify: vars.sectionDatas.Ify,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Ify.Data);
+                    vars.sectionDatas.Ify.Data = myJSON;
+                    var theCacheData = {
+                        Ify: vars.sectionDatas.Ify,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Ify.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
-
-            GetGallery()
 
         },
         error: function() {
@@ -115,51 +110,19 @@ function GetIfyData() {
     });
 }
 
-function GetGallery() {
-    var html = '';
-
-    UG = jQuery('#G' + vars.sectionNames.Kod).unitegallery({
-        thumb_fixed_size: false,
-        thumb_image_overlay_effect: true,
-        thumb_image_overlay_type: "blur",
-        slider_scale_mode: "fit",
-        gallery_autoplay: true,
-        gallery_width: 1400,
-        gallery_height: 650,
-    });
-
-    html = UG.getItem(0)['aciklama'];
-    $('#' + vars.sectionShowBases.Aciklama).html(html);
-
-    UG.on("item_change", function(num, data) { //on item change, get item number and item data
-        var htmlTemp = UG.getItem(num)['aciklama'];
-        $('#' + vars.sectionShowBases.Aciklama).html(htmlTemp);
-    });
-}
-
 function GetHtmlTr(data, trArray) {
     var i;
     var newHtml = '';
     var length = trArray.length;
     var no = data.No;
-    var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
         '<td>' +
-        '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonUp + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconUp + '" aria-hidden="true"></i></a> ' +
-        '</td>' +
-        '<td>' +
-        '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonDown + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconDown + '" aria-hidden="true"></i></a> ' +
-        '</td>' +
-        '<td>' +
         '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
-        '</td>' +
-        '<td>' +
-        '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
         '</td>';
 
     return newHtml;

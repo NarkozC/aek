@@ -11,7 +11,10 @@ var vars = {
         Normal: 'Haberler',
         Upper: 'Haberler',
         Lower: 'haberler',
-        Kod: 'GH'
+        Kod: 'GH',
+        UpperSingle: 'Haber',
+        LowerSingle: 'haber',
+        LowerA: 'haberlerA',
     },
     sectionShowBases: {
         Sections: 'showHaberler',
@@ -59,8 +62,6 @@ $(function() {
         vars.sectionControllers.Portal + vars.sectionFunctions.Add,
         vars.sectionObjects.Form, vars.sectionObjects.Modal);
 
-
-
     //Button for posting data for add/update
     $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
         var $link = $(e.target);
@@ -76,7 +77,6 @@ $(function() {
                 method: 'post',
                 url: url,
                 data: data,
-                async: false,
                 dataType: 'json',
                 success: function(response) {
                     ResetFormErrors();
@@ -112,15 +112,12 @@ $(function() {
                             } else {
                                 willRefresh = true;
                             }
-
+                        }
+                        if (willRefresh) {
+                            RefreshData(1, 1, 1)
                         }
                         $(vars.sectionObjects.Modal).modal('hide');
                         iziSuccess();
-                        if (willRefresh) {
-                            setTimeout(function() {
-                                RefreshData(1, 1, 1)
-                            }, 310);
-                        }
                     } else {
                         var ajaxGroup;
                         if (response.messages.length != 0) {
@@ -158,7 +155,6 @@ $(function() {
                 data: {
                     No: no
                 },
-                async: false,
                 dataType: 'json',
                 success: function(result) {
                     setTimeout(function() {
@@ -204,62 +200,20 @@ $(function() {
 });
 
 function GetOkullarSelect() {
-    var i, data = vars.sectionDatas.Okullar,
-        length = data.length,
-        html;
-
-    var tr_ID = vars.sectionSPs.Okul + 'Select';
-    var tr_section = vars.sectionSPs.Okul;
-
-    html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '[]" id="' + tr_ID + '" title="' + formLang.OkulSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
-
-    for (i = 0; i < length; i++) {
-        html += '<option data-tokens="' + data[i].Ad + '" value="' + data[i].Kod + '">' + data[i].Ad + '</option>';
+    if (!vars.sectionIsFirst) {
+        vars.sectionDatas.Okullar = GetOkullarData();
     }
-
-    html += '</select>'
-    $('#' + tr_section).html(html);
-    RefreshSelectpicker();
+    FunSelect(vars.sectionDatas.Okullar, vars.sectionSPs.Okul, formLang.OkulSec, "Ad", "Kod", "Ad", true);
 }
 
 function GetResimlerSelect() {
-    setTimeout(function() {
-        var i, data = vars.sectionDatas.Resimler,
-            length = data.length;
-
-        var tr_AnaID = 'tr_' + vars.sectionSPs.AnaResim + 'Select';
-        var tr_AnaSection = 'tr_' + vars.sectionSPs.AnaResim;
-        var en_AnaID = 'en_' + vars.sectionSPs.AnaResim + 'Select';
-        var en_AnaSection = 'en_' + vars.sectionSPs.AnaResim;
-
-        var tr_DigerID = 'tr_' + vars.sectionSPs.DigerResimler + 'Select';
-        var tr_DigerSection = 'tr_' + vars.sectionSPs.DigerResimler;
-        var en_DigerID = 'en_' + vars.sectionSPs.DigerResimler + 'Select';
-        var en_DigerSection = 'en_' + vars.sectionSPs.DigerResimler;
-
-        var tr_Anahtml = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_AnaSection + '" id="' + tr_AnaID + '" title="' + formLang.AnaResimSec + '" data-liveSearchNormalize="true">';
-        var tr_Digerhtml = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_DigerSection + '[]" id="' + tr_DigerID + '" title="' + formLang.DigerResimlerSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
-
-        var en_Anahtml = '<select class="form-control selectpicker" data-live-search="true" name="' + en_AnaSection + '" id="' + en_AnaID + '" title="' + formLang.AnaResimSec + '" data-liveSearchNormalize="true">' + '<option data-tokens="' + formLang.AnaResimSecTokens + '" value="0">' + formLang.AnaResimSecUse + '</option>';
-        var en_Digerhtml = '<select class="form-control selectpicker" data-live-search="true" name="' + en_DigerSection + '[]" id="' + en_DigerID + '" title="' + formLang.DigerResimlerSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">' + '<option data-tokens="' + formLang.DigerResimlerSecTokens + '" value="0">' + formLang.DigerResimlerSecUse + '</option>';
-        var lastParts = '';
-
-        lastParts = vars.sectionDatas.Resimler.Html;
-
-        lastParts += '</select>';
-
-        tr_Anahtml += lastParts;
-        tr_Digerhtml += lastParts;
-
-        en_Anahtml += lastParts;
-        en_Digerhtml += lastParts;
-        $('#' + tr_AnaSection).html(tr_Anahtml);
-        $('#' + tr_DigerSection).html(tr_Digerhtml);
-
-        $('#' + en_AnaSection).html(en_Anahtml);
-        $('#' + en_DigerSection).html(en_Digerhtml);
-        RefreshSelectpicker();
-    }, 5);
+    if (!vars.sectionIsFirst) {
+        vars.sectionDatas.Resimler = GetResimlerData();
+    }
+    FunSelect(vars.sectionDatas.Resimler, 'tr_' + vars.sectionSPs.AnaResim, formLang.AnaResimSec, "", "", "", false, true);
+    FunSelect(vars.sectionDatas.Resimler, 'en_' + vars.sectionSPs.AnaResim, formLang.AnaResimSec, "", "", "", false, true);
+    FunSelect(vars.sectionDatas.Resimler, 'tr_' + vars.sectionSPs.DigerResimler, formLang.DigerResimlerSec, "", "", "", true, true);
+    FunSelect(vars.sectionDatas.Resimler, 'en_' + vars.sectionSPs.DigerResimler, formLang.DigerResimlerSec, "", "", "", true, true);
 }
 
 function GetSectionsNum() {
@@ -276,12 +230,9 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.Haberler.Data[i]);
     }
 
-    ShortenContent6();
+    ShortenContent();
 
-    if (!vars.sectionIsFirst) {
-        CreateDataTables();
-    }
-    vars.sectionIsFirst = false;
+    CreateDataTables();
 }
 
 function GetSectionsData() {
@@ -306,12 +257,20 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Haberler;
                 vars.sectionDatas.Haberler = cache;
+                vars.sectionDatas.Haberler.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.Haberler.FData = JSON.parse(cache.FData);
+                vars.sectionDatas.Haberler.FHtml = JSON.parse(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Haberler;
                 vars.sectionDatas.Haberler = cache;
+                vars.sectionDatas.Haberler.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.Haberler.FData = JSON.parse(cache.FData);
+                vars.sectionDatas.Haberler.FHtml = JSON.parse(cache.FHtml);
             } else {
                 var i, j, data = result.data,
-                    length, length2, htmls = {}, fHtml = '', fData = new Array();
+                    length, length2, htmls = {},
+                    fHtml = new Array(),
+                    fData = new Array();
                 var curData, trInside, trArray;
 
                 for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
@@ -332,19 +291,24 @@ function GetSectionsData() {
                         trInside = GetHtmlTr(curData, trArray);
                         htmls[okul[j]] += '<tr>' + trInside + '</tr>';
                     }
-
-
-
                     if (en) {
-                        curData.Link = baseurl + 'en/'+page+'/Haber/' + curData.SectionID;
+                        if (page != '') {
+                            curData.Link = baseurl + 'en/' + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        } else {
+                            curData.Link = baseurl + 'en/' + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        }
                     } else {
-                        curData.Link = baseurl + page +'/Haber/' + curData.SectionID;
+                        if (page != '') {
+                            curData.Link = baseurl + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        } else {
+                            curData.Link = baseurl + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        }
                     }
                     var dateAr = curData.Tarih.split('-');
                     curData.Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];
                     fData[i] = curData;
 
-                    fHtml +=
+                    fHtml[i] =
                         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad25 marginB35 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- hidden-xs-sm-md -->' +
                         '<div class="col-lg-4">' +
@@ -375,10 +339,16 @@ function GetSectionsData() {
                 vars.sectionDatas.Haberler.Data = htmls;
                 vars.sectionDatas.Haberler.Num = length;
 
+                vars.sectionDatas.Haberler.Data = JSON.stringify(vars.sectionDatas.Haberler.Data);
+                vars.sectionDatas.Haberler.FData = JSON.stringify(vars.sectionDatas.Haberler.FData);
+                vars.sectionDatas.Haberler.FHtml = JSON.stringify(vars.sectionDatas.Haberler.FHtml);
                 var theCacheData = {
                     Haberler: vars.sectionDatas.Haberler,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Haberler.Data = JSON.parse(vars.sectionDatas.Haberler.Data);
+                vars.sectionDatas.Haberler.FData = JSON.parse(vars.sectionDatas.Haberler.FData);
+                vars.sectionDatas.Haberler.FHtml = JSON.parse(vars.sectionDatas.Haberler.FHtml);
             }
         },
         error: function() {
@@ -399,9 +369,9 @@ function GetHtmlTr(data, trArray) {
             var tarih = data.Tarih.split('-');
             tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+            newHtml += '<td class="shorten_content">' + tarih + '</td>';
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
     newHtml +=
@@ -416,176 +386,98 @@ function GetHtmlTr(data, trArray) {
 }
 
 function GetSectionsModalHtml() {
+    if (vars.sectionIsFirst) {
+        var html,
+            genelHtml = new Array(
+                '<label>' + formLang.Okul + '</label>' +
+                '<div id="' + vars.sectionSPs.Okul + '"></div>',
 
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header" align="center">' +
-        '<img class="maxW150" src="' + logoUrl + '">' +
-        modalOpts.ModalCloseButton +
-        '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
-        '<div class="modal-body">' +
-        '<ul class="nav nav-tabs" role="tablist">' +
-        '<li role="presentation" class="active"><a class="hvr-wobble-top" href="#' + formTabs.Turkce + '" aria-controls="' + formTabs.Turkce + '" role="tab" data-toggle="tab">' + formLang.Turkce + '</a></li>' +
-        '<li role="presentation"><a class="hvr-wobble-top" href="#' + formTabs.Ingilizce + '" aria-controls="' + formTabs.Ingilizce + '" role="tab" data-toggle="tab">' + formLang.Ingilizce + '</a></li>' +
-        '</ul>' +
-        '<div class="tab-content">' +
-        '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
-        '<div role="tabpanel" class="tab-pane fade in active" id="' + formTabs.Turkce + '">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Baslik + '</label>' +
-        '<input name="tr_Baslik" id="tr_Baslik" class="form-control" type="text" placeholder="' + formLang.Baslik + '">' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.AnaResim + '</label>' +
-        '<div id="tr_' + vars.sectionSPs.AnaResim + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.DigerResimler + '</label>' +
-        '<div id="tr_' + vars.sectionSPs.DigerResimler + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Yazi + '</label> <br>' +
-        '<textarea name="tr_Yazi" id="tr_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="4"></textarea>' +
-        '</div>' +
-        '</div>' +
-        '<div role="tabpanel" class="tab-pane fade" id="' + formTabs.Ingilizce + '">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Baslik + '</label>' +
-        '<input name="en_Baslik" id="en_Baslik" class="form-control" type="text" placeholder="' + formLang.Baslik + '">' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.AnaResim + '</label>' +
-        '<div id="en_' + vars.sectionSPs.AnaResim + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.DigerResimler + '</label>' +
-        '<div id="en_' + vars.sectionSPs.DigerResimler + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Yazi + '</label>' +
-        '<textarea name="en_Yazi" id="en_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="4"></textarea>' +
-        '</div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Okul + '</label>' +
-        '<div id="' + vars.sectionSPs.Okul + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Tarih + '</label>' +
-        '<input name="Tarih" id="Tarih" class="form-control" type="date" placeholder="' + formLang.Tarih + '">' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
-        '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
-        '</div>' +
-        '</form> ' +
-        '</div>' +
-        '</div>' +
-        '</div>';
-    $('#' + vars.sectionShowBases.Modal).html(html);
-    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
-    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+                '<label>' + formLang.Tarih + '</label>' +
+                '<input name="Tarih" id="Tarih" class="form-control" type="date" placeholder="' + formLang.Tarih + '">'
+            ),
+            turkceHtml = new Array(
+                '<label>' + formLang.Baslik + '</label>' +
+                '<input name="tr_Baslik" id="tr_Baslik" class="form-control" type="text" placeholder="' + formLang.Baslik + '">',
+
+                '<label>' + formLang.AnaResim + '</label>' +
+                '<div id="tr_' + vars.sectionSPs.AnaResim + '"></div>',
+
+                '<label>' + formLang.DigerResimler + '</label>' +
+                '<div id="tr_' + vars.sectionSPs.DigerResimler + '"></div>',
+
+                '<label>' + formLang.Yazi + '</label> <br>' +
+                '<textarea name="tr_Yazi" id="tr_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="4"></textarea>'
+            ),
+            ingilizceHtml = new Array(
+                '<label>' + formLang.Baslik + '</label>' +
+                '<input name="en_Baslik" id="en_Baslik" class="form-control" type="text" placeholder="' + formLang.Baslik + '">',
+
+                '<label>' + formLang.AnaResim + '</label>' +
+                '<div id="en_' + vars.sectionSPs.AnaResim + '"></div>',
+
+                '<label>' + formLang.DigerResimler + '</label>' +
+                '<div id="en_' + vars.sectionSPs.DigerResimler + '"></div>',
+
+                '<label>' + formLang.Yazi + '</label>' +
+                '<textarea name="en_Yazi" id="en_Yazi" class="form-control" placeholder="' + formLang.Yazi + '" rows="4"></textarea>'
+            );
+
+        html = FunCreateModalHtml(vars.sectionNames.Lower, true, genelHtml, turkceHtml, ingilizceHtml, vars.sectionButtons.Submit)
+        $('#' + vars.sectionShowBases.Modal).html(html);
+        vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+        vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+    }
 }
 
 function GetSectionsHtml() {
-    var html = '';
-    var thei = true;
-    var i = 0,
-        data = vars.sectionDatas.Okullar,
-        length = data.length;
-
-    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
-        '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center">' +
-        '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-        '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
-        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
-        '</h2>' +
-        '</div>' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-
-        '<div class="panel with-nav-tabs panel-default">' +
-        '<div class="panel-heading">' +
-        '<ul class="nav nav-tabs">';
-
-    thei = true;
-    for (i = 0; i < length; i++) {
-        if (thei) {
-            html += '<li class="active"><a href="#' + data[i].ShowID + '" data-toggle="tab">' + data[i].Ad + '</a></li>';
-            thei = false;
-        } else {
-            html += '<li><a href="#' + data[i].ShowID + '" data-toggle="tab">' + data[i].Ad + '</a></li>';
-        }
+    if (vars.sectionIsFirst) {
+        var html = CreateSectionHtml(
+            vars.sectionNames.Lower,
+            vars.sectionNames.Upper,
+            vars.sectionNames.Normal,
+            new Array(
+                '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>',
+                '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>'
+            ),
+            new Array(
+                formLang.Tarih,
+                formLang.Baslik,
+                formLang.Duzenle,
+                formLang.Sil
+            ),
+            vars.sectionShowBases.Modal,
+            true,
+            vars.sectionDatas.Okullar,
+            vars.sectionDatas.Okullar.length,
+            "ShowID",
+            "Ad"
+        )
+        $('#' + vars.sectionShowBases.Sections).html(html);
     }
-
-    html += '</ul>' +
-        '</div>' +
-        '<div class="panel-body">' +
-        '<div class="tab-content">';
-
-    thei = true;
-    for (i = 0; i < length; i++) {
-        if (thei) {
-            html += '<div class="tab-pane fade in active" id="' + data[i].ShowID + '">';
-            thei = false;
-        } else {
-            html += '<div class="tab-pane fade" id="' + data[i].ShowID + '">';
-        }
-        html += '<div class="table-responsive">' +
-            '<table class="table table-bordered table-hover datatable">' +
-            '<thead class="text-center">' +
-            '<th class="text-center">' + formLang.Tarih + '</th>' +
-            '<th class="text-center">' + formLang.Baslik + '</th>' +
-            '<th class="text-center">' + formLang.Duzenle + '</th>' +
-            '<th class="text-center">' + formLang.Sil + '</th>' +
-            '</thead>' +
-            '<tbody id="show' + vars.sectionNames.Upper + 'Data' + data[i].ShowID + '">' +
-            '</tbody>' +
-            '</table>' +
-            '</div>' +
-            '</div>';
-    }
-
-
-
-    html += '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
-        '</div>' +
-        '</section>';
-
-    $('#' + vars.sectionShowBases.Sections).html(html);
 }
-
-var isFirst = true;
 
 function RefreshData(main = 1, html = 0, side = 0) {
     if (main == 1) {
         GetSectionsData();
     }
     if (html != 0) {
-        GetSectionsHtml()
-        GetSectionsModalHtml()
-        CreateSectionsTable()
+        setTimeout(function() {
+            GetSectionsHtml()
+            GetSectionsModalHtml()
+            CreateSectionsTable()
+        }, 50);
     }
     if (side != 0) {
-        GetOkullarSelect();
-        GetResimlerSelect();
+        setTimeout(function() {
+            GetOkullarSelect();
+            GetResimlerSelect();
+        }, 100);
     }
-
     setTimeout(function() {
-        if (!isFirst) {
-            ShortenContent6();
+        if (!vars.sectionIsFirst) {
+            ShortenContent();
         }
-        isFirst = false;
-    }, 5);
-    GetSectionsNum();
+        GetSectionsNum();
+        vars.sectionIsFirst = false;
+    }, 150);
 }

@@ -32,6 +32,8 @@ var vars = {
     sectionDatas: {
         Galeriler: {
             Data: new Array(),
+            FData: new Array(),
+            FHtml: new Array(),
             Num: 0,
         },
 
@@ -54,8 +56,8 @@ $(function() {
 
     //Button that opens add/update modal
     FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-                vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-                vars.sectionObjects.Form, vars.sectionObjects.Modal);
+        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+        vars.sectionObjects.Form, vars.sectionObjects.Modal);
 
 
 
@@ -197,8 +199,8 @@ $(function() {
 
     //Button for deleting
     FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
-            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
-            RefreshData,"1, 1, 1");
+        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+        RefreshData, "1, 1, 1");
 });
 
 function GetOkullarSelect() {
@@ -274,7 +276,7 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.Galeriler.Data[i]);
     }
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -285,6 +287,8 @@ function CreateSectionsTable() {
 function GetSectionsData() {
     vars.sectionDatas.Galeriler = {
         Data: new Array(),
+        FData: new Array(),
+        FHtml: new Array(),
         Num: 0,
     }
 
@@ -302,12 +306,20 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Galeriler;
                 vars.sectionDatas.Galeriler = cache;
+                vars.sectionDatas.Galeriler.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.Galeriler.FData = JSON.parse(cache.FData);
+                vars.sectionDatas.Galeriler.FHtml = JSON.parse(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Galeriler;
                 vars.sectionDatas.Galeriler = cache;
+                vars.sectionDatas.Galeriler.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.Galeriler.FData = JSON.parse(cache.FData);
+                vars.sectionDatas.Galeriler.FHtml = JSON.parse(cache.FHtml);
             } else {
                 var i, j, data = result.data,
-                    length, length2, htmls = {};
+                    length, length2, htmls = {},
+                    fHtml = new Array(),
+                    fData = new Array();
                 var curData, trInside, trArray;
 
                 for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
@@ -328,14 +340,65 @@ function GetSectionsData() {
                         trInside = GetHtmlTr(curData, trArray);
                         htmls[okul[j]] += '<tr>' + trInside + '</tr>';
                     }
+
+                    if (en) {
+                        if (page != '') {
+                            curData.Link = baseurl + 'en/' + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        } else {
+                            curData.Link = baseurl + 'en/' + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        }
+                    } else {
+                        if (page != '') {
+                            curData.Link = baseurl + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        } else {
+                            curData.Link = baseurl + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        }
+                    }
+                    var dateAr = curData.Tarih.split('-');
+                    curData.Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];
+                    fData[i] = curData;
+
+                    fHtml[i] =
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad25 marginB35 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
+                        '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- hidden-xs-sm-md -->' +
+                        '<div class="col-lg-4">' +
+                        '<a href="' + curData.Link + '"><img alt="' + curData.Baslik + '" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="' + imagesDir + curData.AnaResim + '"></a>' +
+                        '</div>' +
+                        '<div class="col-lg-8">' +
+                        '<h3><a href="' + curData.Link + '">' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></a></h3>' +
+                        '<p class="shorten_content8">' + curData.Yazi + '</p>' +
+                        '<br>' +
+                        '</div>' +
+                        '<a href="' + curData.Link + '" class="btn btn-sm btn-danger borderRad10" style="position:absolute;bottom:20px;right:20px">' + formLang.ReadMore + '</a>' +
+                        '</div>' +
+                        '<div class="row visible-md visible-sm visible-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- visible-xs-sm-md -->' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12">' +
+                        '<h3 class="text-center"><a href="' + curData.Link + '">' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></a></h3>' +
+                        '<a href="' + curData.Link + '"><img alt="' + curData.Baslik + '" class="img-responsive img-center w400 hvr-bob" style="max-height:300px;" src="' + imagesDir + curData.AnaResim + '"></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 marginTop10">' +
+                        '<p class="shorten_content8">' + curData.Yazi + '</p>' +
+                        '<br><a href="' + curData.Link + '" style="position:absolute;bottom:0;"><span class="btn btn-sm btn-danger pull-right marginR15 borderRad10">' + formLang.ReadMore + '</span></a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
                 }
+
+                vars.sectionDatas.Galeriler.FHtml = fHtml;
+                vars.sectionDatas.Galeriler.FData = fData;
                 vars.sectionDatas.Galeriler.Data = htmls;
                 vars.sectionDatas.Galeriler.Num = length;
 
+                vars.sectionDatas.Galeriler.Data = JSON.stringify(vars.sectionDatas.Galeriler.Data);
+                vars.sectionDatas.Galeriler.FData = JSON.stringify(vars.sectionDatas.Galeriler.FData);
+                vars.sectionDatas.Galeriler.FHtml = JSON.stringify(vars.sectionDatas.Galeriler.FHtml);
                 var theCacheData = {
                     Galeriler: vars.sectionDatas.Galeriler,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Galeriler.Data = JSON.parse(vars.sectionDatas.Galeriler.Data);
+                vars.sectionDatas.Galeriler.FData = JSON.parse(vars.sectionDatas.Galeriler.FData);
+                vars.sectionDatas.Galeriler.FHtml = JSON.parse(vars.sectionDatas.Galeriler.FHtml);
             }
         },
         error: function() {
@@ -356,9 +419,9 @@ function GetHtmlTr(data, trArray) {
             var tarih = data.Tarih.split('-');
             tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+            newHtml += '<td class="shorten_content">' + tarih + '</td>';
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
     newHtml +=
@@ -540,7 +603,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

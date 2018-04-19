@@ -70,7 +70,6 @@ $(function() {
                 name: 'English',
                 value: String(en)
             });
-            console.log(data);
             $.ajax({
                 type: 'ajax',
                 method: 'post',
@@ -79,7 +78,6 @@ $(function() {
                 async: false,
                 dataType: 'json',
                 success: function(response) {
-                    console.log(response)
                     ResetFormErrors();
                     if (response.success) {
                         ResetSelectpicker();
@@ -335,7 +333,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Banner.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -364,9 +362,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Banner;
                 vars.sectionDatas.Banner = cache;
+                vars.sectionDatas.Banner.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Banner;
                 vars.sectionDatas.Banner = cache;
+                vars.sectionDatas.Banner.Data = JSON.parse(cache.Data);
             } else {
                 var data = result.data,
                     length = data.length,
@@ -402,10 +402,13 @@ function GetSectionsData() {
                 vars.sectionDatas.Banner.FHtml = fHtml;
                 vars.sectionDatas.Banner.Num = length;
 
+                var myJSON = JSON.stringify(vars.sectionDatas.Banner.Data);
+                vars.sectionDatas.Banner.Data = myJSON;
                 var theCacheData = {
                     Banner: vars.sectionDatas.Banner,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Banner.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -422,7 +425,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -482,6 +485,7 @@ function GetSectionsHtml() {
         '<div class="col-lg-12 page-header text-center">' +
         '<h2>' +
         '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
+        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
         '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
@@ -531,7 +535,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

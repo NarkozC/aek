@@ -134,8 +134,8 @@ function GetSubelerSelect(okul = -1) {
 
     html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '" id="' + tr_ID + '" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true" disabled>';
     if (okul != -1) {
-        html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '" id="' + tr_ID + '" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true">'+
-        '<option data-tokens="Sifirla Bos" value="reset">' + formLang.Sifirla + '</option>';
+        html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '" id="' + tr_ID + '" title="' + formLang.SubeSec + '" data-liveSearchNormalize="true">' +
+            '<option data-tokens="Sifirla Bos" value="reset">' + formLang.Sifirla + '</option>';
         var curData = data.filter(function(sube) {
             return sube.Okul == okul;
         });
@@ -208,7 +208,7 @@ function CreateSelectedTable() {
     $('#show' + vars.sectionNames.Upper + 'Table').find('tbody:first').html(html);
     $('#show' + vars.sectionNames.Upper + 'Table').show();
 
-    ShortenContent6();
+    ShortenContent();
 
     CreateDataTables();
 
@@ -238,9 +238,13 @@ function GetSinavTakvimiData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.SinavTakvimi;
                 vars.sectionDatas.SinavTakvimi = cache;
+                vars.sectionDatas.SinavTakvimi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.SinavTakvimi.FData = JSON.parse(cache.FData);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.SinavTakvimi;
                 vars.sectionDatas.SinavTakvimi = cache;
+                vars.sectionDatas.SinavTakvimi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.SinavTakvimi.FData = JSON.parse(cache.FData);
             } else {
                 var i, j, curData, trInside;
                 var data = result.data,
@@ -276,10 +280,16 @@ function GetSinavTakvimiData() {
                 vars.sectionDatas.SinavTakvimi.Data = htmls;
                 vars.sectionDatas.SinavTakvimi.Num = length;
 
-                var theCacheData = {
-                    SinavTakvimi: vars.sectionDatas.SinavTakvimi,
+                if (length < cacheLimit) {
+                    vars.sectionDatas.SinavTakvimi.Data = JSON.stringify(vars.sectionDatas.SinavTakvimi.Data);
+                    vars.sectionDatas.SinavTakvimi.FData = JSON.stringify(vars.sectionDatas.SinavTakvimi.FData);
+                    var theCacheData = {
+                        SinavTakvimi: vars.sectionDatas.SinavTakvimi,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.SinavTakvimi.Data = JSON.parse(vars.sectionDatas.SinavTakvimi.Data);
+                    vars.sectionDatas.SinavTakvimi.FData = JSON.parse(vars.sectionDatas.SinavTakvimi.FData);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -364,7 +374,7 @@ function GetHtmlTr(data, trArray) {
     var newHtml = '';
     var length = trArray.length;
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     return newHtml;
 }

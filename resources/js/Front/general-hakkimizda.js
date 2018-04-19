@@ -45,10 +45,12 @@ function GetHakkimizda() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Hakkimizda;
                 vars.sectionDatas.Hakkimizda = cache;
+                vars.sectionDatas.Hakkimizda.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Hakkimizda;
                 vars.sectionDatas.Hakkimizda = cache;
+                vars.sectionDatas.Hakkimizda.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var fhtml = '',
@@ -93,10 +95,16 @@ function GetHakkimizda() {
                 vars.sectionDatas.Hakkimizda.FHtml = fhtml;
                 vars.sectionDatas.Hakkimizda.BHtml = bHtml;
                 vars.sectionDatas.Hakkimizda.Num = length;
-                var theCacheData = {
-                    Hakkimizda: vars.sectionDatas.Hakkimizda,
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Hakkimizda.Data);
+                    vars.sectionDatas.Hakkimizda.Data = myJSON;
+                    var theCacheData = {
+                        Hakkimizda: vars.sectionDatas.Hakkimizda,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Hakkimizda.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -113,7 +121,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

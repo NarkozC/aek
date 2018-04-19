@@ -121,10 +121,12 @@ function GetIletisim() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Iletisim;
                 vars.sectionDatas.Iletisim = cache;
+                vars.sectionDatas.Iletisim.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Iletisim;
                 vars.sectionDatas.Iletisim = cache;
+                vars.sectionDatas.Iletisim.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var fHtml = '',
@@ -192,7 +194,7 @@ function GetIletisim() {
                             '</a>' +
                             '</div>' +
                             '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddingLR0 marginT10">' +
-                            '<a href="#' + vars.sectionContactShowID + '" class="btn btn-danger btn-md btn-block whiteSpaceNormal mailL">' +
+                            '<a href="#' + vars.sectionShowBases.Contact + '" class="btn btn-danger btn-md btn-block whiteSpaceNormal mailL">' +
                             '<div class="row disFlex">' +
                             '<div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">' +
                             '<i class="fa fa-2x fa-envelope posRelVerCen"></i>' +
@@ -266,10 +268,16 @@ function GetIletisim() {
                 vars.sectionDatas.Iletisim.BHtml = bHtml;
                 vars.sectionDatas.Iletisim.Data = data;
                 vars.sectionDatas.Iletisim.Num = length;
-                var theCacheData = {
-                    Iletisim: vars.sectionDatas.Iletisim,
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Iletisim.Data);
+                    vars.sectionDatas.Iletisim.Data = myJSON;
+                    var theCacheData = {
+                        Iletisim: vars.sectionDatas.Iletisim,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Iletisim.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetIletisim', url, theCacheData), 1);
 
             }
         },
@@ -288,7 +296,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

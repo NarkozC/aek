@@ -1,11 +1,8 @@
-    
-
     $(function() {
         GetNavbar();
     });
 
     function GetNavbar() {
-
         var vars = {
             sectionControllers: {
                 Normal: baseurl + 'Genel-Navbar/',
@@ -40,7 +37,7 @@
             var listOrder = data.ListOrder
 
             for (i = 0; i < length; i++) {
-                newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+                newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
             }
 
             newHtml +=
@@ -60,8 +57,6 @@
             return newHtml;
         }
 
-
-
         var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
         $.ajax({
             type: 'ajax',
@@ -76,10 +71,12 @@
                 if (en && result.cachedataEN != "") {
                     var cache = result.cachedataEN.NavbarF;
                     vars.sectionDatas.NavbarF = cache;
+                    vars.sectionDatas.NavbarF.Data = JSON.parse(cache.Data);
                     $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
                 } else if (!en && result.cachedataTR != "") {
                     var cache = result.cachedataTR.NavbarF;
                     vars.sectionDatas.NavbarF = cache;
+                    vars.sectionDatas.NavbarF.Data = JSON.parse(cache.Data);
                     $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
                 } else {
                     var fhtml = '',
@@ -173,10 +170,15 @@
 
                     vars.sectionDatas.NavbarF.FHtml = $('#' + vars.sectionShowBases.Sections).html();
 
-                    var theCacheData = {
-                        NavbarF: vars.sectionDatas.NavbarF,
+                    if (vars.sectionDatas.NavbarF.Num < cacheLimit) {
+                        var myJSON = JSON.stringify(vars.sectionDatas.NavbarF.Data);
+                        vars.sectionDatas.NavbarF.Data = myJSON;
+                        var theCacheData = {
+                            NavbarF: vars.sectionDatas.NavbarF,
+                        }
+                        setTimeout(Cache('GetNavbarData', url, theCacheData), 1);
+                        vars.sectionDatas.NavbarF.Data = JSON.parse(myJSON);
                     }
-                    setTimeout(Cache('GetNavbarData', url, theCacheData), 1);
                 }
             },
             error: function() {

@@ -49,145 +49,145 @@ $(function() {
     //Refresh Page
     RefreshData(1, 1, 1);
 
+    setTimeout(function() {
 
-    //Button that opens add/update modal
-    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-        vars.sectionObjects.Form, vars.sectionObjects.Modal);
+        //Button that opens add/update modal
+        FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+            vars.sectionObjects.Form, vars.sectionObjects.Modal);
 
 
 
-    //Button for posting data for add/update
-    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var url = vars.sectionObjects.Form.attr('action');
-            var data = vars.sectionObjects.Form.serializeArray();
-            data.push({
-                name: 'English',
-                value: String(en)
-            });
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: data,
-                async: false,
-                dataType: 'json',
-                success: function(response) {
-                    ResetFormErrors();
-                    if (response.success) {
-                        ResetSelectpicker();
-                        var trArray;
-                        var willRefresh = false;
+        //Button for posting data for add/update
+        $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
+            var $link = $(e.target);
+            if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+                var url = vars.sectionObjects.Form.attr('action');
+                var data = vars.sectionObjects.Form.serializeArray();
+                data.push({
+                    name: 'English',
+                    value: String(en)
+                });
+                $.ajax({
+                    type: 'ajax',
+                    method: 'post',
+                    url: url,
+                    data: data,
+                    dataType: 'json',
+                    success: function(response) {
+                        ResetFormErrors();
+                        if (response.success) {
+                            ResetSelectpicker();
+                            var trArray;
+                            var willRefresh = false;
 
-                        if (response.type == 'add') {
-                            willRefresh = true;
+                            if (response.type == 'add') {
+                                willRefresh = true;
+
+                                iziSuccess();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            } else {
+                                var no = response.data.No;
+                                var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
+
+                                var curData = response.data;
+                                trArray = new Array('BasSaat', 'BitSaat');
+                                var trInside = GetHtmlTr(curData, trArray);
+                                editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
+                                    editBtn.parents('tr:first').html(trInside);
+                                    $(this).css('background-color', '#EDEDED').fadeIn();
+                                    ShortenContent(50, false, true);
+                                });
+                                iziSuccess();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            }
+
+                            if (willRefresh) {
+                                RefreshData(1, 1, 1);
+                            }
                         } else {
-                            var no = response.data.No;
-                            var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
-                            var curData = response.data;
-
-                            trArray = new Array('BasSaat', 'BitSaat');
-                            var trInside = GetHtmlTr(curData, trArray);
-                            editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
-                                editBtn.parents('tr:first').html(trInside);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                        }
-                        $(vars.sectionObjects.Modal).modal('hide');
-                        iziSuccess();
-                        if (willRefresh) {
-                            setTimeout(function() {
+                            var ajaxGroup;
+                            if (response.messages.length != 0) {
+                                ShowFormErrors(response.messages);
+                            } else {
                                 RefreshData(1, 1, 1)
-                            }, 310);
-                        }
-                    } else {
-                        var ajaxGroup;
-                        if (response.messages.length != 0) {
-                            ShowFormErrors(response.messages);
-                        } else {
-                            RefreshData(1, 1, 1)
 
-                            $(vars.sectionObjects.Modal).modal('hide');
-                            iziError();
+                                iziError();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            }
                         }
+                    },
+                    error: function() {
+                        RefreshData(1, 1, 1)
+                        $(vars.sectionObjects.Modal).modal('hide');
+                        iziError();
                     }
-                },
-                error: function() {
-                    RefreshData(1, 1, 1)
-                    $(vars.sectionObjects.Modal).modal('hide');
-                    iziError();
-                }
-            });
+                });
 
-        }
-        $link.data('lockedAt', +new Date());
-    });
+            }
+            $link.data('lockedAt', +new Date());
+        });
 
-    //Button for editing
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var no = $(this).attr('data');
-            $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
-                data: {
-                    No: no
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    setTimeout(function() {
-                        ResetForm(vars.sectionObjects.Form);
-                        if (result.success) {
-                            $('input[name=No]').val(result.data.No);
-                            $('#BasSaat').val(result.data.BasSaat);
-                            $('#BitSaat').val(result.data.BitSaat);
-                            $('#' + vars.sectionSPs.Resim + 'Select').selectpicker('val', result.data.Resim);
+        //Button for editing
+        $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
+            var $link = $(e.target);
+            if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+                var no = $(this).attr('data');
+                $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
+                $.ajax({
+                    type: 'ajax',
+                    method: 'post',
+                    url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
+                    data: {
+                        No: no
+                    },
+                    async: false,
+                    dataType: 'json',
+                    success: function(result) {
+                        setTimeout(function() {
+                            ResetForm(vars.sectionObjects.Form);
+                            if (result.success) {
+                                $('input[name=No]').val(result.data.No);
+                                $('#BasSaat').val(result.data.BasSaat);
+                                $('#BitSaat').val(result.data.BitSaat);
+                                $('#Link').val(result.data.Link);
+                                $('#' + vars.sectionSPs.Resim + 'Select').selectpicker('val', result.data.Resim);
+                                $('#Link').val(result.data.Link);
 
-                            $(vars.sectionObjects.Modal).modal('show');
-                        } else {
-                            RefreshData(1, 1, 1)
-                            iziError();
-                        }
-                    }, 15);
-                },
-                error: function() {
-                    RefreshData(1, 1, 1)
-                    iziError();
-                }
-            });
+                                $(vars.sectionObjects.Modal).modal('show');
+                            } else {
+                                RefreshData(1, 1, 1)
+                                iziError();
+                            }
+                        }, 15);
+                    },
+                    error: function() {
+                        RefreshData(1, 1, 1)
+                        iziError();
+                    }
+                });
 
-        }
-        $link.data('lockedAt', +new Date());
-    });
+            }
+            $link.data('lockedAt', +new Date());
+        });
 
-    //Button for deleting
-    FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
-        RefreshData, "1, 1, 1");
+        //Button for deleting
+        FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+            RefreshData, new Array(1, 1, 1), true);
+
+    }, 200);
 });
 
 function GetResimlerSelect() {
-    var data = vars.sectionDatas.Resimler,
-        length = data.length,
-        id = vars.sectionSPs.Resim + 'Select',
-        section = vars.sectionSPs.Resim,
-        html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.ResimSec + '" data-liveSearchNormalize="true">',
-        lastParts = '';
-    var i;
-
-    lastParts = vars.sectionDatas.Resimler.Html;
-
-    lastParts += '</select>';
-
-    html += lastParts;
-    $('#' + section).html(html);
-    RefreshSelectpicker();
+    var html = FunSelect(
+        vars.sectionDatas.Resimler,
+        vars.sectionSPs.Resim,
+        formLang.ResimSec,
+        "", "", "",
+        false,
+        true
+    );
 }
 
 function GetSectionsNum() {
@@ -197,17 +197,16 @@ function GetSectionsNum() {
 function CreateSectionsTable() {
     var i, length;
     if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('#' + vars.sectionShowBases.Sections).fadeOut();
         $('.datatable').DataTable().destroy();
     }
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Popup.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
-    if (!vars.sectionIsFirst) {
-        CreateDataTables();
-    }
-    vars.sectionIsFirst = false;
+    CreateDataTables();
+    $('#' + vars.sectionShowBases.Sections).fadeIn();
 }
 
 function GetSectionsData() {
@@ -231,9 +230,13 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Popup;
                 vars.sectionDatas.Popup = cache;
+                vars.sectionDatas.Popup.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.Popup.FHtml = JSON.parse(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Popup;
                 vars.sectionDatas.Popup = cache;
+                vars.sectionDatas.Popup.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.Popup.FHtml = JSON.parse(cache.FHtml);
             } else {
                 var data = result.data,
                     length = data.length,
@@ -253,7 +256,6 @@ function GetSectionsData() {
                     html += '<tr>' + trInside + '</tr>';
 
 
-
                     curData = data[i]
                     curData.BasSaat = curData.BasSaat.split(':')
                     curData.BitSaat = curData.BitSaat.split(':')
@@ -270,7 +272,7 @@ function GetSectionsData() {
                         modalOpts.ModalCloseButton +
                         '</div>' +
                         '<div class="modal-body">' +
-                        '<img src="' + imagesDir + curData.Resim + '" id="' + vars.sectionNames.Lower + '-img" class="img-responsive img-center hvr-border-fade" style="position:relative; left:50%;transform:translate(-50%,0)">' +
+                        '<a href="' + curData.Link + '"><img src="' + imagesDir + curData.Resim + '" id="' + vars.sectionNames.Lower + '-img" class="img-responsive img-center hvr-border-fade" style="position:relative; left:50%;transform:translate(-50%,0)"></a>' +
                         '</div>' +
                         '<div class="modal-footer">' +
                         '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Kapat + '</button>' +
@@ -285,10 +287,17 @@ function GetSectionsData() {
 
                 vars.sectionDatas.Popup.BHtml = html;
                 vars.sectionDatas.Popup.Num = length;
-                var theCacheData = {
-                    Popup: vars.sectionDatas.Popup,
+
+                if (length < cacheLimit) {
+                    vars.sectionDatas.Popup.Data = JSON.stringify(vars.sectionDatas.Popup.Data);
+                    vars.sectionDatas.Popup.FHtml = JSON.stringify(vars.sectionDatas.Popup.FHtml);
+                    var theCacheData = {
+                        Popup: vars.sectionDatas.Popup,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Popup.Data = JSON.parse(vars.sectionDatas.Popup.Data);
+                    vars.sectionDatas.Popup.FHtml = JSON.parse(vars.sectionDatas.Popup.FHtml);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -304,7 +313,7 @@ function GetHtmlTr(data, trArray) {
     var no = data.No;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     newHtml +=
         '<td>' +
@@ -318,84 +327,49 @@ function GetHtmlTr(data, trArray) {
 }
 
 function GetSectionsModalHtml() {
+    if (vars.sectionIsFirst) {
+        var html,
+            genelHtml = new Array(
+                '<label>' + formLang.BasSaat + '</label> <br>' +
+                '<input type="time" name="BasSaat" id="BasSaat" class="form-control" placeholder="' + formLang.BasSaat + '"></input>',
 
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header" align="center">' +
-        '<img class="maxW150" src="' + logoUrl + '">' +
-        modalOpts.ModalCloseButton +
-        '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
-        '<div class="modal-body">' +
+                '<label>' + formLang.BitSaat + '</label> <br>' +
+                '<input type="time" name="BitSaat" id="BitSaat" class="form-control" placeholder="' + formLang.BitSaat + '"></input>',
 
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.BasSaat + '</label> <br>' +
-        '<input type="time" name="BasSaat" id="BasSaat" class="form-control" placeholder="' + formLang.BasSaat + '"></input>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.BitSaat + '</label> <br>' +
-        '<input type="time" name="BitSaat" id="BitSaat" class="form-control" placeholder="' + formLang.BitSaat + '"></input>' +
-        '</div>' +
-        '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Resim + '</label>' +
-        '<div id="' + vars.sectionSPs.Resim + '"></div>' +
-        '</div>' +
+                '<label>' + formLang.Resim + '</label>' +
+                '<div id="' + vars.sectionSPs.Resim + '"></div>',
 
+                '<label>' + formLang.Link + '</label> <br>' +
+                '<input type="text" name="Link" id="Link" class="form-control" placeholder="' + formLang.Link + '"></input>'
+            );
 
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
-        '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
-        '</div>' +
-        '</form> ' +
-        '</div>' +
-        '</div>' +
-        '</div>';
-    $('#' + vars.sectionShowBases.Modal).html(html);
-    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
-    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+        html = FunCreateModalHtml(vars.sectionNames.Lower, false, genelHtml, new Array(), new Array(), vars.sectionButtons.Submit)
+        $('#' + vars.sectionShowBases.Modal).html(html);
+        vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+        vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+    }
 }
 
 function GetSectionsHtml() {
-    var html = '';
-
-    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
-        '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center">' +
-        '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal +
-        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
-        '</h2>' +
-        '</div>' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-
-        '<div class="table-responsive">' +
-        '<table class="table table-bordered table-hover datatable">' +
-        '<thead class="text-center">' +
-        '<th class="text-center">' + formLang.BasSaat + '</th>' +
-        '<th class="text-center">' + formLang.BitSaat + '</th>' +
-        '<th class="text-center">' + formLang.Duzenle + '</th>' +
-        '<th class="text-center">' + formLang.Sil + '</th>' +
-        '</thead>' +
-        '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
-        '</tbody>' +
-        '</table>' +
-        '</div>' +
-        '</div>' +
-
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
-        '</div>' +
-        '</section>';
-
-    $('#' + vars.sectionShowBases.Sections).html(html);
+    if (vars.sectionIsFirst) {
+        var html = CreateSectionHtml(
+            vars.sectionNames.Lower,
+            vars.sectionNames.Upper,
+            vars.sectionNames.Normal,
+            new Array(
+                '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>',
+            ),
+            new Array(
+                formLang.BasSaat,
+                formLang.BitSaat,
+                formLang.Duzenle,
+                formLang.Sil
+            ),
+            vars.sectionShowBases.Modal
+        )
+        $('#' + vars.sectionShowBases.Sections).html(html);
+        $('#' + vars.sectionShowBases.Sections).css('transition', 'none');
+    }
 }
 
 var isFirst = true;
@@ -405,19 +379,22 @@ function RefreshData(main = 1, html = 0, side = 0) {
         GetSectionsData();
     }
     if (html != 0) {
-        GetSectionsHtml()
-        GetSectionsModalHtml()
-        CreateSectionsTable()
+        setTimeout(function() {
+            GetSectionsHtml();
+            GetSectionsModalHtml();
+            CreateSectionsTable();
+        }, 50);
     }
     if (side != 0) {
-        GetResimlerSelect();
+        setTimeout(function() {
+            GetResimlerSelect()
+        }, 100);
     }
-
     setTimeout(function() {
-        if (!isFirst) {
-            ShortenContent6();
+        if (!vars.sectionIsFirst) {
+            ShortenContent();
         }
-        isFirst = false;
-    }, 5);
-    GetSectionsNum();
+        GetSectionsNum();
+        vars.sectionIsFirst = false;
+    }, 150);
 }

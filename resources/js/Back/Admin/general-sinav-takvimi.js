@@ -386,7 +386,7 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.SinavTakvimi.Data[i]);
     }
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -415,9 +415,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.SinavTakvimi;
                 vars.sectionDatas.SinavTakvimi = cache;
+                vars.sectionDatas.SinavTakvimi.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.SinavTakvimi;
                 vars.sectionDatas.SinavTakvimi = cache;
+                vars.sectionDatas.SinavTakvimi.Data = JSON.parse(cache.Data);
             } else {
                 var i, j, data = result.data,
                     length, length2, htmls = {};
@@ -453,10 +455,13 @@ function GetSectionsData() {
                 vars.sectionDatas.SinavTakvimi.Data = htmls;
                 vars.sectionDatas.SinavTakvimi.Num = length;
 
+                var myJSON = JSON.stringify(vars.sectionDatas.SinavTakvimi.Data);
+                vars.sectionDatas.SinavTakvimi.Data = myJSON;
                 var theCacheData = {
                     SinavTakvimi: vars.sectionDatas.SinavTakvimi,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.SinavTakvimi.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -477,18 +482,18 @@ function GetHtmlTr(data, trArray) {
             var tarih = data.Tarih.split('-');
             tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+            newHtml += '<td class="shorten_content">' + tarih + '</td>';
         } else if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "Ders") {
             var dersTemp = vars.sectionDatas.Dersler.Data.filter(function(ders) {
                 return ders.Kod == data.Ders;
             });
             if (dersTemp.length > 0) {
-                newHtml += '<td class="shorten_content6">' + dersTemp[0].Ad + '</td>';
+                newHtml += '<td class="shorten_content">' + dersTemp[0].Ad + '</td>';
             } else {
-                newHtml += '<td class="shorten_content6">' + trArrayTemp[1] + '</td>';
+                newHtml += '<td class="shorten_content">' + trArrayTemp[1] + '</td>';
             }
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
     newHtml +=
@@ -657,7 +662,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

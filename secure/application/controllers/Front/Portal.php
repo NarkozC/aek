@@ -47,7 +47,7 @@ class Portal extends CI_Controller {
 			}
 			$this->form_validation->set_rules('TCNoOrEmail', 'TC No/Email', 'required|trim|max_length[65]|strip_tags|xss_clean');				
 			$this->form_validation->set_rules('Sifre', 'Şifre', 'required|trim|max_length[65]|strip_tags|xss_clean');
-			$this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+			
 	        if ($this->form_validation->run()) {
 	    		$TCNoOrEmail = $this->input->post('TCNoOrEmail');
 	    		$Sifre = $this->input->post('Sifre');
@@ -143,27 +143,61 @@ class Portal extends CI_Controller {
 		}
 	}
 
-
-
-
-
-	public function Create()
+	public function BuildBackups()
 	{
-		if(! $this->input->is_ajax_request()) {
-		    redirect('404');
+		print_r(FCPATH);
+
+		$date = date("Y-m-d");
+		$this->Database_Backup($date);
+		$this->Send_Backup($date);
+	}
+
+	public function Database_Backup($date)
+	{
+		$this->load->helper('file');
+		$prefs = array(
+	        'format'        => 'zip',
+	        'filename'      => 'Database_'.$date.'.sql',
+		);
+		$this->load->dbutil($prefs);
+		$backup = $this->dbutil->backup();
+		write_file('resources/backups/Database_'.$date.'.zip', $backup);
+	}
+
+	public function Send_Backup($date)
+	{
+		$this->load->library('encrypt');
+		$this->load->helper('email');
+		$this->load->library('email');
+		$this->email->from('aek.k12.tr@gmail.com', 'Ankara Eğitim Kurumları');
+		$this->email->to('aek.k12.tr@gmail.com', 'drmbatur@yahoo.com');
+		$this->email->subject($date." Database Backup | AEK");
+		$this->email->message($date." Database Backup");
+		$this->email->attach('resources/backups/Database_'.$date.'.zip');
+		if ($this->email->send()) {
+			unlink('resources/backups/Database_'.$date.'.zip');
 		} else {
-			$this->simpleloginsecure->create('doktorlar@gmail.com', '12345678910', 'Mb!271190', 0, 0, 0, 0, 0, 1);
+			show_error($this->email->print_debugger());
 		}
 	}
 
-	public function Delete()
-	{
-		if ($this->simpleloginsecure->delete(6)) {
-			echo 'success';
-		} else {
-			echo 'fail';
-		}
-	}
+	// public function Create()
+	// {
+	// 	if(! $this->input->is_ajax_request()) {
+	// 	    redirect('404');
+	// 	} else {
+	// 		$this->simpleloginsecure->create('doktorlar@gmail.com', '12345678910', 'Mb!271190', 0, 0, 0, 0, 0, 1);
+	// 	}
+	// }
+
+	// public function Delete()
+	// {
+	// 	if ($this->simpleloginsecure->delete(6)) {
+	// 		echo 'success';
+	// 	} else {
+	// 		echo 'fail';
+	// 	}
+	// }
 
 
 }

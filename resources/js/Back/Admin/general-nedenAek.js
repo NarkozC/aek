@@ -312,7 +312,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.NedenAEK.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -341,9 +341,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.NedenAEK;
                 vars.sectionDatas.NedenAEK = cache;
+                vars.sectionDatas.NedenAEK.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.NedenAEK;
                 vars.sectionDatas.NedenAEK = cache;
+                vars.sectionDatas.NedenAEK.Data = JSON.parse(cache.Data);
             } else {
                 var fhtml = '',
                     bHtml = '',
@@ -387,10 +389,14 @@ function GetSectionsData() {
                 vars.sectionDatas.NedenAEK.FHtml = fhtml;
                 vars.sectionDatas.NedenAEK.BHtml = bHtml;
                 vars.sectionDatas.NedenAEK.Num = length;
+                
+                var myJSON = JSON.stringify(vars.sectionDatas.NedenAEK.Data);
+                vars.sectionDatas.NedenAEK.Data = myJSON;
                 var theCacheData = {
                     NedenAEK: vars.sectionDatas.NedenAEK,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.NedenAEK.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -407,7 +413,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -482,41 +488,22 @@ function GetSectionsModalHtml() {
 }
 
 function GetSectionsHtml() {
-    var html = '';
-
-    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
-        '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center">' +
-        '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
-        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
-        '</h2>' +
-        '</div>' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-
-        '<div class="table-responsive">' +
-        '<table class="table table-bordered table-hover datatable">' +
-        '<thead class="text-center">' +
-        '<th class="text-center">' + formLang.Baslik + '</th>' +
-        '<th class="text-center">' + formLang.Yukari + '</th>' +
-        '<th class="text-center">' + formLang.Asagi + '</th>' +
-        '<th class="text-center">' + formLang.Duzenle + '</th>' +
-        '<th class="text-center">' + formLang.Sil + '</th>' +
-        '</thead>' +
-        '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
-        '</tbody>' +
-        '</table>' +
-        '</div>' +
-        '</div>' +
-
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
-        '</div>' +
-        '</section>';
+    var html = CreateSectionHtml(
+        vars.sectionNames.Lower,
+        vars.sectionNames.Upper,
+        vars.sectionNames.Normal,
+        new Array(
+            '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>',
+        ),
+        new Array(
+            formLang.Baslik,
+            formLang.Yukari,
+            formLang.Asagi,
+            formLang.Duzenle,
+            formLang.Sil
+        ),
+        vars.sectionShowBases.Modal
+    )
 
     $('#' + vars.sectionShowBases.Sections).html(html);
 }
@@ -537,7 +524,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

@@ -45,10 +45,12 @@ function GetEgitimSistemimiz() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.EgitimSistemimiz;
                 vars.sectionDatas.EgitimSistemimiz = cache;
+                vars.sectionDatas.EgitimSistemimiz.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.EgitimSistemimiz;
                 vars.sectionDatas.EgitimSistemimiz = cache;
+                vars.sectionDatas.EgitimSistemimiz.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var fhtml = '',
@@ -93,10 +95,16 @@ function GetEgitimSistemimiz() {
                 vars.sectionDatas.EgitimSistemimiz.FHtml = fhtml;
                 vars.sectionDatas.EgitimSistemimiz.BHtml = bHtml;
                 vars.sectionDatas.EgitimSistemimiz.Num = length;
-                var theCacheData = {
-                    EgitimSistemimiz: vars.sectionDatas.EgitimSistemimiz,
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.EgitimSistemimiz.Data);
+                    vars.sectionDatas.EgitimSistemimiz.Data = myJSON;
+                    var theCacheData = {
+                        EgitimSistemimiz: vars.sectionDatas.EgitimSistemimiz,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.EgitimSistemimiz.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -113,7 +121,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

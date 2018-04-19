@@ -45,10 +45,12 @@ function GetNedenAEK() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.NedenAEK;
                 vars.sectionDatas.NedenAEK = cache;
+                vars.sectionDatas.NedenAEK.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.NedenAEK;
                 vars.sectionDatas.NedenAEK = cache;
+                vars.sectionDatas.NedenAEK.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var fhtml = '',
@@ -93,10 +95,16 @@ function GetNedenAEK() {
                 vars.sectionDatas.NedenAEK.FHtml = fhtml;
                 vars.sectionDatas.NedenAEK.BHtml = bHtml;
                 vars.sectionDatas.NedenAEK.Num = length;
-                var theCacheData = {
-                    NedenAEK: vars.sectionDatas.NedenAEK,
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.NedenAEK.Data);
+                    vars.sectionDatas.NedenAEK.Data = myJSON;
+                    var theCacheData = {
+                        NedenAEK: vars.sectionDatas.NedenAEK,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.NedenAEK.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -113,7 +121,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

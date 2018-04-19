@@ -47,10 +47,12 @@ function GetUluslararasiProjelerData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.UluslararasiProjeler;
                 vars.sectionDatas.UluslararasiProjeler = cache;
+                vars.sectionDatas.UluslararasiProjeler.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.UluslararasiProjeler;
                 vars.sectionDatas.UluslararasiProjeler = cache;
+                vars.sectionDatas.UluslararasiProjeler.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var data = result.data,
@@ -100,10 +102,15 @@ function GetUluslararasiProjelerData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                var theCacheData = {
-                    UluslararasiProjeler: vars.sectionDatas.UluslararasiProjeler,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.UluslararasiProjeler.Data);
+                    vars.sectionDatas.UluslararasiProjeler.Data = myJSON;
+                    var theCacheData = {
+                        UluslararasiProjeler: vars.sectionDatas.UluslararasiProjeler,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.UluslararasiProjeler.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
 
             GetGallery()
@@ -145,7 +152,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

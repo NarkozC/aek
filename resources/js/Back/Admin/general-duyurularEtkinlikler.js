@@ -276,7 +276,7 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.DuyurularEtkinlikler.Data[i]);
     }
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -306,12 +306,20 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.DuyurularEtkinlikler;
                 vars.sectionDatas.DuyurularEtkinlikler = cache;
+                vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.parse(cache.FData);
+                vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.parse(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.DuyurularEtkinlikler;
                 vars.sectionDatas.DuyurularEtkinlikler = cache;
+                vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.parse(cache.FData);
+                vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.parse(cache.FHtml);
             } else {
                 var i, j, data = result.data,
-                    length, length2, htmls = {}, fHtml = '', fData = new Array();
+                    length, length2, htmls = {},
+                    fHtml = new Array(),
+                    fData = new Array();
                 var curData, trInside, trArray;
 
                 for (i = 0, length = vars.sectionDatas.Okullar.length; i < length; i++) {
@@ -333,18 +341,24 @@ function GetSectionsData() {
                         htmls[okul[j]] += '<tr>' + trInside + '</tr>';
                     }
 
-
-
                     if (en) {
-                        curData.Link = baseurl + 'en/'+page+'/Haber/' + curData.SectionID;
+                        if (page != '') {
+                            curData.Link = baseurl + 'en/' + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        } else {
+                            curData.Link = baseurl + 'en/' + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        }
                     } else {
-                        curData.Link = baseurl + page +'/Haber/' + curData.SectionID;
+                        if (page != '') {
+                            curData.Link = baseurl + page + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        } else {
+                            curData.Link = baseurl + vars.sectionNames.Upper + '/' + vars.sectionNames.UpperSingle + '/' + curData.SectionID;
+                        }
                     }
                     var dateAr = curData.Tarih.split('-');
                     curData.Tarih = dateAr[2] + '.' + dateAr[1] + '.' + dateAr[0];
                     fData[i] = curData;
 
-                    fHtml +=
+                    fHtml[i] =
                         '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad25 marginB35 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
                         '<div class="row hidden-md hidden-sm hidden-xs marginTop20 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + 's"> <!-- hidden-xs-sm-md -->' +
                         '<div class="col-lg-4">' +
@@ -375,10 +389,16 @@ function GetSectionsData() {
                 vars.sectionDatas.DuyurularEtkinlikler.Data = htmls;
                 vars.sectionDatas.DuyurularEtkinlikler.Num = length;
 
+                vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.stringify(vars.sectionDatas.DuyurularEtkinlikler.Data);
+                vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.stringify(vars.sectionDatas.DuyurularEtkinlikler.FData);
+                vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.stringify(vars.sectionDatas.DuyurularEtkinlikler.FHtml);
                 var theCacheData = {
                     DuyurularEtkinlikler: vars.sectionDatas.DuyurularEtkinlikler,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.DuyurularEtkinlikler.Data = JSON.parse(vars.sectionDatas.DuyurularEtkinlikler.Data);
+                vars.sectionDatas.DuyurularEtkinlikler.FData = JSON.parse(vars.sectionDatas.DuyurularEtkinlikler.FData);
+                vars.sectionDatas.DuyurularEtkinlikler.FHtml = JSON.parse(vars.sectionDatas.DuyurularEtkinlikler.FHtml);
             }
         },
         error: function() {
@@ -399,9 +419,9 @@ function GetHtmlTr(data, trArray) {
             var tarih = data.Tarih.split('-');
             tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+            newHtml += '<td class="shorten_content">' + tarih + '</td>';
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
     newHtml +=
@@ -583,7 +603,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

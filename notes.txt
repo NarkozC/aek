@@ -8,33 +8,9 @@
 u7383628 -ftp kullanıcı adı
 XQah99Q8 -ftp şifresi
 225460 - natro müşteri numarası
-M!b*271190 - veritabanı şifresi
+M!b*271190 - veritabanı şifresi -- aek.k12.tr@gmail.com email şifresi
 Mb!271190 - natro hosting
 
 u7530033 - k12tr ftp kullanıcı adı
 to9r@W=O5nT8 - k12tr ftp şifresi
-
-
-http://www.akifavsar.com.tr/ms-access-uygulama-3-okul-veritabani/
-
-
-
-/*
-=====================================
-  ------------ Todo ---------------
-=====================================
-*/
-
-öncelik;
-duyuruların ismi duyurular-etkinlikler olacak
-
-
-Yemek Listesi
-Etkinlik Takvimi
-Kurumsal-Birimler'i sayfalara bölmek
-Kurumsal-Kadro'yu sayfalara bölmek
-Anaokulu Kadrosu
-Haberlere video dosyası eklemek
-İletişim güncellenecek
-Navigasyon sub sub yapılacak
 	

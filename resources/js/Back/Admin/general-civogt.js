@@ -422,7 +422,7 @@ function CreateSectionsTable() {
     }
     $('#show' + vars.sectionNames.Upper + 'Data').html(html);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -449,9 +449,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Civogt;
                 vars.sectionDatas.Civogt = cache;
+                vars.sectionDatas.Civogt.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Civogt;
                 vars.sectionDatas.Civogt = cache;
+                vars.sectionDatas.Civogt.Data = JSON.parse(cache.Data);
             } else {
                 var data = result.data,
                     length = data.length;
@@ -462,11 +464,13 @@ function GetSectionsData() {
                     vars.sectionDatas.Civogt.Data[i] = curData;
                 }
 
-                vars.sectionDatas.Civogt.Num = length;
+                var myJSON = JSON.stringify(vars.sectionDatas.Civogt.Data);
+                vars.sectionDatas.Civogt.Data = myJSON;
                 var theCacheData = {
                     Civogt: vars.sectionDatas.Civogt,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Civogt.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -503,7 +507,7 @@ function GetHtmlTr(data, trArray) {
     var no = data.No;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     newHtml +=
         '<td>' +
@@ -682,7 +686,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

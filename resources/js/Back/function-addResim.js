@@ -23,15 +23,10 @@ var rVars = {
         Submit: 'ResimlerSubmit',
     },
     sectionDatas: {
-        Resimler: {
-            Data: '',
-            Num: 0,
-        },
-
         Kategoriler: GetKategorilerData(),
     },
     sectionSPs: {
-        Kategori: 'RKategoriler',
+        Kategori: 'RKategori',
     },
     sectionIsFirst: true,
 };
@@ -47,8 +42,8 @@ function GetAllAddResim() {
         if ($('#' + rVars.sectionShowBases.Modal).length <= 0) {
             $('#' + vars.sectionShowBases.Sections).append('<div id="' + rVars.sectionShowBases.Modal + '"></div> ');
         }
-        GetResimlerModalHtml();
-        GetKategorilerSelect();
+
+        RefreshResimlerData()
 
 
         //Button that opens add/update modal
@@ -71,30 +66,6 @@ function GetAllAddResim() {
                     name: 'English',
                     value: String(en)
                 });
-                var dataTarget = "RIsim";
-                var dataTargetSecond = "RKategoriler";
-
-                var RIsim;
-                var RKategoriler;
-                for (var i = 0; i < data.length; i++) {
-                    var rIsim;
-                    var rKategoriler;
-                    if (data[i].name == dataTarget) {
-                        rIsim = data[i];
-                        if (rIsim.value == "") {
-                            data[i].value = "RDosya";
-                        }
-                        RIsim = data[i].value;
-                    }
-
-                    if (data[i].name == dataTargetSecond) {
-                        rKategoriler = data[i];
-                        if (rKategoriler.value == "") {
-                            data[i].value = "Genel";
-                        }
-                        RKategoriler = data[i].value;
-                    }
-                }
                 $.ajax({
                     type: 'ajax',
                     method: 'post',
@@ -111,35 +82,47 @@ function GetAllAddResim() {
                             var willRefresh = false;
 
                             if (response.type == 'add') {
+
                                 var uploadURI = rVars.sectionControllers.Portal + rVars.sectionFunctions.Upload;
-                                var inputFile = $('#RDosya');
-                                var fileToUpload = inputFile[0].files[0];
-                                if (inputFile.get(0).files.length === 0) {
+                                var rDosya = $('#RDosya')[0],
+                                    files = $('#RDosya')[0].files,
+                                    rIsim = $('#RIsim').val(),
+                                    rKategori = $('#' + rVars.sectionSPs.Kategori + 'Select').selectpicker('val'),
+                                    isNamesSame = $('#IsNamesSame').is(":checked");
+                                var i,
+                                    length = files.length;
+
+                                if (length < 1) {
                                     var ajaxGroup;
-                                    var element = inputFile;
+                                    var element = rDosya;
                                     ajaxGroup = element.parents('.ajax-group:first');
 
                                     ajaxGroup.addClass('has-error');
                                     if (en) {
-                                        ajaxGroup.append('<p class="text-danger">The<strong> File </strong> field is required!</p>');
+                                        ajaxGroup.append('<p class="text-danger">The <strong>File</strong> field is required!</p>');
                                     } else {
                                         ajaxGroup.append('<p class="text-danger"><strong>Dosya</strong> alanını doldurmanız gerekmektedir!</p>');
                                     }
                                 } else {
                                     var formData = new FormData();
-                                    var rDosyaName = fileToUpload['name'].split('.');
-                                    rDosyaName = rDosyaName[0];
-                                    formData.append("RDosya", fileToUpload);
-                                    formData.append("RIsim", RIsim);
-                                    formData.append("RKategoriler", RKategoriler);
-                                    formData.append("RDosyaName", rDosyaName);
+
+                                    for (i = 0; i < length; i++) {
+                                        formData.append("files[]", files[i]);
+                                    }
+                                    if (isNamesSame) {
+                                        formData.append("IsNamesSame", true);
+                                    } else {
+                                        formData.append("IsNamesSame", false);
+                                    }
+                                    formData.append("RIsim", rIsim);
+                                    formData.append("RKategori", rKategori);
                                     $.ajax({
                                         url: uploadURI,
                                         type: 'post',
                                         data: formData,
                                         processData: false,
                                         contentType: false,
-                                        async: false,
+                                        cache: false,
                                         dataType: 'json',
                                         success: function(response2) {
                                             if (response2.success) {
@@ -150,7 +133,6 @@ function GetAllAddResim() {
                                         },
                                         error: function() {
                                             iziError();
-
                                         }
                                     });
                                     $(rVars.sectionObjects.Modal).modal('hide');
@@ -160,7 +142,14 @@ function GetAllAddResim() {
 
                             if (willRefresh) {
                                 setTimeout(function() {
-                                    GetResimlerData()
+                                    if (typeof vars.sectionDatas.Resimler !== 'undefined') {
+                                        vars.sectionDatas.Resimler = GetResimlerData();
+                                    } else {
+                                        GetResimlerData();
+                                    }
+                                    if (typeof GetResimlerSelect != 'undefined' && $.isFunction(GetResimlerSelect)) {
+                                        GetResimlerSelect();
+                                    }
                                 }, 310);
                             }
                         } else {
@@ -220,6 +209,10 @@ function GetAllAddResim() {
             '<div class="tab-content">' +
             '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
             '<div class="ajax-group col-sm-12 paddingLR0">' +
+            '<label>' + formLang.IsNamesSame + '</label>' +
+            '<input name="IsNamesSame" id="IsNamesSame" class="form-control" type="checkbox">' +
+            '</div>' +
+            '<div class="ajax-group col-sm-12 paddingLR0">' +
             '<label>' + formLang.Isim + '</label>' +
             '<input name="RIsim" id="RIsim" class="form-control" type="text" placeholder="' + formLang.Isim + '">' +
             '</div>' +
@@ -229,7 +222,7 @@ function GetAllAddResim() {
             '</div>' +
             '<div class="ajax-group col-sm-12 paddingLR0">' +
             '<label>' + formLang.Dosya + '</label>' +
-            '<input type="file" name="RDosya" class="form-control" id="RDosya" placeholder="' + formLang.Dosya + '" multiple>' +
+            '<input type="file" name="RDosya" class="form-control" id="RDosya" placeholder="' + formLang.Dosya + '" multiple accept="image/gif,image/jpeg,image/png">' +
             '</div>' +
             '</div>' +
             '</div>' +
@@ -244,5 +237,10 @@ function GetAllAddResim() {
         $('#' + rVars.sectionShowBases.Modal).html(html);
         rVars.sectionObjects.Form = $('#' + rVars.sectionNames.Lower + '-form');
         rVars.sectionObjects.Modal = $('#' + rVars.sectionNames.Lower + '-modal');
+    }
+
+    function RefreshResimlerData() {
+        GetResimlerModalHtml();
+        GetKategorilerSelect();
     }
 }

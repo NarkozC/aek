@@ -1,21 +1,104 @@
-﻿yazılara resim ekleme yapılacak. ( zaten yapıldı. sasiogludogucan@gmail.com'da annemden mail olarak geldi. )
+yazılara resim ekleme yapılacak. ( zaten yapıldı. sasiogludogucan@gmail.com'da annemden mail olarak geldi. )
 
 
-kurumlardan örnek olarak ilkokula basıldığında navdaki başlık "Özel Ankara Eğitim Kurumları"ndan "Özel Ankara Eğitim Kurumları İlkokulu" şeklinde olacak
+--------------------
+--> Yapılacaklar <--
+--------------------
+
+-> haberler facebook paylaşım
+
+-> eğer kayıtlar 6000 in üstündeyse cache sil ve data yolla direk
+
+-> kayıt ekleyince modal bozulması sorunu düzeltildi
+örnek: back general-haberler.js line 117-119, 587-632
+
+-> form val yaparken error gözükmeyen yerler için çözüm bulundu
+örnek: front general-insanKaynaklari.js line 62-65, 311
+
+-> submit edit ve delete den asnyc kaldırılacak
+
+-> controllerdan cache silerken bu şekilde kullanılacak
+örnek: Front/Insan_Kaynaklari.php line 112-113
+
+-> resimler to resimler/videolar {
+
+	ekleme yaparken {
+		eğer resim ise {
+			------------------
+			"İsimler Aynı Mı?"
+			"İsim"
+			"Kategori"
+			"Dosya"
+			------------------
+			hepsini gizle ve yukarıdakileri göster
+
+			"ResimOrVideo" alanını "Resim" olarak değiştir
+		}
+
+		eğer video ise {
+			----------
+			"Link"
+			"Kategori"
+			----------
+			hepsini gizle ve yukarıdakileri göster
+
+			"ResimOrVideo" alanını "Video" olarak değiştir
+		}
+	}
+
+	güncellerken {
+		eğer resim ise {
+			----------
+			"İsim"
+			"Kategori"
+			----------
+			hepsini gizle ve yukarıdakileri göster
+
+			sadece yukarıdakiler değişebilir
+		}
+
+		eğer video ise {
+			----------
+			"Link"
+			"Kategori"
+			----------
+			hepsini gizle ve yukarıdakileri göster
+
+			sadece yukarıdakiler değişebilir
+		}
+	}
 
 
-06.11.17
---galeriye video eklemenin nasıl yapılacağı--
-combobox ile video/resim seçilecek
-videoyu yüklerken isim,youtube linki,kategori istenecek
+	seçerken {
+		gözüken format {
+			Dosya ismi (kategorisi)(video/resim)
+			örn: Deneme (Genel)(Video)
+		}
 
---kullanırken ise--
-resim ile beraber video seçilebilecek normal bir element gibi
-mesela galeride karar verirken uzantısına bakacak
+		işlem yaparken {
+			eğer video ise (youtube olmak zorunda) {
+				galeriye video formatında ekle
+			}
+
+			eğe resim ise {
+				galeriye resim formatında ekle
+			}
+		}
+	}
+
+}
 
 
-sınav başvurusu için portaldan bir şekilde excele geçicek wtf
-Sınav başvurusu için 3 tane silme yöntemi olacak
-1 Kayıt üstünden
-2 Tarih aratarak multiple
-3 Tüm sınav başvuruları
+
+-----------------------------------
+--> when updating to aek.k12.tr <--
+-----------------------------------
+-> general_pozisyon tablosu
+-> system language
+-> config->form_validation.php
+
+
+
+
+
+ 

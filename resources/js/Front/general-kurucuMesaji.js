@@ -45,10 +45,12 @@ function GetKurucuMesaji() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.KurucuMesaji;
                 vars.sectionDatas.KurucuMesaji = cache;
+                vars.sectionDatas.KurucuMesaji.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.KurucuMesaji;
                 vars.sectionDatas.KurucuMesaji = cache;
+                vars.sectionDatas.KurucuMesaji.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var fhtml = '',
@@ -93,10 +95,16 @@ function GetKurucuMesaji() {
                 vars.sectionDatas.KurucuMesaji.FHtml = fhtml;
                 vars.sectionDatas.KurucuMesaji.BHtml = bHtml;
                 vars.sectionDatas.KurucuMesaji.Num = length;
-                var theCacheData = {
-                    KurucuMesaji: vars.sectionDatas.KurucuMesaji,
+
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.KurucuMesaji.Data);
+                    vars.sectionDatas.KurucuMesaji.Data = myJSON;
+                    var theCacheData = {
+                        KurucuMesaji: vars.sectionDatas.KurucuMesaji,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.KurucuMesaji.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -113,7 +121,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

@@ -197,7 +197,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Iletisim.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -226,9 +226,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Iletisim;
                 vars.sectionDatas.Iletisim = cache;
+                vars.sectionDatas.Iletisim.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Iletisim;
                 vars.sectionDatas.Iletisim = cache;
+                vars.sectionDatas.Iletisim.Data = JSON.parse(cache.Data);
             } else {
                 var fHtml = '',
                     bHtml = '',
@@ -368,10 +370,14 @@ function GetSectionsData() {
                 vars.sectionDatas.Iletisim.BHtml = bHtml;
                 vars.sectionDatas.Iletisim.Data = data;
                 vars.sectionDatas.Iletisim.Num = length;
+                
+                var myJSON = JSON.stringify(vars.sectionDatas.Iletisim.Data);
+                vars.sectionDatas.Iletisim.Data = myJSON;
                 var theCacheData = {
                     Iletisim: vars.sectionDatas.Iletisim,
                 }
-                setTimeout(Cache('GetIletisim', url, theCacheData), 1);
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Iletisim.Data = JSON.parse(myJSON);
 
             }
         },
@@ -389,7 +395,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -514,7 +520,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

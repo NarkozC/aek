@@ -336,7 +336,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.A4x4.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -365,132 +365,137 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.A4x4;
                 vars.sectionDatas.A4x4 = cache;
+                vars.sectionDatas.A4x4.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.A4x4;
                 vars.sectionDatas.A4x4 = cache;
+                vars.sectionDatas.A4x4.Data = JSON.parse(cache.Data);
             } else {
-                    var data = result.data,
-                        length = data.length,
-                        bHtml = '',
-                        fHtml = '',
-                        break_on = 4,
-                        oneLeft = 'F',
-                        its13 = false,
-                        counter = 0;
-                    var i, j, rLength, curData, tempCurData, link, trInside, trArray;
+                var data = result.data,
+                    length = data.length,
+                    bHtml = '',
+                    fHtml = '',
+                    break_on = 4,
+                    oneLeft = 'F',
+                    its13 = false,
+                    counter = 0;
+                var i, j, rLength, curData, tempCurData, link, trInside, trArray;
 
-                    fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
-                        '<div class="container-fluid">';
+                fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
+                    '<div class="container-fluid">';
 
-                    if (length == 13) {
-                        break_on = 3;
-                        its13 = true;
-                    } else if (length % 4 == 0) {
-                        break_on = 4;
-                    } else if (length % 3 == 0) {
-                        break_on = 3;
-                    } else if (length % 4 == 1) {
-                        break_on = 3;
-                        oneLeft = 'T4';
-                    } else if (length % 2 == 0) {
-                        break_on = 2;
-                    } else if (length % 3 == 1) {
-                        break_on = 4;
-                        oneLeft = 'T3';
+                if (length == 13) {
+                    break_on = 3;
+                    its13 = true;
+                } else if (length % 4 == 0) {
+                    break_on = 4;
+                } else if (length % 3 == 0) {
+                    break_on = 3;
+                } else if (length % 4 == 1) {
+                    break_on = 3;
+                    oneLeft = 'T4';
+                } else if (length % 2 == 0) {
+                    break_on = 2;
+                } else if (length % 3 == 1) {
+                    break_on = 4;
+                    oneLeft = 'T3';
+                }
+                for (i = 0; i < length; i++) {
+                    curData = GetCurData(data[i]);
+                    tempCurData = curData.Link.split('/');
+                    if (tempCurData.length > 1) {
+                        link = curData.Link;
+                    } else {
+                        link = baseurl + curData.Link;
                     }
-                    for (i = 0; i < length; i++) {
-                        curData = GetCurData(data[i]);
-                        tempCurData = curData.Link.split('/');
-                        if (tempCurData.length > 1) {
-                            link = curData.Link;
-                        } else {
-                            link = baseurl + curData.Link;
-                        }
 
-                        if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
-                            fHtml += '<div class="row">';
-                        } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
+                    if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
+                        fHtml += '<div class="row">';
+                    } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
 
-                        } else if (counter % break_on == 1 && break_on == 3 && oneLeft == 'T3' && counter == length - 3) {
-                            fHtml += '<div class="row">';
-                        } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
+                    } else if (counter % break_on == 1 && break_on == 3 && oneLeft == 'T3' && counter == length - 3) {
+                        fHtml += '<div class="row">';
+                    } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
 
-                        } else if (counter == Number(length - 4) && break_on == 2 && its13 == true) {
-                            fHtml += '<div class="row">';
-                        } else if (its13 == true && counter == Number(length - 3)) {
+                    } else if (counter == Number(length - 4) && break_on == 2 && its13 == true) {
+                        fHtml += '<div class="row">';
+                    } else if (its13 == true && counter == Number(length - 3)) {
 
-                        } else if (counter == Number(length - 2) && break_on == 2 && its13 == true) {
-                            fHtml += '<div class="row">';
-                        } else if (its13 == true && counter == length - 1) {
+                    } else if (counter == Number(length - 2) && break_on == 2 && its13 == true) {
+                        fHtml += '<div class="row">';
+                    } else if (its13 == true && counter == length - 1) {
 
-                        } else if (counter % break_on == 0) {
-                            fHtml += '<div class="row">';
-                        }
-
-                        if (break_on == 4) {
-                            fHtml += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
-                        } else if (break_on == 3) {
-                            fHtml += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
-                        } else if (break_on == 2) {
-                            fHtml += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
-                        }
-
-                        fHtml += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad10 maxH300 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-                            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">' +
-                            '<a href="' + link + '"><img src="' + imagesDir + curData.Resim + '" class="img-responsive maxH200" style="position: relative;left: 50%;transform: translate(-50%,0);"></a>' +
-                            '</div>' +
-                            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' +
-                            '<a href="' + link + '"><h4>' + curData.Baslik + '</h4></a>' +
-                            '</div>' +
-                            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-right">' +
-                            '<a href="' + link + '"><button type="button" class="btn btn-danger">' + formLang.DetaylarIcin + '</button></a>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>';
-
-                        counter++;
-                        if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
-
-                        } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
-
-                        } else if (its13 == true && counter == Number(length - 3)) {
-
-                        } else if (its13 == true && counter == Number(length - 2)) {
-                            fHtml += '</div>';
-                        } else if (its13 == true && counter == Number(length - 1)) {
-
-                        } else if (counter % break_on == 0) {
-                            fHtml += '</div>';
-                        }
-                        if (break_on == 4 && oneLeft == 'T3' && counter == length - 3) {
-                            break_on = 3;
-                        } else if (break_on == 3 && oneLeft == 'T4' && counter == length - 2) {
-                            break_on = 2;
-                        } else if (break_on == 3 && its13 == true && counter == length - 4) {
-                            break_on = 2;
-                        }
-
-                        vars.sectionDatas.A4x4.Data[i] = curData;
-
-                        trArray = new Array('Baslik');
-                        trInside = GetHtmlTr(curData, trArray);
-                        bHtml += '<tr>' + trInside + '</tr>';
+                    } else if (counter % break_on == 0) {
+                        fHtml += '<div class="row">';
                     }
-                    if (counter % break_on != 0) {
+
+                    if (break_on == 4) {
+                        fHtml += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
+                    } else if (break_on == 3) {
+                        fHtml += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
+                    } else if (break_on == 2) {
+                        fHtml += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
+                    }
+
+                    fHtml += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad10 maxH300 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">' +
+                        '<a href="' + link + '"><img src="' + imagesDir + curData.Resim + '" class="img-responsive maxH200" style="position: relative;left: 50%;transform: translate(-50%,0);"></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' +
+                        '<a href="' + link + '"><h4>' + curData.Baslik + '</h4></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-right">' +
+                        '<a href="' + link + '"><button type="button" class="btn btn-danger">' + formLang.DetaylarIcin + '</button></a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+
+                    counter++;
+                    if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
+
+                    } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
+
+                    } else if (its13 == true && counter == Number(length - 3)) {
+
+                    } else if (its13 == true && counter == Number(length - 2)) {
+                        fHtml += '</div>';
+                    } else if (its13 == true && counter == Number(length - 1)) {
+
+                    } else if (counter % break_on == 0) {
                         fHtml += '</div>';
                     }
-
-                    fHtml += '</div>';
-
-                    vars.sectionDatas.A4x4.BHtml = bHtml;
-                    vars.sectionDatas.A4x4.FHtml = fHtml;
-                    vars.sectionDatas.A4x4.Num = length;
-
-                    var theCacheData = {
-                        A4x4: vars.sectionDatas.A4x4,
+                    if (break_on == 4 && oneLeft == 'T3' && counter == length - 3) {
+                        break_on = 3;
+                    } else if (break_on == 3 && oneLeft == 'T4' && counter == length - 2) {
+                        break_on = 2;
+                    } else if (break_on == 3 && its13 == true && counter == length - 4) {
+                        break_on = 2;
                     }
-                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+
+                    vars.sectionDatas.A4x4.Data[i] = curData;
+
+                    trArray = new Array('Baslik');
+                    trInside = GetHtmlTr(curData, trArray);
+                    bHtml += '<tr>' + trInside + '</tr>';
                 }
+                if (counter % break_on != 0) {
+                    fHtml += '</div>';
+                }
+
+                fHtml += '</div>';
+
+                vars.sectionDatas.A4x4.BHtml = bHtml;
+                vars.sectionDatas.A4x4.FHtml = fHtml;
+                vars.sectionDatas.A4x4.Num = length;
+
+                var myJSON = JSON.stringify(vars.sectionDatas.A4x4.Data);
+                vars.sectionDatas.A4x4.Data = myJSON;
+                var theCacheData = {
+                    A4x4: vars.sectionDatas.A4x4,
+                }
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.A4x4.Data = JSON.parse(myJSON);
+            }
         },
         error: function() {
             iziError();
@@ -506,7 +511,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -544,7 +549,7 @@ function GetSectionsModalHtml() {
         '<div class="tab-content">' +
 
         '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
-        
+
         '<div role="tabpanel" class="tab-pane fade in active" id="' + formTabs.Turkce + '">' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.Baslik + '</label>' +
@@ -590,7 +595,7 @@ function GetSectionsHtml() {
         '<h2>' +
         '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
         '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal+
+        vars.sectionNames.Normal +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
         '</div>' +
@@ -639,7 +644,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

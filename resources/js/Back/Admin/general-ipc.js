@@ -335,7 +335,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Ipc.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -364,9 +364,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Ipc;
                 vars.sectionDatas.Ipc = cache;
+                vars.sectionDatas.Ipc.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Ipc;
                 vars.sectionDatas.Ipc = cache;
+                vars.sectionDatas.Ipc.Data = JSON.parse(cache.Data);
             } else {
                 var data = result.data,
                     length = data.length,
@@ -415,10 +417,13 @@ function GetSectionsData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
+                var myJSON = JSON.stringify(vars.sectionDatas.Ipc.Data);
+                vars.sectionDatas.Ipc.Data = myJSON;
                 var theCacheData = {
                     Ipc: vars.sectionDatas.Ipc,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Ipc.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -435,7 +440,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -563,7 +568,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

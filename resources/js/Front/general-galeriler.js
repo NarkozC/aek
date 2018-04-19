@@ -1,6 +1,7 @@
 $(function() {
     AllGaleriler();
 });
+
 function AllGaleriler() {
     var vars = {
         sectionControllers: {
@@ -50,19 +51,21 @@ function AllGaleriler() {
     $(function() {
         GetGalerilerData()
 
-        if (cfunction == "Galeri") {
-            if (cparam1 != undefined) {
-                GetGaleri();
+        setTimeout(function() {
+            if (cfunction == "Galeri") {
+                if (cparam1 != undefined) {
+                    GetGaleri();
+                } else {
+                    window.location.replace(baseurl + page);
+                }
             } else {
-                window.location.replace(baseurl + page);
+                if (page == "" || page == "Anasayfa") {
+                    GetGalerilerA();
+                } else {
+                    GetGalerilerHtml();
+                }
             }
-        } else {
-            if (page == "" || page == "Anasayfa") {
-                GetGalerilerA();
-            } else {
-                GetGalerilerHtml();
-            }
-        }
+        }, 100);
 
     });
 
@@ -83,9 +86,15 @@ function AllGaleriler() {
                 if (en && result.cachedataEN != "") {
                     var cache = result.cachedataEN.Galeriler;
                     vars.sectionDatas.Galeriler = cache;
+                    vars.sectionDatas.Galeriler.Data = JSON.parse(cache.Data);
+                    vars.sectionDatas.Galeriler.FData = JSON.parse(cache.FData);
+                    vars.sectionDatas.Galeriler.FHtml = JSON.parse(cache.FHtml);
                 } else if (!en && result.cachedataTR != "") {
                     var cache = result.cachedataTR.Galeriler;
                     vars.sectionDatas.Galeriler = cache;
+                    vars.sectionDatas.Galeriler.Data = JSON.parse(cache.Data);
+                    vars.sectionDatas.Galeriler.FData = JSON.parse(cache.FData);
+                    vars.sectionDatas.Galeriler.FHtml = JSON.parse(cache.FHtml);
                 } else {
                     var i, j, data = result.data,
                         length, length2, htmls = {},
@@ -160,10 +169,18 @@ function AllGaleriler() {
                     vars.sectionDatas.Galeriler.Data = htmls;
                     vars.sectionDatas.Galeriler.Num = length;
 
-                    var theCacheData = {
-                        Galeriler: vars.sectionDatas.Galeriler,
+                    if (length < cacheLimit) {
+                        vars.sectionDatas.Galeriler.Data = JSON.stringify(vars.sectionDatas.Galeriler.Data);
+                        vars.sectionDatas.Galeriler.FData = JSON.stringify(vars.sectionDatas.Galeriler.FData);
+                        vars.sectionDatas.Galeriler.FHtml = JSON.stringify(vars.sectionDatas.Galeriler.FHtml);
+                        var theCacheData = {
+                            Galeriler: vars.sectionDatas.Galeriler,
+                        }
+                        setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                        vars.sectionDatas.Galeriler.Data = JSON.parse(vars.sectionDatas.Galeriler.Data);
+                        vars.sectionDatas.Galeriler.FData = JSON.parse(vars.sectionDatas.Galeriler.FData);
+                        vars.sectionDatas.Galeriler.FHtml = JSON.parse(vars.sectionDatas.Galeriler.FHtml);
                     }
-                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
                 }
             },
             error: function() {
@@ -283,12 +300,14 @@ function AllGaleriler() {
             '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
             '<h2>' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></h2>' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '</div>' +
+            '<div class="container dark-bg shadow borderRad25 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0">' +
             '<div id="' + vars.sectionNames.Kod + '" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">' +
             DigerResimlerHtml +
             '</div>' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15">' +
             '<p>' + curData.Yazi + '</p>' +
             '</div>' +
             '</div>' +
@@ -315,7 +334,8 @@ function AllGaleriler() {
 
     function GetGalerilerA() {
         var data = vars.sectionDatas.Galeriler.FData,
-            html = '';
+            html = '',
+            showData = new Array();
         var i, curData;
 
         html += '<section id="' + vars.sectionNames.LowerA + '">' +
@@ -325,8 +345,17 @@ function AllGaleriler() {
             '<a href="' + vars.sectionControllers.Normal + '"><h3 data-baslik="B_' + vars.sectionNames.Upper + '" class="page-header">' + vars.sectionNames.Normal + '</h3></a>' +
             '</div>';
 
-        for (i = 0; i <= 2; i++) {
-            curData = data[i];
+        for (var i = 0; i < data.length; i++) {
+            if (i < 3) {
+                showData[i] = data[i]
+            } else {
+                break;
+            }
+        }
+        for (i = 0; i < showData.length; i++) {
+            curData = showData[i];
+            // console.log('i:'+i)
+            // console.log(curData.Link)
             html += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 paddingLR0 paddingTB5 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
                 '<div class="col-lg-4 visible-lg padding0">' +
                 '<a href="' + curData.Link + '"><img src="' + imagesDir + curData.AnaResim + '" style="max-height:70px;max-width:170px;" class="img-responsive" alt="' + curData.Baslik + '"></a>' +
@@ -363,9 +392,9 @@ function AllGaleriler() {
                 var tarih = data.Tarih.split('-');
                 tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-                newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+                newHtml += '<td class="shorten_content">' + tarih + '</td>';
             } else {
-                newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+                newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
             }
         }
         newHtml +=

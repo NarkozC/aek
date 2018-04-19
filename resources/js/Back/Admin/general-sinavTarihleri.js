@@ -144,8 +144,9 @@ $(function() {
                     setTimeout(function() {
                         ResetForm(vars.sectionObjects.Form);
                         if (result.success) {
+                            var SinifArray = result.data.Sinif.split(',');
                             $('input[name=No]').val(result.data.No);
-                            $('#' + vars.sectionSPs.Sinif + 'Select').selectpicker('val', result.data.Sinif);
+                            $('#' + vars.sectionSPs.Sinif + 'Select').selectpicker('val', SinifArray);
                             $('#Tarih').val(result.data.Tarih);
 
                             $(vars.sectionObjects.Modal).modal('show');
@@ -180,7 +181,7 @@ function GetSiniflarSelect() {
         var tr_ID = vars.sectionSPs.Sinif + 'Select';
         var tr_Section = vars.sectionSPs.Sinif;
 
-        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_Section + '" id="' + tr_ID + '" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true">';
+        var html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_Section + '[]" id="' + tr_ID + '" title="' + formLang.SinifSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">';
 
         for (i = 0; i < length; i++) {
             html += '<option data-tokens="' + data[i].Kod + '" value="' + data[i].Kod + '">' + data[i].Kod + '</option>';
@@ -205,7 +206,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.SinavTarihleri.Html);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -233,42 +234,58 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.SinavTarihleri;
                 vars.sectionDatas.SinavTarihleri = cache;
+                vars.sectionDatas.SinavTarihleri.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.SinavTarihleri;
                 vars.sectionDatas.SinavTarihleri = cache;
+                vars.sectionDatas.SinavTarihleri.Data = JSON.parse(cache.Data);
             } else {
                 var html = '',
                     data = result.data,
-                    length = data.length;
-                var i, curData, trInside, trArray;
+                    length = data.length,
+                    curI = 0;
+                var i, j, sLength, tData, curData, trInside, trArray;
 
                 vars.sectionDatas.SinavTarihleri.Data[0] = new Array();
                 vars.sectionDatas.SinavTarihleri.Data[0][0] = {};
-                for (i = 1; i < length; i++) {
-                    if (vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif] == undefined) {
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif] = new Array();
+                for (i = 1; i <= length; i++) {
+                    curData = data[curI];
 
-                        clength = vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif].length;
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][clength] = data[i];
-                    } else {
-                        clength = vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif].length;
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][clength] = data[i];
+                    curData.Tarih = curData.Tarih.split('-');
+                    curData.Tarih = curData.Tarih[2] + '.' + curData.Tarih[1] + '.' + curData.Tarih[0];
+                    tData = curData.Sinif.split(',');
+
+                    for (j = 0, sLength = tData.length; j < sLength; j++) {
+                        if (vars.sectionDatas.SinavTarihleri.Data[tData[j]] == undefined) {
+                            vars.sectionDatas.SinavTarihleri.Data[tData[j]] = new Array();
+
+                            clength = vars.sectionDatas.SinavTarihleri.Data[tData[j]].length;
+                            vars.sectionDatas.SinavTarihleri.Data[tData[j]][clength] = curData;
+                        } else {
+                            clength = vars.sectionDatas.SinavTarihleri.Data[tData[j]].length;
+                            vars.sectionDatas.SinavTarihleri.Data[tData[j]][clength] = curData;
+                        }
                     }
+                    curI++;
                 }
 
                 for (i = 0; i < length; i++) {
                     curData = GetCurData(data[i]);
 
-                    trArray = new Array('ozel-Tarih', 'Sinif');
+                    trArray = new Array('Tarih', 'Sinif');
                     trInside = GetHtmlTr(curData, trArray);
                     html += '<tr>' + trInside + '</tr>';
                 }
                 vars.sectionDatas.SinavTarihleri.Html = html;
                 vars.sectionDatas.SinavTarihleri.Num = length;
+
+                var myJSON = JSON.stringify(vars.sectionDatas.SinavTarihleri.Data);
+                vars.sectionDatas.SinavTarihleri.Data = myJSON;
                 var theCacheData = {
                     SinavTarihleri: vars.sectionDatas.SinavTarihleri,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.SinavTarihleri.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -289,9 +306,9 @@ function GetHtmlTr(data, trArray) {
             var tarih = data.Tarih.split('-');
             tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+            newHtml += '<td class="shorten_content">' + tarih + '</td>';
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
 
@@ -400,7 +417,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

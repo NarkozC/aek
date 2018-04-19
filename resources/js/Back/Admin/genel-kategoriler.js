@@ -42,253 +42,137 @@ $(function() {
     //Refresh Page
     RefreshData(1, 1, 1);
 
+    setTimeout(function() {
+        //Button that opens add/update modal
+        FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+            vars.sectionObjects.Form, vars.sectionObjects.Modal);
 
-    //Button that opens add/update modal
-    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-        vars.sectionObjects.Form, vars.sectionObjects.Modal);
+        //Button for posting data for add/update
+        $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
+            var $link = $(e.target);
+            if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+                var url = vars.sectionObjects.Form.attr('action');
+                var data = vars.sectionObjects.Form.serializeArray();
+                data.push({
+                    name: 'English',
+                    value: String(en)
+                });
+                $.ajax({
+                    type: 'ajax',
+                    method: 'post',
+                    url: url,
+                    data: data,
+                    dataType: 'json',
+                    success: function(response) {
+                        ResetFormErrors();
+                        if (response.success) {
+                            ResetSelectpicker();
+                            var trArray;
+                            var willRefresh = false;
 
+                            if (response.type == 'add') {
+                                willRefresh = true;
 
+                                iziSuccess();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            } else {
+                                var no = response.data.No;
+                                var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
 
-    //Button for posting data for add/update
-    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var url = vars.sectionObjects.Form.attr('action');
-            var data = vars.sectionObjects.Form.serializeArray();
-            data.push({
-                name: 'English',
-                value: String(en)
-            });
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: data,
-                async: false,
-                dataType: 'json',
-                success: function(response) {
-                    ResetFormErrors();
-                    if (response.success) {
-                        ResetSelectpicker();
-                        var trArray;
-                        var willRefresh = false;
+                                var curData = response.data;
+                                trArray = new Array('Isim');
+                                var trInside = GetHtmlTr(curData, trArray);
+                                editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
+                                    editBtn.parents('tr:first').html(trInside);
+                                    $(this).css('background-color', '#EDEDED').fadeIn();
+                                    ShortenContent(50, false, true);
+                                });
+                                iziSuccess();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            }
 
-                        if (response.type == 'add') {
-                            willRefresh = true;
+                            if (willRefresh) {
+                                RefreshData(1, 1, 1);
+                            }
                         } else {
-                            var no = response.data.No;
-                            var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
-                            var curData = response.data;
+                            var ajaxGroup;
+                            if (response.messages.length != 0) {
+                                ShowFormErrors(response.messages);
+                            } else {
+                                RefreshData(1, 1, 1)
 
-                            trArray = new Array('Isim');
-                            var trInside = GetHtmlTr(curData, trArray);
-                            editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
-                                editBtn.parents('tr:first').html(trInside);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
+                                iziError();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            }
                         }
+                    },
+                    error: function() {
+                        RefreshData(1, 1, 1)
                         $(vars.sectionObjects.Modal).modal('hide');
-                        iziSuccess();
-                        if (willRefresh) {
-                            setTimeout(function() {
-                                RefreshData(1, 1, 1)
-                            }, 310);
-                        }
-                    } else {
-                        var ajaxGroup;
-                        if (response.messages.length != 0) {
-                            ShowFormErrors(response.messages);
-                        } else {
-                            RefreshData(1, 1, 1)
-                            $(vars.sectionObjects.Modal).modal('hide');
-                            iziError();
-                        }
-                    }
-                },
-                error: function() {
-                    RefreshData(1, 1, 1)
-                    $(vars.sectionObjects.Modal).modal('hide');
-                    iziError();
-                }
-            });
-
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
-    //Button for editing
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var no = $(this).attr('data');
-            $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
-                data: {
-                    No: no
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    setTimeout(function() {
-                        ResetForm(vars.sectionObjects.Form);
-                        if (result.success) {
-                            $('input[name=No]').val(result.data.No);
-                            $('#Isim').val(result.data.Isim);
-
-                            $(vars.sectionObjects.Modal).modal('show');
-                        } else {
-                            RefreshData(1, 1, 1)
-                            iziError();
-                        }
-                    }, 15);
-                },
-                error: function() {
-                    RefreshData(1, 1, 1)
-                    iziError();
-                }
-            });
-
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
-    //Button for deleting
-    FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
-        RefreshData, "1, 1, 1");
-
-    //Button for moving record up
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonUp, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var No = $(this).attr('data');
-            var ListOrder = $(this).attr('data2');
-            var url = vars.sectionControllers.Portal + vars.sectionFunctions.Up;
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: {
-                    No: No,
-                    ListOrder: ListOrder
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    if (result.success) {
-                        iziSuccess();
-                        TargetListOrder = Number(ListOrder) - 1;
-                        var upbtn = $('tr .item-up[data2=' + ListOrder + ']')
-                        var downbtn = $('tr .item-down[data2=' + ListOrder + ']')
-                        var tr = upbtn.parents('tr:first');
-                        if ($('tr .item-up[data2=' + TargetListOrder + ']').length) {
-                            var targetupbtn = $('tr .item-up[data2=' + TargetListOrder + ']')
-                            var targetdownbtn = $('tr .item-down[data2=' + TargetListOrder + ']')
-                            var targettr = targetupbtn.parents('tr:first');
-                            targettr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                targetupbtn.attr('data2', ListOrder);
-                                targetdownbtn.attr('data2', ListOrder);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                            tr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                upbtn.attr('data2', TargetListOrder);
-                                downbtn.attr('data2', TargetListOrder);
-                                $(tr).after(targettr);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                        } else {
-                            setTimeout(function() {
-                                RefreshData(1, 1, 1)
-                            }, 10)
-                        }
-                    } else {
                         iziError();
-                        setTimeout(function() {
-                            RefreshData(1, 1, 1)
-                        }, 10)
                     }
+                });
 
-                },
-                error: function() {
-                    iziError();
-                    setTimeout(function() {
-                        RefreshData(1, 1, 1)
-                    }, 10)
-                }
-            });
+            }
+            $link.data('lockedAt', +new Date());
+        });
 
-        }
-        $link.data('lockedAt', +new Date());
-    });
+        //Button for editing
+        $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
+            var $link = $(e.target);
+            if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+                var no = $(this).attr('data');
+                $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
+                $.ajax({
+                    type: 'ajax',
+                    method: 'post',
+                    url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
+                    data: {
+                        No: no
+                    },
+                    async: false,
+                    dataType: 'json',
+                    success: function(result) {
+                        setTimeout(function() {
+                            ResetForm(vars.sectionObjects.Form);
+                            if (result.success) {
+                                $('input[name=No]').val(result.data.No);
+                                $('#Isim').val(result.data.Isim);
 
-
-    //Button for moving record down
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonDown, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var No = $(this).attr('data');
-            var ListOrder = $(this).attr('data2');
-            var url = vars.sectionControllers.Portal + vars.sectionFunctions.Down;
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: {
-                    No: No,
-                    ListOrder: ListOrder
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    if (result.success) {
-                        iziSuccess()
-                        TargetListOrder = Number(ListOrder) + 1;
-                        var upbtn = $('tr .item-up[data2=' + ListOrder + ']')
-                        var downbtn = $('tr .item-down[data2=' + ListOrder + ']')
-                        var tr = upbtn.parents('tr:first');
-                        if ($('tr .item-up[data2=' + TargetListOrder + ']').length) {
-                            var targetupbtn = $('tr .item-up[data2=' + TargetListOrder + ']')
-                            var targetdownbtn = $('tr .item-down[data2=' + TargetListOrder + ']')
-                            var targettr = targetupbtn.parents('tr:first');
-                            targettr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                targetupbtn.attr('data2', ListOrder);
-                                targetdownbtn.attr('data2', ListOrder);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                            tr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                upbtn.attr('data2', TargetListOrder);
-                                downbtn.attr('data2', TargetListOrder);
-                                $(targettr).after(tr);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                        } else {
-                            setTimeout(function() {
+                                $(vars.sectionObjects.Modal).modal('show');
+                            } else {
                                 RefreshData(1, 1, 1)
-                            }, 10)
-                        }
-                    } else {
-                        iziError()
-                        setTimeout(function() {
-                            RefreshData(1, 1, 1)
-                        }, 10)
-                    }
-                },
-                error: function() {
-                    iziError()
-                    setTimeout(function() {
+                                iziError();
+                            }
+                        }, 15);
+                    },
+                    error: function() {
                         RefreshData(1, 1, 1)
-                    }, 10)
-                }
-            });
+                        iziError();
+                    }
+                });
 
-        }
-        $link.data('lockedAt', +new Date());
-    });
+            }
+            $link.data('lockedAt', +new Date());
+        });
 
+        //Button for deleting
+        FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+            RefreshData, new Array(1, 1, 1));
+
+        //Button for moving record up
+        FunUp(vars.sectionShowBases.Sections,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Up,
+            RefreshData, new Array(1, 1, 1));
+
+        //Button for moving record down
+        FunDown(vars.sectionShowBases.Sections,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Down,
+            RefreshData, new Array(1, 1, 1));
+
+    }, 200);
 });
 
 function GetSectionsNum() {
@@ -298,17 +182,16 @@ function GetSectionsNum() {
 function CreateSectionsTable() {
     var i, length;
     if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('#' + vars.sectionShowBases.Sections).fadeOut();
         $('.datatable').DataTable().destroy();
     }
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Kategoriler.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
-    if (!vars.sectionIsFirst) {
-        CreateDataTables();
-    }
-    vars.sectionIsFirst = false;
+    CreateDataTables();
+    $('#' + vars.sectionShowBases.Sections).fadeIn();
 }
 
 function GetHtmlTr(data, trArray) {
@@ -319,7 +202,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -340,77 +223,41 @@ function GetHtmlTr(data, trArray) {
 }
 
 function GetSectionsModalHtml() {
+    if (vars.sectionIsFirst) {
+        var html,
+            genelHtml = new Array(
+                '<label>' + formLang.Isim + '</label>' +
+                '<input type="text" name="Isim" id="Isim" class="form-control" placeholder="' + formLang.Isim + '"></input>'
+            );
 
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header" align="center">' +
-        '<img class="maxW150" src="' + logoUrl + '">' +
-        modalOpts.ModalCloseButton +
-        '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
-        '<div class="modal-body">' +
-        '<div class="tab-content">' +
-
-        '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Isim + '</label>' +
-        '<input type="text" name="Isim" id="Isim" class="form-control" placeholder="' + formLang.Isim + '"></input>' +
-        '</div>' +
-
-        '</div>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
-        '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
-        '</div>' +
-        '</form> ' +
-        '</div>' +
-        '</div>' +
-        '</div>';
-    $('#' + vars.sectionShowBases.Modal).html(html);
-    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
-    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+        html = FunCreateModalHtml(vars.sectionNames.Lower, false, genelHtml, new Array(), new Array(), vars.sectionButtons.Submit)
+        $('#' + vars.sectionShowBases.Modal).html(html);
+        vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+        vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+    }
 }
 
 function GetSectionsHtml() {
-    var html = '';
-
-    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
-        '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center">' +
-        '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
-        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
-        '</h2>' +
-        '</div>' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-
-        '<div class="table-responsive">' +
-        '<table class="table table-bordered table-hover datatable">' +
-        '<thead class="text-center">' +
-        '<th class="text-center">' + formLang.Isim + '</th>' +
-        '<th class="text-center">' + formLang.Yukari + '</th>' +
-        '<th class="text-center">' + formLang.Asagi + '</th>' +
-        '<th class="text-center">' + formLang.Duzenle + '</th>' +
-        '<th class="text-center">' + formLang.Sil + '</th>' +
-        '</thead>' +
-        '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
-        '</tbody>' +
-        '</table>' +
-        '</div>' +
-        '</div>' +
-
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
-        '</div>' +
-        '</section>';
-
-    $('#' + vars.sectionShowBases.Sections).html(html);
+    if (vars.sectionIsFirst) {
+        var html = CreateSectionHtml(
+            vars.sectionNames.Lower,
+            vars.sectionNames.Upper,
+            vars.sectionNames.Normal,
+            new Array(
+                '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>',
+            ),
+            new Array(
+                formLang.Isim,
+                formLang.Yukari,
+                formLang.Asagi,
+                formLang.Duzenle,
+                formLang.Sil
+            ),
+            vars.sectionShowBases.Modal
+        )
+        $('#' + vars.sectionShowBases.Sections).html(html);
+        $('#' + vars.sectionShowBases.Sections).css('transition', 'none');
+    }
 }
 
 var isFirst = true;
@@ -420,18 +267,20 @@ function RefreshData(main = 1, html = 0, side = 0) {
         vars.sectionDatas.Kategoriler = GetKategorilerData();
     }
     if (html != 0) {
-        GetSectionsHtml()
-        GetSectionsModalHtml()
-        CreateSectionsTable()
+        setTimeout(function() {
+            GetSectionsHtml();
+            GetSectionsModalHtml();
+            CreateSectionsTable();
+        }, 50);
     }
     if (side != 0) {
+        setTimeout(function() {}, 100);
     }
-
     setTimeout(function() {
-        if (!isFirst) {
-            ShortenContent6();
+        if (!vars.sectionIsFirst) {
+            ShortenContent();
         }
-        isFirst = false;
-    }, 5);
-    GetSectionsNum();
+        GetSectionsNum();
+        vars.sectionIsFirst = false;
+    }, 150);
 }

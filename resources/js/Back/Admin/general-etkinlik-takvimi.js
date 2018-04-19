@@ -340,7 +340,7 @@ function CreateSectionsTable() {
         $('#show' + vars.sectionNames.Upper + 'Data' + vars.sectionDatas.Okullar[i].ShowID).html(vars.sectionDatas.EtkinlikTakvimi.Data[i]);
     }
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -368,9 +368,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.EtkinlikTakvimi;
                 vars.sectionDatas.EtkinlikTakvimi = cache;
+                vars.sectionDatas.EtkinlikTakvimi.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.EtkinlikTakvimi;
                 vars.sectionDatas.EtkinlikTakvimi = cache;
+                vars.sectionDatas.EtkinlikTakvimi.Data = JSON.parse(cache.Data);
             } else {
                 var i, j, data = result.data,
                     length, length2, htmls = {};
@@ -398,10 +400,13 @@ function GetSectionsData() {
                 vars.sectionDatas.EtkinlikTakvimi.Data = htmls;
                 vars.sectionDatas.EtkinlikTakvimi.Num = length;
 
+                var myJSON = JSON.stringify(vars.sectionDatas.EtkinlikTakvimi.Data);
+                vars.sectionDatas.EtkinlikTakvimi.Data = myJSON;
                 var theCacheData = {
                     EtkinlikTakvimi: vars.sectionDatas.EtkinlikTakvimi,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.EtkinlikTakvimi.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -422,9 +427,9 @@ function GetHtmlTr(data, trArray) {
             var tarih = data.Tarih.split('-');
             tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-            newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+            newHtml += '<td class="shorten_content">' + tarih + '</td>';
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
     newHtml +=
@@ -581,7 +586,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

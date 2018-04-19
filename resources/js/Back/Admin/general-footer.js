@@ -74,7 +74,7 @@ $(function() {
                             var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
                             var curData = GetCurData(response.data);
 
-                            trArray = new Array('Facebook', 'Twitter', 'Instagram');
+                            trArray = new Array('Facebook', 'Twitter', 'Instagram', 'Youtube');
                             var trInside = GetHtmlTr(curData, trArray);
                             editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
                                 editBtn.parents('tr:first').html(trInside);
@@ -137,6 +137,8 @@ $(function() {
                             $('#en_Twitter').val(result.data.en_Twitter);
                             $('#tr_Instagram').val(result.data.tr_Instagram);
                             $('#en_Instagram').val(result.data.en_Instagram);
+                            $('#tr_Youtube').val(result.data.tr_Youtube);
+                            $('#en_Youtube').val(result.data.en_Youtube);
 
                             $(vars.sectionObjects.Modal).modal('show');
                         } else {
@@ -165,7 +167,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Footer.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -193,9 +195,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Footer;
                 vars.sectionDatas.Footer = cache;
+                vars.sectionDatas.Footer.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Footer;
                 vars.sectionDatas.Footer = cache;
+                vars.sectionDatas.Footer.Data = JSON.parse(cache.Data);
             } else {
                 var fhtml = '',
                     bHtml = '',
@@ -206,7 +210,7 @@ function GetSectionsData() {
 
                 curData = GetCurData(data);
 
-                trArray = new Array('Facebook', 'Twitter', 'Instagram');
+                trArray = new Array('Facebook', 'Twitter', 'Instagram', 'Youtube');
                 trInside = GetHtmlTr(curData, trArray);
                 bHtml += '<tr>' + trInside + '</tr>';
 
@@ -233,10 +237,14 @@ function GetSectionsData() {
 
                 vars.sectionDatas.Footer.FHtml = fhtml;
                 vars.sectionDatas.Footer.BHtml = bHtml;
+                    
+                var myJSON = JSON.stringify(vars.sectionDatas.Footer.Data);
+                vars.sectionDatas.Footer.Data = myJSON;
                 var theCacheData = {
                     Footer: vars.sectionDatas.Footer,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Footer.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -252,7 +260,7 @@ function GetHtmlTr(data, trArray) {
     var no = data.No;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -294,6 +302,10 @@ function GetSectionsModalHtml() {
         '<label>' + formLang.Instagram + '</label>' +
         '<input type="text" name="tr_Instagram" id="tr_Instagram" class="form-control" placeholder="' + formLang.Instagram + '"></input>' +
         '</div>' +
+        '<div class="ajax-group col-sm-12 paddingLR0">' +
+        '<label>' + formLang.Youtube + '</label>' +
+        '<input type="text" name="tr_Youtube" id="tr_Youtube" class="form-control" placeholder="' + formLang.Youtube + '"></input>' +
+        '</div>' +
         '</div>' +
         '<div role="tabpanel" class="tab-pane fade" id="' + formTabs.Ingilizce + '">' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
@@ -307,6 +319,10 @@ function GetSectionsModalHtml() {
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.Instagram + '</label>' +
         '<input type="text" name="en_Instagram" id="en_Instagram" class="form-control" placeholder="' + formLang.Instagram + '"></input>' +
+        '</div>' +
+        '<div class="ajax-group col-sm-12 paddingLR0">' +
+        '<label>' + formLang.Youtube + '</label>' +
+        '<input type="text" name="en_Youtube" id="en_Youtube" class="form-control" placeholder="' + formLang.Youtube + '"></input>' +
         '</div>' +
         '</div>' +
 
@@ -343,6 +359,7 @@ function GetSectionsHtml() {
         '<th class="text-center">' + formLang.Facebook + '</th>' +
         '<th class="text-center">' + formLang.Twitter + '</th>' +
         '<th class="text-center">' + formLang.Instagram + '</th>' +
+        '<th class="text-center">' + formLang.Youtube + '</th>' +
         '<th class="text-center">' + formLang.Duzenle + '</th>' +
         '</thead>' +
         '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
@@ -377,7 +394,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

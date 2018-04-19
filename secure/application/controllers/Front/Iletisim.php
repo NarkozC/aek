@@ -77,16 +77,16 @@ class Iletisim extends CI_Controller {
 
 			if ($en == "true") {
 				$this->config->set_item('language', 'english');
-				$this->form_validation->set_rules('AdSoyad', FORM_LANG_EN['AdSoyad'], 'required|trim|max_length[255]|strip_tags|xss_clean');
-				$this->form_validation->set_rules('Email', FORM_LANG_EN['Email'], 'required|trim|valid_email|strip_tags|xss_clean');
-				$this->form_validation->set_rules('Mesaj', FORM_LANG_EN['Mesaj'], 'required|trim|strip_tags|xss_clean');
+				$this->form_validation->set_rules('AdSoyad', "", 'required|trim|max_length[255]|strip_tags|xss_clean');
+				$this->form_validation->set_rules('Email', "", 'required|trim|valid_email|strip_tags|xss_clean');
+				$this->form_validation->set_rules('Mesaj', "", 'required|trim|strip_tags|xss_clean');
 			} else {
-				$this->form_validation->set_rules('AdSoyad', FORM_LANG_TR['AdSoyad'], 'required|trim|max_length[255]|strip_tags|xss_clean');
-				$this->form_validation->set_rules('Email', FORM_LANG_TR['Email'], 'required|trim|valid_email|strip_tags|xss_clean');
-				$this->form_validation->set_rules('Mesaj', FORM_LANG_TR['Mesaj'], 'required|trim|strip_tags|xss_clean');
+				$this->form_validation->set_rules('AdSoyad', "", 'required|trim|max_length[255]|strip_tags|xss_clean');
+				$this->form_validation->set_rules('Email', "", 'required|trim|valid_email|strip_tags|xss_clean');
+				$this->form_validation->set_rules('Mesaj', "", 'required|trim|strip_tags|xss_clean');
 			}
-			$this->form_validation->set_rules('MAdres', FORM_LANG_TR['MAdres'], 'required|trim|strip_tags|xss_clean');
-			$this->form_validation->set_error_delimiters('<p class="text-danger">', '</p>');
+			$this->form_validation->set_rules('MAdres', "", 'required|trim|strip_tags|xss_clean');
+			
 			if ($this->form_validation->run()) {
 				$isVerified = false;
 				$secret="6LdEEy4UAAAAACxIXHGMvBnC3FI4NrpRsqgISfIF";
@@ -135,7 +135,7 @@ class Iletisim extends CI_Controller {
 						if ($this->email->send()) {
 							$this->data['success'] = true;
 						} else {
-							$this->data['error'] = $this->email->print_debugger();
+							// $this->data['error'] = $this->email->print_debugger();
 						}
 					}
 				} else {

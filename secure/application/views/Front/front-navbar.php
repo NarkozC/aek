@@ -16,6 +16,19 @@
   <script src="<?php echo base_url(); ?>resources/js/headerscript.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/Front/genel-popup.js"></script>
   <script src="<?php echo base_url(); ?>resources/js/Front/genel-navbar.js"></script>
+
+  <style type="text/css">
+    .img-right-get{position: absolute; right: -600px;}
+  </style>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-91678098-6"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+ 
+  gtag('config', 'UA-91678098-6');
+</script>
 </head>
 <body>
 <div id="loader-container">
@@ -33,13 +46,19 @@
   <nav class="navbar navbar-custom-dek no-active-arrow navbar-fixed-top xs-height75 dropdown-onhover no-fix" role="navigation">
     <div class="container-fluid padding0" id="nav-banner">
       <div class="row text-center">
-        <div class="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+        <div class="col-xs-2 col-sm-2 col-md-4 col-lg-4">
           <a class="navbar-brand" href="<?php echo base_url(); ?>"><img class="img-responsive" src="<?php echo base_url(); ?>resources/images/aek-logo.png" alt="LOGO"></a>
         </div>
-        <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+        <div class="col-xs-8 col-sm-8 col-md-4 col-lg-4">
           <h3 class="paddingB0 paddingT25">Özel Ankara Eğitim Kurumları</h3>
           <!--<h3 class="paddingB0 paddingT0">AEK DOKTORLAR INTERNATIONAL PREMIER COLLAGE</h3>-->
         </div>
+        <!--<div class="col-xs-2 col-sm-2 col-md-4 col-lg-4">
+          <a target="_blank" href="http://www.aek.k12.tr/Sinav-Basvurusu"><div style="height: 105px; align-items: center; display: flex; overflow: hidden; position: relative;">
+            <img src="<?php echo base_url(); ?>resources/images/sinav-bas3.jpg" class="img-responsive img-right-get">
+          </div></a>
+        </div>-->
+
       </div>
     </div>
     <div class="container-fluid">
@@ -83,3 +102,4 @@
     </div>
   </nav>
   <!-- end AekNavbar-->
+

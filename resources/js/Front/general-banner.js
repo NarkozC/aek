@@ -46,10 +46,12 @@ function GetBannerData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Banner;
                 vars.sectionDatas.Banner = cache;
+                vars.sectionDatas.Banner.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Banner;
                 vars.sectionDatas.Banner = cache;
+                vars.sectionDatas.Banner.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var data = result.data,
@@ -72,7 +74,7 @@ function GetBannerData() {
                     trInside = GetHtmlTr(curData, trArray);
                     bHtml += '<tr>' + trInside + '</tr>';
 
-                    fHtml += '<div class="ls-slide" data-ls="duration: ' + bDuration + '; transition3d: all;">' +
+                    fHtml += '<div class="ls-slide" data-ls="duration: ' + bDuration + ';">' +
                         '<img src="' + imagesDir + curData.Resim + '" class="ls-bg" alt="I">' +
                         '</div>';
                 }
@@ -89,10 +91,15 @@ function GetBannerData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                var theCacheData = {
-                    Banner: vars.sectionDatas.Banner,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Banner.Data);
+                    vars.sectionDatas.Banner.Data = myJSON;
+                    var theCacheData = {
+                        Banner: vars.sectionDatas.Banner,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Banner.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
 
         },
@@ -110,7 +117,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

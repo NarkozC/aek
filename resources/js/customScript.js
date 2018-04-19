@@ -1,4 +1,9 @@
 var UG;
+
+if (language == 'en') {
+    $('html').attr('lang', 'en');
+}
+
 $(document).ready(function() {
 
     /*
@@ -17,17 +22,73 @@ $(document).ready(function() {
 
     /*
     =====================================
+      ----------- Ajax Loader ---------
+    =====================================
+    */
+    $('#page').append(
+        '<div id="ajax-loader-container">' +
+        '<div id="ajax-loader">' +
+        '<div>'+
+        '<span id="ajax-loader-text"></span>'+
+        '<img src="' + imagesDir + 'Genel/aek-loader.gif" class="img-responsive">' +
+        '</div>'+
+        '</div>' +
+        '</div>'
+    );
+    var $loading = $('#ajax-loader-container').hide();
+    $(document)
+        .ajaxStart(function() {
+            $loading.show();
+        })
+        .ajaxStop(function() {
+            setTimeout(function() {
+               $loading.hide(); 
+               $('#ajax-loader-text').hide();
+            }, 100);
+        });
+
+
+
+
+
+    /*
+    =====================================
       ------------- Login -------------
     =====================================
     */
     CheckLogin();
+
+    $('#AekNavbar').on('click', '#deleteCaches', function(e) {
+        var $link = $(e.target);
+        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+            $.ajax({
+                type: 'ajax',
+                method: 'post',
+                url: baseurl + 'Cache/DeleteAll',
+                async: false,
+                dataType: 'json',
+                success: function(result) {
+                    if (result.success) {
+                        iziSuccess();
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        iziError();
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    }
+                },
+                error: function() {
+                    iziError();
+                }
+            });
+
+        }
+        $link.data('lockedAt', +new Date());
+    });
 });
-
-
-
-if (language == 'en') {
-    $('html').attr('lang', 'en');
-}
 
 function CheckLogin() {
     var url = baseurl + 'Portal/Check';
@@ -93,10 +154,14 @@ function CheckLogin() {
                         portals[6] = '<li data-toggle="collapse" data-target="#AekNavbar"><a class="ajax" href="' + baseurl + '">Anasayfaya Dön</a></li>';
                     }
                 }
-                //portals[7] = '<li data-toggle="collapse" data-target="#AekNavbar"><a class="ajax" href="'+Link+'Hesap/">Hesap</a></li>';
 
-
-
+                if (data.Ogrenci || data.Ogretmen || data.Rehberlik || data.Teknik || data.Yonetici || data.Admin) {
+                    if (en) {
+                        portals[portals.length] = '<li data-toggle="collapse" data-target="#AekNavbar"><a id="deleteCaches" class="ajax">Delete Caches</a></li>';
+                    } else {
+                        portals[portals.length] = '<li data-toggle="collapse" data-target="#AekNavbar"><a id="deleteCaches" class="ajax">Cacheleri Sil</a></li>';
+                    }
+                }
 
 
 
@@ -233,26 +298,6 @@ $(document).ready(function() {
     CreteLGM();
 });
 
-
-
-
-
-/*
-=====================================
-  ---------- Ajax Loader ----------
-=====================================
-*/
-// $(document).ready(function(){
-//   $(document).bind("ajaxSend", function(){
-//     if ($('#ajax-loader-container').css('display') == 'none') {
-//       $('#ajax-loader-container').show();
-//     }
-//   }).bind("ajaxComplete", function(){
-//     if ($('#ajax-loader-container').css('display') == 'block') {
-//       $('#ajax-loader-container').hide();
-//     }
-//   });
-// });
 
 
 
@@ -489,8 +534,8 @@ $(document).ready(function() {
                 height: height,
             });
         }
-    }, 650);
-    
+    }, 1000);
+
 });
 
 function Navbar() {
@@ -556,3 +601,11 @@ $(document).ready(function() {
         e.stopPropagation();
     })
 });
+
+
+var elem2 = $(".img-right-get");
+setTimeout(function() {
+
+    $(elem2).css('right', '0px');
+    $(elem2).css('transition', 'all 0.5s ease');
+}, 3000);

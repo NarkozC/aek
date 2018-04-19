@@ -1,8 +1,8 @@
 vars.sectionDatas.Settings = GetSettingsData();
 $(function() {
-	GetSettingsModalHtml();
 
     setTimeout(function() {
+        GetSettingsModalHtml();
         UpdateBasliks();
     }, 300);
 
@@ -20,8 +20,9 @@ $(function() {
             $('#Deger1').val(curData.Deger1);
             $('#Deger2').val(curData.Deger2);
             $('#Deger3').val('B_'+vars.sectionNames.Upper);
-
-            $(settingsOpts.Objects.Modal).modal('show');
+            setTimeout(function() {
+               $(settingsOpts.Objects.Modal).modal('show'); 
+            }, 10);
         }
         $link.data('lockedAt', +new Date());
     });

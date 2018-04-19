@@ -51,50 +51,25 @@ function GetAllA4x4() {
                 if (en && result.cachedataEN != "") {
                     var cache = result.cachedataEN.A4x4;
                     vars.sectionDatas.A4x4 = cache;
+                    vars.sectionDatas.A4x4.Data = JSON.parse(cache.Data);
                     $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
                 } else if (!en && result.cachedataTR != "") {
                     var cache = result.cachedataTR.A4x4;
                     vars.sectionDatas.A4x4 = cache;
+                    vars.sectionDatas.A4x4.Data = JSON.parse(cache.Data);
                     $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
                 } else {
                     var data = result.data,
                         length = data.length,
                         bHtml = '',
-                        fHtml = '',
-                        break_on = 4,
-                        oneLeft = 'F',
-                        its13 = false,
-                        counter = 0;
+                        fHtml = '';
                     var i, j, rLength, curData, tempCurData, link, trInside, trArray;
 
-                    fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
-                        '<div class="container-fluid">';
-
-                    if (length == 13) {
-                        break_on = 3;
-                        its13 = true;
-                    } else if (length % 4 == 0) {
-                        break_on = 4;
-                    } else if (length % 3 == 0) {
-                        break_on = 3;
-                    } else if (length % 4 == 1) {
-                        break_on = 3;
-                        oneLeft = 'T4';
-                    } else if (length % 2 == 0) {
-                        break_on = 2;
-                    } else if (length % 3 == 1) {
-                        break_on = 4;
-                        oneLeft = 'T3';
-                    }
                     for (i = 0; i < length; i++) {
                         curData = GetCurData(data[i]);
                         tempCurData = curData.Link.split('/');
                         if (tempCurData.length > 1) {
-                            if (en) {
-                                link = 'en/' + curData.Link;
-                            } else {
-                                link = curData.Link;
-                            }
+                            link = curData.Link;
                         } else {
                             if (en) {
                                 link = baseurl + 'en/' + curData.Link;
@@ -102,79 +77,31 @@ function GetAllA4x4() {
                                 link = baseurl + curData.Link;
                             }
                         }
-
-                        if (counter % break_on == 1 && break_on == 2 && oneLeft == 'T4' && counter == length - 2) {
-                            fHtml += '<div class="row">';
-                        } else if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
-
-                        } else if (counter % break_on == 1 && break_on == 3 && oneLeft == 'T3' && counter == length - 3) {
-                            fHtml += '<div class="row">';
-                        } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
-
-                        } else if (counter == Number(length - 4) && break_on == 2 && its13 == true) {
-                            fHtml += '<div class="row">';
-                        } else if (its13 == true && counter == Number(length - 3)) {
-
-                        } else if (counter == Number(length - 2) && break_on == 2 && its13 == true) {
-                            fHtml += '<div class="row">';
-                        } else if (its13 == true && counter == length - 1) {
-
-                        } else if (counter % break_on == 0) {
-                            fHtml += '<div class="row">';
-                        }
-
-                        if (break_on == 4) {
-                            fHtml += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-3 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
-                        } else if (break_on == 3) {
-                            fHtml += '<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
-                        } else if (break_on == 2) {
-                            fHtml += '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 text-center marginTop15 wow ' + AnimationText + '" data-wow-delay="' + wowDelay + '">';
-                        }
-
-                        fHtml += '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad10 maxH300 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-                            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">' +
-                            '<a href="' + link + '"><img src="' + imagesDir + curData.Resim + '" class="img-responsive maxH200" style="position: relative;left: 50%;transform: translate(-50%,0);"></a>' +
-                            '</div>' +
-                            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' +
-                            '<a href="' + link + '"><h4>' + curData.Baslik + '</h4></a>' +
-                            '</div>' +
-                            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-right">' +
-                            '<a href="' + link + '"><button type="button" class="btn btn-danger">' + formLang.DetaylarIcin + '</button></a>' +
-                            '</div>' +
-                            '</div>' +
-                            '</div>';
-
-                        counter++;
-                        if (counter % break_on == 0 && break_on == 2 && oneLeft == 'T4') {
-
-                        } else if (counter % break_on == 0 && break_on == 3 && oneLeft == 'T3') {
-
-                        } else if (its13 == true && counter == Number(length - 3)) {
-
-                        } else if (its13 == true && counter == Number(length - 2)) {
-                            fHtml += '</div>';
-                        } else if (its13 == true && counter == Number(length - 1)) {
-
-                        } else if (counter % break_on == 0) {
-                            fHtml += '</div>';
-                        }
-                        if (break_on == 4 && oneLeft == 'T3' && counter == length - 3) {
-                            break_on = 3;
-                        } else if (break_on == 3 && oneLeft == 'T4' && counter == length - 2) {
-                            break_on = 2;
-                        } else if (break_on == 3 && its13 == true && counter == length - 4) {
-                            break_on = 2;
-                        }
+                        curData.Link = link;
 
                         vars.sectionDatas.A4x4.Data[i] = curData;
-
                         trArray = new Array('Baslik');
                         trInside = GetHtmlTr(curData, trArray);
                         bHtml += '<tr>' + trInside + '</tr>';
                     }
-                    if (counter % break_on != 0) {
-                        fHtml += '</div>';
-                    }
+
+                    fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
+                        '<div class="container-fluid">';
+
+                    fHtml += MakeRows(data,
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 dark-bg shadow borderRad10 maxH300 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center">' +
+                        '<a href="curData[Link]"><img src="' + imagesDir + 'curData[Resim]" class="img-responsive maxH200" style="position: relative;left: 50%;transform: translate(-50%,0);"></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">' +
+                        '<a href="curData[Link]"><h4>curData[Baslik]</h4></a>' +
+                        '</div>' +
+                        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-right">' +
+                        '<a href="curData[Link]"><button type="button" class="btn btn-danger">' + formLang.DetaylarIcin + '</button></a>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>'
+                    );
 
                     fHtml += '</div>';
 
@@ -184,10 +111,15 @@ function GetAllA4x4() {
 
                     $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                    var theCacheData = {
-                        A4x4: vars.sectionDatas.A4x4,
+                    if (length < cacheLimit) {
+                        var myJSON = JSON.stringify(vars.sectionDatas.A4x4.Data);
+                        vars.sectionDatas.A4x4.Data = myJSON;
+                        var theCacheData = {
+                            A4x4: vars.sectionDatas.A4x4,
+                        }
+                        setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                        vars.sectionDatas.A4x4.Data = JSON.parse(myJSON);
                     }
-                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
                 }
 
             },
@@ -205,7 +137,7 @@ function GetAllA4x4() {
         var listOrder = data.ListOrder
 
         for (i = 0; i < length; i++) {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
 
         newHtml +=

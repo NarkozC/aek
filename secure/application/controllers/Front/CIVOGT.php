@@ -1,6 +1,6 @@
 <?php
 
-class CIVOGT extends CI_Controller {
+class Civogt extends CI_Controller {
 
 	public function __construct()
 	{
@@ -17,7 +17,7 @@ class CIVOGT extends CI_Controller {
 
 	public function index()
 	{
-		$this->load->view('Front/CIVOGT-view');
+		$this->load->view('Front/Civogt-view');
 	}
 
 	public function GetCivogt(){

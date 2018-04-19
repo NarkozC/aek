@@ -22,23 +22,18 @@ var vars = {
         Add: 'AddResimler',
         Update: 'UpdateResimler',
         Edit: 'EditResimler',
-        Delete: 'AddResimlerUpload',
-        Upload: 'AddResimlerUpload',
+        Delete: 'DeleteResimler',
     },
     sectionButtons: {
         OpenModal: 'ResimlerOpenModal',
         Submit: 'ResimlerSubmit',
     },
     sectionDatas: {
-        Resimler: {
-            Data: '',
-            Num: 0,
-        },
-
+        Resimler: {},
         Kategoriler: GetKategorilerData(),
     },
     sectionSPs: {
-        Kategori: 'RKategoriler',
+        Kategori: 'RKategori',
     },
     sectionIsFirst: true,
 };
@@ -48,299 +43,176 @@ $(function() {
     //Refresh Page
     RefreshData(1, 1, 1);
 
+    setTimeout(function() {
 
-    //Button that opens add/update modal
-    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-        vars.sectionObjects.Form, vars.sectionObjects.Modal,
-        function() {
-            $('#RDosya').parents('.ajax-group:first').show();
+        //Button that opens add/update modal
+        FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Add,
+            vars.sectionObjects.Form, vars.sectionObjects.Modal,
+            function() {
+                $('#RDosya').parents('.ajax-group:first').show();
+            });
+
+
+
+        //Button for posting data for add/update
+        $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
+            var $link = $(e.target);
+            if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+                var url = vars.sectionObjects.Form.attr('action'),
+                    dosya = $('#RDosya')[0].files,
+                    isNamesSame = $('#IsNamesSame').is(":checked"),
+                    formData = new FormData(),
+                    file = $('#RDosya')[0].files,
+                    length = file.length;
+                if (dosya.length >= 1) {
+                    $('#RDosyaV').val("1")
+                }
+                var data = vars.sectionObjects.Form.serializeArray();
+                data.push({
+                    name: 'English',
+                    value: String(en)
+                });
+                for (i = 0; i < length; i++) {
+                    formData.append("files[]", file[i]);
+                }
+                formData.append("IsNamesSameV", isNamesSame);
+                $.each(data, function(index, value) {
+                    formData.append(value.name, value.value);
+                });
+                $.ajax({
+                    type: 'ajax',
+                    method: 'post',
+                    url: url,
+                    data: formData,
+                    dataType: 'json',
+                    processData: false,
+                    contentType: false,
+                    cache: false,
+                    success: function(response) {
+                        ResetFormErrors();
+                        if (response.success) {
+                            ResetSelectpicker();
+                            var trArray;
+                            var willRefresh = false;
+
+                            if (response.type == 'add') {
+                                willRefresh = true;
+
+                                iziSuccess();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            } else {
+                                var no = response.data.No;
+                                var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
+
+                                var curData = response.data;
+                                trArray = new Array('RIsim', 'RKategori');
+                                var trInside = GetHtmlTr(curData, trArray);
+                                editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
+                                    editBtn.parents('tr:first').html(trInside);
+                                    $(this).css('background-color', '#EDEDED').fadeIn();
+                                    ShortenContent(50, false, true);
+                                });
+                                iziSuccess();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            }
+
+                            if (willRefresh) {
+                                RefreshData(1, 1, 1);
+                            }
+                        } else {
+                            var ajaxGroup;
+                            if (response.messages.length != 0) {
+                                ShowFormErrors(response.messages);
+                            } else {
+                                RefreshData(1, 1, 1)
+
+                                iziError();
+                                $(vars.sectionObjects.Modal).modal('hide');
+                            }
+                        }
+                    },
+                    error: function() {
+                        RefreshData(1, 1, 1)
+                        iziError();
+                        $(vars.sectionObjects.Modal).modal('hide');
+                    },
+                    xhr: function() {
+                        var xhr = new XMLHttpRequest();
+                        $('#ajax-loader-text').show();
+                        xhr.upload.addEventListener("progress", function(event) {
+                            if (event.lengthComputable) {
+                                var percentComplete = Math.round((event.loaded / event.total) * 100);
+                                $('#ajax-loader-text').html(percentComplete);
+                            }
+                        }, false);
+
+                        return xhr;
+                    }
+                });
+
+            }
+            $link.data('lockedAt', +new Date());
         });
 
+        //Button for editing
+        $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
+            var $link = $(e.target);
+            if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
+                var no = $(this).attr('data');
+                $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
+                $.ajax({
+                    type: 'ajax',
+                    method: 'post',
+                    url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
+                    data: {
+                        No: no
+                    },
+                    async: false,
+                    dataType: 'json',
+                    success: function(result) {
+                        setTimeout(function() {
+                            ResetForm(vars.sectionObjects.Form);
+                            if (result.success) {
+                                $('#RDosya').parents('.ajax-group:first').hide();
+                                $('#IsNamesSame').parents('.ajax-group:first').hide();
 
+                                $('input[name=No]').val(result.data.No);
+                                $('#RIsim').val(result.data.RIsim);
+                                $('#' + vars.sectionSPs.Kategori + 'Select').selectpicker('val', result.data.RKategori);
 
-    //Button for posting data for add/update
-    $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var url = vars.sectionObjects.Form.attr('action');
-            var data = vars.sectionObjects.Form.serializeArray();
-            data.push({
-                name: 'English',
-                value: String(en)
-            });
-            var dataTarget = "RIsim";
-            var dataTargetSecond = "RKategoriler";
-
-            var RIsim;
-            var RKategoriler;
-            for (var i = 0; i < data.length; i++) {
-                var rIsim;
-                var rKategoriler;
-                if (data[i].name == dataTarget) {
-                    rIsim = data[i];
-                    if (rIsim.value == "") {
-                        data[i].value = "RDosya";
-                    }
-                    RIsim = data[i].value;
-                }
-
-                if (data[i].name == dataTargetSecond) {
-                    rKategoriler = data[i];
-                    if (rKategoriler.value == "") {
-                        data[i].value = "Genel";
-                    }
-                    RKategoriler = data[i].value;
-                }
-            }
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: data,
-                async: false,
-                dataType: 'json',
-                success: function(response) {
-                    ResetFormErrors();
-                    if (response.success) {
-                        ResetSelectpicker();
-                        var trArray;
-                        var newSayfa = response.sayfa;
-                        var willRefresh = false;
-
-                        if (response.type == 'add') {
-                            var uploadURI = vars.sectionControllers.Portal + vars.sectionFunctions.Upload;
-                            var inputFile = $('#RDosya');
-                            var fileToUpload = inputFile[0].files[0];
-                            if (inputFile.get(0).files.length === 0) {
-                                var ajaxGroup;
-                                var element = inputFile;
-                                ajaxGroup = element.parents('.ajax-group:first');
-
-                                ajaxGroup.addClass('has-error');
-                                if (en) {
-                                    ajaxGroup.append('<p class="text-danger">The<strong> File </strong> field is required!</p>');
-                                } else {
-                                    ajaxGroup.append('<p class="text-danger"><strong>Dosya</strong> alanını doldurmanız gerekmektedir!</p>');
-                                }
+                                $(vars.sectionObjects.Modal).modal('show');
                             } else {
-                                var formData = new FormData();
-                                var rDosyaName = fileToUpload['name'].split('.');
-                                rDosyaName = rDosyaName[0];
-                                formData.append("RDosya", fileToUpload);
-                                formData.append("RIsim", RIsim);
-                                formData.append("RKategoriler", RKategoriler);
-                                formData.append("RDosyaName", rDosyaName);
-                                $.ajax({
-                                    url: uploadURI,
-                                    type: 'post',
-                                    data: formData,
-                                    processData: false,
-                                    contentType: false,
-                                    async: false,
-                                    dataType: 'json',
-                                    success: function(response2) {
-                                        if (response2.success) {
-                                            iziSuccess();
-                                        } else {
-                                            iziError();
-                                        }
-                                    },
-                                    error: function() {
-                                        iziError();
-
-                                    }
-                                });
-                                $(vars.sectionObjects.Modal).modal('hide');
-                                willRefresh = true;
-                            }
-                        } else {
-                            var no = response.data.No;
-                            var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
-
-                            var curData = GetCurData(response.data);
-                            trArray = new Array('RIsim', 'RKategoriler');
-                            var trInside = GetHtmlTr(curData, trArray);
-                            editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
-                                editBtn.parents('tr:first').html(trInside);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                            iziSuccess();
-                            $(vars.sectionObjects.Modal).modal('hide');
-                        }
-
-                        if (willRefresh) {
-                            setTimeout(function() {
                                 RefreshData(1, 1, 1)
-                            }, 310);
-                        }
-                    } else {
-                        var ajaxGroup;
-                        if (response.messages.length != 0) {
-                            ShowFormErrors(response.messages);
-                        } else {
-                            RefreshData(1, 1, 1)
-
-                            $(vars.sectionObjects.Modal).modal('hide');
-                            iziError();
-                        }
-                    }
-                },
-                error: function() {
-                    RefreshData(1, 1, 1)
-                    $(vars.sectionObjects.Modal).modal('hide');
-                    iziError();
-                }
-            });
-
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
-    //Button for editing
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonEdit, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var no = $(this).attr('data');
-            var sayfa = $(this).parents('.tab-pane.fade.active.in').attr('id')
-            $(vars.sectionObjects.Form).attr('action', vars.sectionControllers.Portal + vars.sectionFunctions.Update);
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: vars.sectionControllers.Portal + vars.sectionFunctions.Edit,
-                data: {
-                    No: no
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    setTimeout(function() {
-                        ResetForm(vars.sectionObjects.Form);
-                        if (result.success) {
-                            $('#RDosya').parents('.ajax-group:first').hide();
-
-                            $('input[name=No]').val(result.data.No);
-                            $('#RIsim').val(result.data.RIsim);
-                            $('#' + vars.sectionSPs.Kategori + 'Select').selectpicker('val', result.data.RKategoriler);
-
-                            $(vars.sectionObjects.Modal).modal('show');
-                        } else {
-                            RefreshData(1, 1, 1)
-                            iziError();
-                        }
-                    }, 15);
-                },
-                error: function() {
-                    RefreshData(1, 1, 1)
-                    iziError();
-                }
-            });
-
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
-    //Button for deleting
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonDelete, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > linkLockedTime) {
-            var btn = $(this);
-            var no = $(this).attr('data');
-            var Dosya = $(this).attr('data2');
-            var Kategori = $(this).attr('data3');
-            var FileToRemove = 'resources/images/' + Kategori + '/' + Dosya;
-
-            iziToast.question({
-                timeout: 15000,
-                close: false,
-                overlay: true,
-                toastOnce: true,
-                id: 'iziDelete',
-                zindex: 999,
-                title: formLang.delTitle,
-                message: formLang.delMessage,
-                position: 'center',
-                buttons: [
-                    ['<button><b>' + formLang.delEvetBtn + '</b></button>', function(instance, toast) {
-
-                        furl = vars.sectionControllers.Portal + vars.sectionFunctions.Delete
-                        $.ajax({
-                            type: 'ajax',
-                            method: 'post',
-                            async: false,
-                            url: furl,
-                            data: {
-                                No: no,
-                                file_to_remove: FileToRemove,
-                            },
-                            dataType: 'json',
-                            success: function(result) {
-                                if (result.success) {
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-
-                                    $(btn).parents('tr:first').css('background-color', '#ccc').fadeOut('slow', function() {
-                                        $(this).remove();
-                                    });
-
-                                    iziSuccess();
-                                } else {
-                                    instance.hide(toast, {
-                                        transitionOut: 'fadeOutDown'
-                                    }, 'button');
-                                    iziError();
-                                }
-                            },
-                            error: function() {
-                                instance.hide(toast, {
-                                    transitionOut: 'fadeOutDown'
-                                }, 'button');
                                 iziError();
-                            },
-                            complete: function() {
-                                var sayfaID = $(btn).parents('tbody:first').attr('id');
-                                var rowCount = $('#' + sayfaID + ' tr').length;
-                                if (rowCount == 1) {
-                                    RefreshData("1, 1, 1");
-                                }
                             }
-                        });
+                        }, 15);
+                    },
+                    error: function() {
+                        RefreshData(1, 1, 1)
+                        iziError();
+                    }
+                });
 
-                    }, true],
-                    ['<button>' + formLang.delHayirBtn + '</button>', function(instance, toast) {
+            }
+            $link.data('lockedAt', +new Date());
+        });
 
-                        instance.hide(toast, {
-                            transitionOut: 'fadeOutDown'
-                        }, 'button');
-
-                    }]
-                ],
-            });
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
+        //Button for deleting
+        FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
+            vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
+            RefreshData, new Array(1, 1, 1), true);
+    }, 200);
 
 });
 
 function GetKategorilerSelect() {
-    var i, data = vars.sectionDatas.Kategoriler.Data,
-        length = data.length,
-        html;
-
-    var tr_ID = vars.sectionSPs.Kategori + 'Select';
-    var tr_section = vars.sectionSPs.Kategori;
-
-    html = '<select class="form-control selectpicker" data-live-search="true" name="' + tr_section + '" id="' + tr_ID + '" title="' + formLang.KategoriSec + '" data-liveSearchNormalize="true">';
-
-    for (i = 0; i < length; i++) {
-        html += '<option data-tokens="' + data[i].Isim + '" value="' + data[i].Isim + '">' + data[i].Isim + '</option>';
-    }
-
-    html += '</select>'
-    $('#' + tr_section).html(html);
-    RefreshSelectpicker();
+    var html = FunSelect(
+        vars.sectionDatas.Kategoriler.Data,
+        vars.sectionSPs.Kategori,
+        formLang.KategoriSec,
+        "Isim", "Isim", "Isim"
+    );
 }
 
 function GetSectionsNum() {
@@ -350,55 +222,16 @@ function GetSectionsNum() {
 function CreateSectionsTable() {
     var i, length;
     if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('#' + vars.sectionShowBases.Sections).fadeOut();
         $('.datatable').DataTable().destroy();
     }
 
-    $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Resimler.Html);
+    $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Resimler.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
-    if (!vars.sectionIsFirst) {
-        CreateDataTables();
-    }
-    vars.sectionIsFirst = false;
-}
-
-function GetSectionsData() {
-    vars.sectionDatas.Resimler = {
-        Data: '',
-        Num: 0,
-    }
-
-    var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
-        data: {
-            English: en,
-            NeedData: true,
-        },
-        async: false,
-        dataType: 'json',
-        success: function(result) {
-            var i, data = result.data,
-                length, html = '';
-            var curData, trInside, trArray;
-
-            for (i = 0, length = data.length; i < length; i++) {
-                curData = GetCurData(data[i]);
-
-                trArray = new Array('RIsim', 'RKategoriler');
-                trInside = GetHtmlTr(curData, trArray);
-                html += '<tr>' + trInside + '</tr>';
-            }
-            vars.sectionDatas.Resimler.Html = html;
-            vars.sectionDatas.Resimler.Num = length;
-        },
-        error: function() {
-            iziError();
-        }
-    });
+    CreateDataTables();
+    $('#' + vars.sectionShowBases.Sections).fadeIn();
 }
 
 function GetHtmlTr(data, trArray) {
@@ -407,10 +240,10 @@ function GetHtmlTr(data, trArray) {
     var length = trArray.length;
     var no = data.No;
     var dosya = data.RDosya;
-    var kategori = data.RKategoriler;
+    var kategori = 'images/' + data.RKategori;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
 
     }
     newHtml +=
@@ -425,106 +258,75 @@ function GetHtmlTr(data, trArray) {
 }
 
 function GetSectionsModalHtml() {
+    if (vars.sectionIsFirst) {
+        var html,
+            genelHtml = new Array(
+                '<label>' + formLang.IsNamesSame + '</label>' +
+                '<input name="IsNamesSame" id="IsNamesSame" class="form-control" type="checkbox">',
 
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header" align="center">' +
-        '<img class="maxW150" src="' + logoUrl + '">' +
-        modalOpts.ModalCloseButton +
-        '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
-        '<div class="modal-body">' +
-        '<div class="tab-content">' +
-        '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Isim + '</label>' +
-        '<input name="RIsim" id="RIsim" class="form-control" type="text" placeholder="' + formLang.Isim + '">' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Kategori + '</label>' +
-        '<div id="' + vars.sectionSPs.Kategori + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Dosya + '</label>' +
-        '<input type="file" name="RDosya" class="form-control" id="RDosya" placeholder="' + formLang.Dosya + '" multiple>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
-        '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
-        '</div>' +
-        '</form> ' +
-        '</div>' +
-        '</div>' +
-        '</div>';
-    $('#' + vars.sectionShowBases.Modal).html(html);
-    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
-    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+                '<label>' + formLang.Isim + '</label>' +
+                '<input name="RIsim" id="RIsim" class="form-control" type="text" placeholder="' + formLang.Isim + '">',
+
+                '<label>' + formLang.Kategori + '</label>' +
+                '<div id="' + vars.sectionSPs.Kategori + '"></div>',
+
+                '<label>' + formLang.Dosya + '</label>' +
+                '<input type="file" name="RDosya" class="form-control" id="RDosya" placeholder="' + formLang.Dosya + '" multiple accept="image/gif,image/jpeg,image/png">' +
+                '<input name="RDosyaV" id="RDosyaV" type="text" style="display:none;">'
+            );
+
+        html = FunCreateModalHtml(vars.sectionNames.Lower, false, genelHtml, new Array(), new Array(), vars.sectionButtons.Submit)
+        $('#' + vars.sectionShowBases.Modal).html(html);
+        vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+        vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+    }
 }
 
 function GetSectionsHtml() {
-    var html = '';
-
-    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
-        '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center">' +
-        '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal +
-        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
-        '</h2>' +
-        '</div>' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
-
-    html += '<div class="table-responsive">' +
-        '<table class="table table-bordered table-hover datatable">' +
-        '<thead class="text-center">' +
-        '<th class="text-center">' + formLang.Isim + '</th>' +
-        '<th class="text-center">' + formLang.Kategori + '</th>' +
-        '<th class="text-center">' + formLang.Duzenle + '</th>' +
-        '<th class="text-center">' + formLang.Sil + '</th>' +
-        '</thead>' +
-        '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
-        '</tbody>' +
-        '</table>' +
-        '</div>' +
-        '</div>';
-
-
-
-    html += '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
-        '</div>' +
-        '</section>';
-
-    $('#' + vars.sectionShowBases.Sections).html(html);
+    if (vars.sectionIsFirst) {
+        var html = CreateSectionHtml(
+            vars.sectionNames.Lower,
+            vars.sectionNames.Upper,
+            vars.sectionNames.Normal,
+            new Array(
+                '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>',
+            ),
+            new Array(
+                formLang.Isim,
+                formLang.Kategori,
+                formLang.Duzenle,
+                formLang.Sil
+            ),
+            vars.sectionShowBases.Modal
+        )
+        $('#' + vars.sectionShowBases.Sections).html(html);
+        $('#' + vars.sectionShowBases.Sections).css('transition', 'none');
+    }
 }
 
 var isFirst = true;
 
 function RefreshData(main = 1, html = 0, side = 0) {
     if (main == 1) {
-        GetSectionsData();
+        vars.sectionDatas.Resimler = GetResimlerData();
     }
     if (html != 0) {
-        GetSectionsHtml()
-        GetSectionsModalHtml()
-        CreateSectionsTable()
+        setTimeout(function() {
+            GetSectionsHtml();
+            GetSectionsModalHtml();
+            CreateSectionsTable();
+        }, 50);
     }
     if (side != 0) {
-        GetKategorilerSelect();
+        setTimeout(function() {
+            GetKategorilerSelect()
+        }, 100);
     }
-
     setTimeout(function() {
-        if (!isFirst) {
-            ShortenContent6();
+        if (!vars.sectionIsFirst) {
+            ShortenContent();
         }
-        isFirst = false;
-    }, 5);
-    GetSectionsNum();
+        GetSectionsNum();
+        vars.sectionIsFirst = false;
+    }, 150);
 }

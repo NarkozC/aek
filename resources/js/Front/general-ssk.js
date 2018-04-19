@@ -47,10 +47,12 @@ function GetSskData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Ssk;
                 vars.sectionDatas.Ssk = cache;
+                vars.sectionDatas.Ssk.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Ssk;
                 vars.sectionDatas.Ssk = cache;
+                vars.sectionDatas.Ssk.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var data = result.data,
@@ -79,7 +81,6 @@ function GetSskData() {
                     bHtml += '<tr>' + trInside + '</tr>';
 
                     tempCurData = curData.Resim.split(',');
-
                     for (j = 0, rLength = tempCurData.length; j < rLength; j++) {
                         fHtml += '<img ' +
                             ' src="' + imagesDir + tempCurData[j] + '" ' +
@@ -100,10 +101,15 @@ function GetSskData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                var theCacheData = {
-                    Ssk: vars.sectionDatas.Ssk,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Ssk.Data);
+                    vars.sectionDatas.Ssk.Data = myJSON;
+                    var theCacheData = {
+                        Ssk: vars.sectionDatas.Ssk,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Ssk.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
 
             GetGallery()
@@ -145,7 +151,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

@@ -10,8 +10,8 @@ var vars = {
     sectionNames: {
         Normal: 'International Foundation Year',
         Upper: 'Ify',
-        Lower: 'ify',
-        Kod: 'GIFY',
+        Lower: 'aektv',
+        Kod: 'GIfy',
     },
     sectionShowBases: {
         Sections: 'showIfy',
@@ -20,15 +20,10 @@ var vars = {
     },
     sectionFunctions: {
         Get: 'GetIfy',
-        Add: 'AddIfy',
         Update: 'UpdateIfy',
         Edit: 'EditIfy',
-        Delete: 'DeleteIfy',
-        Up: 'UpIfy',
-        Down: 'DownIfy',
     },
     sectionButtons: {
-        OpenModal: 'IfyOpenModal',
         Submit: 'IfySubmit',
     },
     sectionDatas: {
@@ -38,11 +33,6 @@ var vars = {
             BHtml: '',
             Num: 0,
         },
-
-        Resimler: GetResimlerData(),
-    },
-    sectionSPs: {
-        Resim: 'Resim',
     },
     sectionIsFirst: true,
 };
@@ -51,14 +41,6 @@ $(function() {
 
     //Refresh Page
     RefreshData(1, 1, 1);
-
-
-    //Button that opens add/update modal
-    FunOpenModal(vars.sectionShowBases.Sections, vars.sectionButtons.OpenModal,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Add,
-        vars.sectionObjects.Form, vars.sectionObjects.Modal);
-
-
 
     //Button for posting data for add/update
     $('#' + vars.sectionShowBases.Sections).on('click', '#' + vars.sectionButtons.Submit, function(e) {
@@ -82,29 +64,18 @@ $(function() {
                     if (response.success) {
                         ResetSelectpicker();
                         var trArray;
-                        var willRefresh = false;
+                        var no = response.data.No;
+                        var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
+                        var curData = response.data;
 
-                        if (response.type == 'add') {
-                            willRefresh = true;
-                        } else {
-                            var no = response.data.No;
-                            var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
-                            var curData = response.data;
-
-                            trArray = new Array('Resim');
-                            var trInside = GetHtmlTr(curData, trArray);
-                            editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
-                                editBtn.parents('tr:first').html(trInside);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                        }
+                        trArray = new Array('Link');
+                        var trInside = GetHtmlTr(curData, trArray);
+                        editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
+                            editBtn.parents('tr:first').html(trInside);
+                            $(this).css('background-color', '#EDEDED').fadeIn();
+                        });
                         $(vars.sectionObjects.Modal).modal('hide');
                         iziSuccess();
-                        if (willRefresh) {
-                            setTimeout(function() {
-                                RefreshData(1, 1, 1)
-                            }, 310);
-                        }
                     } else {
                         var ajaxGroup;
                         if (response.messages.length != 0) {
@@ -147,11 +118,8 @@ $(function() {
                     setTimeout(function() {
                         ResetForm(vars.sectionObjects.Form);
                         if (result.success) {
-                            var ResimArray = result.data.Resim.split(',');
                             $('input[name=No]').val(result.data.No);
-                            $('#tr_Aciklama').val(result.data.tr_Aciklama);
-                            $('#en_Aciklama').val(result.data.en_Aciklama);
-                            $('#' + vars.sectionSPs.Resim + 'Select').selectpicker('val', ResimArray);
+                            $('#Link').val(result.data.Link);
 
                             $(vars.sectionObjects.Modal).modal('show');
                         } else {
@@ -170,158 +138,7 @@ $(function() {
         $link.data('lockedAt', +new Date());
     });
 
-    //Button for deleting
-    FunDelete(vars.sectionShowBases.Sections, tableOpts.ButtonDelete,
-        vars.sectionControllers.Portal + vars.sectionFunctions.Delete,
-        RefreshData, "1, 1, 1");
-
-    //Button for moving record up
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonUp, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var No = $(this).attr('data');
-            var ListOrder = $(this).attr('data2');
-            var url = vars.sectionControllers.Portal + vars.sectionFunctions.Up;
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: {
-                    No: No,
-                    ListOrder: ListOrder
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    if (result.success) {
-                        iziSuccess();
-                        TargetListOrder = Number(ListOrder) - 1;
-                        var upbtn = $('tr .item-up[data2=' + ListOrder + ']')
-                        var downbtn = $('tr .item-down[data2=' + ListOrder + ']')
-                        var tr = upbtn.parents('tr:first');
-                        if ($('tr .item-up[data2=' + TargetListOrder + ']').length) {
-                            var targetupbtn = $('tr .item-up[data2=' + TargetListOrder + ']')
-                            var targetdownbtn = $('tr .item-down[data2=' + TargetListOrder + ']')
-                            var targettr = targetupbtn.parents('tr:first');
-                            targettr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                targetupbtn.attr('data2', ListOrder);
-                                targetdownbtn.attr('data2', ListOrder);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                            tr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                upbtn.attr('data2', TargetListOrder);
-                                downbtn.attr('data2', TargetListOrder);
-                                $(tr).after(targettr);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                        } else {
-                            setTimeout(function() {
-                                RefreshData(1, 1, 1)
-                            }, 10)
-                        }
-                    } else {
-                        iziError();
-                        setTimeout(function() {
-                            RefreshData(1, 1, 1)
-                        }, 10)
-                    }
-
-                },
-                error: function() {
-                    iziError();
-                    setTimeout(function() {
-                        RefreshData(1, 1, 1)
-                    }, 10)
-                }
-            });
-
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
-
-    //Button for moving record down
-    $('#' + vars.sectionShowBases.Sections).on('click', '.' + tableOpts.ButtonDown, function(e) {
-        var $link = $(e.target);
-        if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
-            var No = $(this).attr('data');
-            var ListOrder = $(this).attr('data2');
-            var url = vars.sectionControllers.Portal + vars.sectionFunctions.Down;
-            $.ajax({
-                type: 'ajax',
-                method: 'post',
-                url: url,
-                data: {
-                    No: No,
-                    ListOrder: ListOrder
-                },
-                async: false,
-                dataType: 'json',
-                success: function(result) {
-                    if (result.success) {
-                        iziSuccess()
-                        TargetListOrder = Number(ListOrder) + 1;
-                        var upbtn = $('tr .item-up[data2=' + ListOrder + ']')
-                        var downbtn = $('tr .item-down[data2=' + ListOrder + ']')
-                        var tr = upbtn.parents('tr:first');
-                        if ($('tr .item-up[data2=' + TargetListOrder + ']').length) {
-                            var targetupbtn = $('tr .item-up[data2=' + TargetListOrder + ']')
-                            var targetdownbtn = $('tr .item-down[data2=' + TargetListOrder + ']')
-                            var targettr = targetupbtn.parents('tr:first');
-                            targettr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                targetupbtn.attr('data2', ListOrder);
-                                targetdownbtn.attr('data2', ListOrder);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                            tr.css('background-color', '#ccc').fadeOut('normal', function() {
-                                upbtn.attr('data2', TargetListOrder);
-                                downbtn.attr('data2', TargetListOrder);
-                                $(targettr).after(tr);
-                                $(this).css('background-color', '#EDEDED').fadeIn();
-                            });
-                        } else {
-                            setTimeout(function() {
-                                RefreshData(1, 1, 1)
-                            }, 10)
-                        }
-                    } else {
-                        iziError()
-                        setTimeout(function() {
-                            RefreshData(1, 1, 1)
-                        }, 10)
-                    }
-                },
-                error: function() {
-                    iziError()
-                    setTimeout(function() {
-                        RefreshData(1, 1, 1)
-                    }, 10)
-                }
-            });
-
-        }
-        $link.data('lockedAt', +new Date());
-    });
-
 });
-
-function GetResimlerSelect() {
-    var data = vars.sectionDatas.Resimler,
-        length = data.length,
-        id = vars.sectionSPs.Resim + 'Select',
-        section = vars.sectionSPs.Resim,
-        html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '[]" id="' + id + '" title="' + formLang.ResimSec + '" data-liveSearchNormalize="true" multiple data-selected-text-format="count > 2">',
-        lastParts = '';
-    var i;
-
-    lastParts = vars.sectionDatas.Resimler.Html;
-
-    lastParts += '</select>';
-
-    html += lastParts;
-    $('#' + section).html(html);
-    RefreshSelectpicker();
-}
 
 function GetSectionsNum() {
     $('#' + vars.sectionShowBases.Num).html(vars.sectionDatas.Ify.Num);
@@ -335,7 +152,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.Ify.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -364,15 +181,17 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Ify;
                 vars.sectionDatas.Ify = cache;
+                vars.sectionDatas.Ify.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Ify;
                 vars.sectionDatas.Ify = cache;
+                vars.sectionDatas.Ify.Data = JSON.parse(cache.Data);
             } else {
                 var data = result.data,
                     length = data.length,
                     bHtml = '',
                     fHtml = '';
-                var i, j, rLength, curData, tempCurData, trInside, trArray;
+                var i, curData, trInside, trArray;
 
                 fHtml += '<section id="' + vars.sectionNames.Lower + '">' +
                     '<div class="container">' +
@@ -382,29 +201,21 @@ function GetSectionsData() {
                     '</div>' +
 
                     '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-                    '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-                    '<div id="G' + vars.sectionNames.Kod + '" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">';
+                    '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">';
 
                 for (i = 0; i < length; i++) {
                     curData = GetCurData(data[i]);
                     vars.sectionDatas.Ify.Data[i] = curData;
 
-                    trArray = new Array('Resim');
+                    fHtml += '<div class="video-container"><iframe width="600" height="355" ' +
+                        'src="' + curData.Link + '" frameborder="0" allowfullscreen></iframe></div>';
+
+                    trArray = new Array('Link');
                     trInside = GetHtmlTr(curData, trArray);
                     bHtml += '<tr>' + trInside + '</tr>';
-
-                    tempCurData = curData.Resim.split(',');
-
-                    for (j = 0, rLength = tempCurData.length; j < rLength; j++) {
-                        fHtml += '<img ' +
-                            ' src="' + imagesDir + tempCurData[j] + '" ' +
-                            ' data-aciklama="' + curData.Aciklama + '">';
-                    }
                 }
 
                 fHtml += '</div>' +
-                    '<div id="' + vars.sectionShowBases.Aciklama + '" class="marginT15"></div>' +
-                    '</div>' +
                     '</div>' +
                     '</section>';
 
@@ -415,16 +226,27 @@ function GetSectionsData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
+                var myJSON = JSON.stringify(vars.sectionDatas.Ify.Data);
+                vars.sectionDatas.Ify.Data = myJSON;
                 var theCacheData = {
                     Ify: vars.sectionDatas.Ify,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.Ify.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
             iziError();
         }
     });
+}
+
+function GetExcelResult() {
+    var myUrl = vars.sectionControllers.Portal + 'ExcelDeneme';
+    $('body').append('<iframe id="excelDownloader" src="' + myUrl + '"></iframe>');
+    setTimeout(function() {
+        $('#excelDownloader').remove();
+    }, 150);
 }
 
 function GetHtmlTr(data, trArray) {
@@ -435,21 +257,12 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
         '<td>' +
-        '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonUp + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconUp + '" aria-hidden="true"></i></a> ' +
-        '</td>' +
-        '<td>' +
-        '<a href="javascript:;" class="btn btn-warning btn-block hvr-round-corners ' + tableOpts.ButtonDown + '" data="' + no + '" data2="' + listOrder + '"><i class="' + tableOpts.IconDown + '" aria-hidden="true"></i></a> ' +
-        '</td>' +
-        '<td>' +
         '<a href="javascript:;" class="btn btn-info btn-block hvr-round-corners ' + tableOpts.ButtonEdit + '" data="' + no + '"><i class="' + tableOpts.IconEdit + '" aria-hidden="true"></i></a> ' +
-        '</td>' +
-        '<td>' +
-        '<a href="javascript:;" class="btn btn-danger btn-block hvr-round-corners ' + tableOpts.ButtonDelete + '" data="' + no + '"><i class="' + tableOpts.IconDelete + '" aria-hidden="true"></i></a>' +
         '</td>';
 
     return newHtml;
@@ -466,31 +279,13 @@ function GetSectionsModalHtml() {
         '</div>' +
         '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
         '<div class="modal-body">' +
-        '<ul class="nav nav-tabs" role="tablist">' +
-        '<li role="presentation" class="active"><a class="hvr-wobble-top" href="#' + formTabs.Turkce + '" aria-controls="' + formTabs.Turkce + '" role="tab" data-toggle="tab">' + formLang.Turkce + '</a></li>' +
-        '<li role="presentation"><a class="hvr-wobble-top" href="#' + formTabs.Ingilizce + '" aria-controls="' + formTabs.Ingilizce + '" role="tab" data-toggle="tab">' + formLang.Ingilizce + '</a></li>' +
-        '</ul>' +
-        '<div class="tab-content">' +
 
         '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Resim + '</label>' +
-        '<div id="' + vars.sectionSPs.Resim + '"></div>' +
-        '</div>' +
-        '<div role="tabpanel" class="tab-pane fade in active" id="' + formTabs.Turkce + '">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Aciklama + '</label>' +
-        '<textarea name="tr_Aciklama" id="tr_Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '" rows="4"></textarea>' +
-        '</div>' +
-        '</div>' +
-        '<div role="tabpanel" class="tab-pane fade" id="' + formTabs.Ingilizce + '">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Aciklama + '</label>' +
-        '<textarea name="en_Aciklama" id="en_Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '" rows="4"></textarea>' +
-        '</div>' +
+        '<label>' + formLang.Link + '</label>' +
+        '<textarea name="Link" id="Link" class="form-control" placeholder="' + formLang.Link + '" rows="2"></textarea>' +
         '</div>' +
 
-        '</div>' +
         '</div>' +
         '<div class="modal-footer">' +
         '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
@@ -512,8 +307,6 @@ function GetSectionsHtml() {
         '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
         '<div class="col-lg-12 page-header text-center">' +
         '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        '<button id="' + rVars.sectionButtons.OpenModal + '" style="float: left; margin-left: 5px;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAddImage + '" aria-hidden="true"></i></button>' +
         '<span data-baslik="B_' + vars.sectionNames.Upper + '" class="' + settingsOpts.Names.Kod + ' cursor-pointer">' + vars.sectionNames.Normal + '</span>' +
         '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
         '</h2>' +
@@ -523,11 +316,8 @@ function GetSectionsHtml() {
         '<div class="table-responsive">' +
         '<table class="table table-bordered table-hover datatable">' +
         '<thead class="text-center">' +
-        '<th class="text-center">' + formLang.Resim + '</th>' +
-        '<th class="text-center">' + formLang.Yukari + '</th>' +
-        '<th class="text-center">' + formLang.Asagi + '</th>' +
+        '<th class="text-center">' + formLang.Link + '</th>' +
         '<th class="text-center">' + formLang.Duzenle + '</th>' +
-        '<th class="text-center">' + formLang.Sil + '</th>' +
         '</thead>' +
         '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
         '</tbody>' +
@@ -546,8 +336,6 @@ function GetSectionsHtml() {
     $('#' + vars.sectionShowBases.Sections).html(html);
 }
 
-var isFirst = true;
-
 function RefreshData(main = 1, html = 0, side = 0) {
     if (main == 1) {
         GetSectionsData();
@@ -558,14 +346,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
         CreateSectionsTable()
     }
     if (side != 0) {
-        GetResimlerSelect();
-    }
 
-    setTimeout(function() {
-        if (!isFirst) {
-            ShortenContent6();
-        }
-        isFirst = false;
-    }, 5);
+    }
     GetSectionsNum();
 }

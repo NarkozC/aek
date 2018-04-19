@@ -351,22 +351,14 @@ $(function() {
 });
 
 function GetLevelsSelect() {
-    var i, data = new Array('Main', 'Sub', 'SubSub'),
-        length = data.length;
-
-    var id = vars.sectionSPs.Level + 'Select';
-    var section = vars.sectionSPs.Level;
-
-    var html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.LevelSec + '" data-liveSearchNormalize="true">';
-
-    for (i = 0; i < length; i++) {
-        html += '<option data-tokens="' + data[i] + '" value="' + data[i] + '">' + data[i] + '</option>';
-    }
-
-    html += '</select>';
-
-    $('#' + section).html(html);
-    RefreshSelectpicker();
+    var data = new Array('Main', 'Sub', 'SubSub'),
+        html = FunSelect(
+            data,
+            vars.sectionSPs.Level,
+            formLang.LevelSec,
+            "", "", "",
+            false, false, true
+        );
 }
 
 function GetMainSectionIdsSelect(level) {
@@ -390,14 +382,13 @@ function GetMainSectionIdsSelect(level) {
         });
         length = curNavData.length;
 
-        html = '<select class="form-control selectpicker" data-live-search="true" name="' + section + '" id="' + id + '" title="' + formLang.UstBirimSec + '" data-liveSearchNormalize="true">';
-        for (i = 0; i < length; i++) {
-            curData = GetCurData(curNavData[i]);
-            html += '<option data-tokens="' + curData.Ad + '" value="' + curData[searchID] + '">' + curData.Ad + '</option>';
-        }
-        html += '</select>';
-
-        $('#' + section).html(html);
+        html = FunSelect(
+            curNavData,
+            vars.sectionSPs.MainSectionID,
+            formLang.UstBirimSec,
+            "Ad", searchID, "Ad",
+            false, false, true
+        );
         $('#' + section).parents('.ajax-group').show();
         RefreshSelectpicker();
     }
@@ -415,7 +406,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.NavbarF.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -444,9 +435,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.NavbarF;
                 vars.sectionDatas.NavbarF = cache;
+                vars.sectionDatas.NavbarF.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.NavbarF;
                 vars.sectionDatas.NavbarF = cache;
+                vars.sectionDatas.NavbarF.Data = JSON.parse(cache.Data);
             } else {
                 var fhtml = '',
                     bHtml = '',
@@ -541,10 +534,13 @@ function GetSectionsData() {
                 vars.sectionDatas.NavbarF.FHtml = $('#frontHtml').html();
                 $('#frontHtml').remove();
 
+                var myJSON = JSON.stringify(vars.sectionDatas.NavbarF.Data);
+                vars.sectionDatas.NavbarF.Data = myJSON;
                 var theCacheData = {
                     NavbarF: vars.sectionDatas.NavbarF,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.NavbarF.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -561,7 +557,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -582,112 +578,64 @@ function GetHtmlTr(data, trArray) {
 }
 
 function GetSectionsModalHtml() {
+    if (vars.sectionIsFirst) {
+        var html,
+            turkceHtml = new Array(
+                '<label>' + formLang.Ad + '</label>' +
+                '<input type="text" name="tr_Ad" id="tr_Ad" class="form-control" placeholder="' + formLang.Ad + '"></input>'
+            ),
+            ingilizceHtml = new Array(
+                '<label>' + formLang.Ad + '</label>' +
+                '<input type="text" name="tr_Ad" id="tr_Ad" class="form-control" placeholder="' + formLang.Ad + '"></input>'
+            ),
+            genelHtml = new Array(
+                '<label>' + formLang.IsLink + '</label>' +
+                '<input type="checkbox" name="IsLink" id="IsLink" class="form-control" value="IsLink-1" checked></input>',
 
-    var html = '<div class="modal fade ajax-modal" id="' + vars.sectionNames.Lower + '-modal" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header" align="center">' +
-        '<img class="maxW150" src="' + logoUrl + '">' +
-        modalOpts.ModalCloseButton +
-        '</div>' +
-        '<form role="form" method="post" id="' + vars.sectionNames.Lower + '-form" class="form-horizontal" action="' + vars.sectionControllers.Portal + vars.sectionFunctions.Add + '">' +
-        '<div class="modal-body">' +
-        '<ul class="nav nav-tabs" role="tablist">' +
-        '<li role="presentation" class="active"><a class="hvr-wobble-top" href="#' + formTabs.Turkce + '" aria-controls="' + formTabs.Turkce + '" role="tab" data-toggle="tab">' + formLang.Turkce + '</a></li>' +
-        '<li role="presentation"><a class="hvr-wobble-top" href="#' + formTabs.Ingilizce + '" aria-controls="' + formTabs.Ingilizce + '" role="tab" data-toggle="tab">' + formLang.Ingilizce + '</a></li>' +
-        '</ul>' +
-        '<div class="tab-content">' +
+                '<label>' + formLang.IsLinkInBaseurl + '</label>' +
+                '<input type="checkbox" name="IsLinkInBaseurl" id="IsLinkInBaseurl" class="form-control" value="IsLinkInBaseurl-1" checked></input>',
 
-        '<input type="hidden" name="No" id="No" class="form-control" value="0">' +
-        '<div role="tabpanel" class="tab-pane fade in active" id="' + formTabs.Turkce + '">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Ad + '</label>' +
-        '<input type="text" name="tr_Ad" id="tr_Ad" class="form-control" placeholder="' + formLang.Ad + '"></input>' +
-        '</div>' +
-        '</div>' +
-        '<div role="tabpanel" class="tab-pane fade" id="' + formTabs.Ingilizce + '">' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Ad + '</label>' +
-        '<input type="text" name="en_Ad" id="en_Ad" class="form-control" placeholder="' + formLang.Ad + '"></input>' +
-        '</div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.IsLink + '</label>' +
-        '<input type="checkbox" name="IsLink" id="IsLink" class="form-control" value="IsLink-1" checked></input>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.IsLinkInBaseurl + '</label>' +
-        '<input type="checkbox" name="IsLinkInBaseurl" id="IsLinkInBaseurl" class="form-control" value="IsLinkInBaseurl-1" checked></input>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Link + '</label>' +
-        '<input type="text" name="Link" id="Link" class="form-control" placeholder="' + formLang.Link + '"></input>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Level + '</label>' +
-        '<div id="' + vars.sectionSPs.Level + '"></div>' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.UstBirim + '</label>' +
-        '<div id="' + vars.sectionSPs.MainSectionID + '"></div>' +
-        '</div>' +
+                '<label>' + formLang.Link + '</label>' +
+                '<input type="text" name="Link" id="Link" class="form-control" placeholder="' + formLang.Link + '"></input>',
 
-        '</div>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" id="' + vars.sectionButtons.Submit + '" class="btn btn-info btn-lg btn-block">' + formLang.Kaydet + '</button>' +
-        '<button data-dismiss="modal" class="btn btn-danger hvr-buzz-out btn-lg btn-block">' + formLang.Iptal + '</button>' +
-        '</div>' +
-        '</form> ' +
-        '</div>' +
-        '</div>' +
-        '</div>';
-    $('#' + vars.sectionShowBases.Modal).html(html);
-    vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
-    vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+                '<label>' + formLang.Level + '</label>' +
+                '<div id="' + vars.sectionSPs.Level + '"></div>',
 
-    $('#' + vars.sectionSPs.MainSectionID).parents('.ajax-group').hide();
+                '<label>' + formLang.UstBirim + '</label>' +
+                '<div id="' + vars.sectionSPs.MainSectionID + '"></div>'
+            );
+
+        html = FunCreateModalHtml(vars.sectionNames.Lower, false, genelHtml, new Array(), new Array(), vars.sectionButtons.Submit)
+        $('#' + vars.sectionShowBases.Modal).html(html);
+        $('#' + vars.sectionSPs.MainSectionID).parents('.ajax-group').hide();
+        vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
+        vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+    }
 }
 
 function GetSectionsHtml() {
-    var html = '';
-
-    html += '<section id="' + vars.sectionNames.Lower + '" class="marginTB25">' +
-        '<div class="container dark-bg shadow borderRad25 wow ' + Animation + '" data-wow-delay="' + wowDelay + '">' +
-        '<div class="col-lg-12 page-header text-center">' +
-        '<h2>' +
-        '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>' +
-        vars.sectionNames.Normal +
-        '<span id="' + vars.sectionShowBases.Num + '" class="badge"></span>' +
-        '</h2>' +
-        '</div>' +
-        '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
-
-        '<div class="table-responsive">' +
-        '<table class="table table-bordered table-hover datatable">' +
-        '<thead class="text-center">' +
-        '<th class="text-center">' + formLang.Level + '</th>' +
-        '<th class="text-center">' + formLang.Ad + '</th>' +
-        '<th class="text-center">' + formLang.Yukari + '</th>' +
-        '<th class="text-center">' + formLang.Asagi + '</th>' +
-        '<th class="text-center">' + formLang.Duzenle + '</th>' +
-        '<th class="text-center">' + formLang.Sil + '</th>' +
-        '</thead>' +
-        '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
-        '</tbody>' +
-        '</table>' +
-        '</div>' +
-        '</div>' +
-
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '<div id="' + vars.sectionShowBases.Modal + '"></div>' +
-        '</div>' +
-        '</section>';
-
-    $('#' + vars.sectionShowBases.Sections).html(html);
+    if (vars.sectionIsFirst) {
+        var html = CreateSectionHtml(
+            vars.sectionNames.Lower,
+            vars.sectionNames.Upper,
+            vars.sectionNames.Normal,
+            new Array(
+                '<button id="' + vars.sectionButtons.OpenModal + '" style="float: left;" class="btn btn-success hvr-float-shadow"><i class="' + tableOpts.IconAdd + '" aria-hidden="true"></i></button>',
+            ),
+            new Array(
+                formLang.Level,
+                formLang.Ad,
+                formLang.Ad,
+                formLang.Yukari,
+                formLang.Asagi,
+                formLang.Duzenle,
+                formLang.Sil
+            ),
+            vars.sectionShowBases.Modal
+        )
+        $('#' + vars.sectionShowBases.Sections).html(html);
+        $('#' + vars.sectionShowBases.Sections).css('transition', 'none');
+    }
 }
 
 var isFirst = true;
@@ -697,20 +645,23 @@ function RefreshData(main = 1, html = 0, side = 0) {
         GetSectionsData();
     }
     if (html != 0) {
-        GetSectionsHtml()
-        GetSectionsModalHtml()
-        CreateSectionsTable()
+        setTimeout(function() {
+            GetSectionsHtml();
+            GetSectionsModalHtml();
+            CreateSectionsTable();
+        }, 50);
     }
     if (side != 0) {
-        GetLevelsSelect()
-        GetMainSectionIdsSelect('Main');
+        setTimeout(function() {
+            GetLevelsSelect()
+            GetMainSectionIdsSelect('Main');
+        }, 100);
     }
-
     setTimeout(function() {
-        if (!isFirst) {
-            ShortenContent6();
+        if (!vars.sectionIsFirst) {
+            ShortenContent();
         }
-        isFirst = false;
-    }, 5);
-    GetSectionsNum();
+        GetSectionsNum();
+        vars.sectionIsFirst = false;
+    }, 150);
 }

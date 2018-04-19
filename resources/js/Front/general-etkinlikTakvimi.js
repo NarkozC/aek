@@ -167,7 +167,7 @@ function CreateSelectedTable() {
     $('#show' + vars.sectionNames.Upper + 'Table').find('tbody:first').html(html);
     $('#show' + vars.sectionNames.Upper + 'Table').show();
 
-    ShortenContent6();
+    ShortenContent();
 
     CreateDataTables();
 
@@ -197,9 +197,13 @@ function GetEtkinlikTakvimiData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.EtkinlikTakvimi;
                 vars.sectionDatas.EtkinlikTakvimi = cache;
+                vars.sectionDatas.EtkinlikTakvimi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.EtkinlikTakvimi.FData = JSON.parse(cache.FData);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.EtkinlikTakvimi;
                 vars.sectionDatas.EtkinlikTakvimi = cache;
+                vars.sectionDatas.EtkinlikTakvimi.Data = JSON.parse(cache.Data);
+                vars.sectionDatas.EtkinlikTakvimi.FData = JSON.parse(cache.FData);
             } else {
                 var i, j, curData, trInside;
                 var data = result.data,
@@ -227,10 +231,16 @@ function GetEtkinlikTakvimiData() {
                 vars.sectionDatas.EtkinlikTakvimi.Data = htmls;
                 vars.sectionDatas.EtkinlikTakvimi.Num = length;
 
-                var theCacheData = {
-                    EtkinlikTakvimi: vars.sectionDatas.EtkinlikTakvimi,
+                if (length < cacheLimit) {
+                    vars.sectionDatas.EtkinlikTakvimi.Data = JSON.stringify(vars.sectionDatas.EtkinlikTakvimi.Data);
+                    vars.sectionDatas.EtkinlikTakvimi.FData = JSON.stringify(vars.sectionDatas.EtkinlikTakvimi.FData);
+                    var theCacheData = {
+                        EtkinlikTakvimi: vars.sectionDatas.EtkinlikTakvimi,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.EtkinlikTakvimi.Data = JSON.parse(vars.sectionDatas.EtkinlikTakvimi.Data);
+                    vars.sectionDatas.EtkinlikTakvimi.FData = JSON.parse(vars.sectionDatas.EtkinlikTakvimi.FData);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
         },
         error: function() {
@@ -306,7 +316,7 @@ function GetHtmlTr(data, trArray) {
     var newHtml = '';
     var length = trArray.length;
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
     return newHtml;
 }

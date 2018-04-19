@@ -24,6 +24,7 @@ var vars = {
         Update: 'UpdateSinavBasvurusu',
         Edit: 'EditSinavBasvurusu',
         Delete: 'DeleteSinavBasvurusu',
+        OutputExcel: 'OutputExcel',
 
         SinavTarihleriGet: 'GetSinavTarihleri',
     },
@@ -95,7 +96,7 @@ $(function() {
                             var editBtn = $('tr .' + tableOpts.ButtonEdit + '[data=' + no + ']');
                             var curData = response.data;
 
-                            trArray = new Array('Baslik');
+                            trArray = new Array('AdSoyad');
                             var trInside = GetHtmlTr(curData, trArray);
                             editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
                                 editBtn.parents('tr:first').html(trInside);
@@ -171,13 +172,9 @@ $(function() {
                             var tempData = $('#' + vars.secionSPs.OOSinif + 'Select').selectpicker('val');
                             tempData = tempData.split('-');
                             GetSinavTarihleriSelect(tempData[1]);
-                            console.log(tempData)
                             setTimeout(function() {
                                 tempData = result.data.SinavTarihi
-                                // tempData = tempData.split('-');
-                                console.log(tempData)
                                 $('#' + vars.secionSPs.SinavTarihi + 'Select').selectpicker('val', tempData);
-                                // $('#' + vars.secionSPs.SinavTarihi + 'Select').selectpicker('val', tempData[1]);
                             }, 5);
 
 
@@ -297,22 +294,32 @@ function GetSinavTarihleriData() {
                 var cache = result.cachedataTR.SinavTarihleri;
                 vars.sectionDatas.SinavTarihleri = cache;
             } else {
-                var i, clength;
                 var data = result.data,
-                    length = data.length;
+                    length = data.length,
+                    curI = 0;
+                var i, j, sLength, tData, curData;
 
                 vars.sectionDatas.SinavTarihleri.Data[0] = new Array();
                 vars.sectionDatas.SinavTarihleri.Data[0][0] = {};
-                for (i = 1; i < length; i++) {
-                    if (vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif] == undefined) {
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif] = new Array();
+                for (i = 1; i <= length; i++) {
+                    curData = data[curI];
 
-                        clength = vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif].length;
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][clength] = data[i];
-                    } else {
-                        clength = vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif].length;
-                        vars.sectionDatas.SinavTarihleri.Data[data[i].Sinif][clength] = data[i];
+                    curData.Tarih = curData.Tarih.split('-');
+                    curData.Tarih = curData.Tarih[2] + '.' + curData.Tarih[1] + '.' + curData.Tarih[0];
+                    tData = curData.Sinif.split(',');
+
+                    for (j = 0, sLength = tData.length; j < sLength; j++) {
+                        if (vars.sectionDatas.SinavTarihleri.Data[tData[j]] == undefined) {
+                            vars.sectionDatas.SinavTarihleri.Data[tData[j]] = new Array();
+
+                            clength = vars.sectionDatas.SinavTarihleri.Data[tData[j]].length;
+                            vars.sectionDatas.SinavTarihleri.Data[tData[j]][clength] = curData;
+                        } else {
+                            clength = vars.sectionDatas.SinavTarihleri.Data[tData[j]].length;
+                            vars.sectionDatas.SinavTarihleri.Data[tData[j]][clength] = curData;
+                        }
                     }
+                    curI++;
                 }
             }
         },
@@ -335,7 +342,7 @@ function CreateSectionsTable() {
 
     $('#show' + vars.sectionNames.Upper + 'Data').html(vars.sectionDatas.SinavBasvurusu.BHtml);
 
-    ShortenContent6();
+    ShortenContent();
 
     if (!vars.sectionIsFirst) {
         CreateDataTables();
@@ -363,9 +370,11 @@ function GetSectionsData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.SinavBasvurusu;
                 vars.sectionDatas.SinavBasvurusu = cache;
+                vars.sectionDatas.SinavBasvurusu.Data = JSON.parse(cache.Data);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.SinavBasvurusu;
                 vars.sectionDatas.SinavBasvurusu = cache;
+                vars.sectionDatas.SinavBasvurusu.Data = JSON.parse(cache.Data);
             } else {
                 var bHtml = '',
                     data = result.data,
@@ -381,13 +390,16 @@ function GetSectionsData() {
 
                     vars.sectionDatas.SinavBasvurusu.Data[i] = curData;
                 }
-
                 vars.sectionDatas.SinavBasvurusu.BHtml = bHtml;
                 vars.sectionDatas.SinavBasvurusu.Num = length;
+
+                var myJSON = JSON.stringify(vars.sectionDatas.SinavBasvurusu.Data);
+                vars.sectionDatas.SinavBasvurusu.Data = myJSON;
                 var theCacheData = {
                     SinavBasvurusu: vars.sectionDatas.SinavBasvurusu,
                 }
                 setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.SinavBasvurusu.Data = JSON.parse(myJSON);
             }
         },
         error: function() {
@@ -403,7 +415,7 @@ function GetHtmlTr(data, trArray) {
     var no = data.No;
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
@@ -448,10 +460,6 @@ function GetSectionsModalHtml() {
         '<input name="DogumTarihi" id="DogumTarihi" class="form-control" type="date" placeholder="' + formLang.DogumTarihi + '">' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.DogumYeri + '</label>' +
-        '<input name="DogumYeri" id="DogumYeri" class="form-control" type="text" placeholder="' + formLang.DogumYeri + '">' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.AnneAd + '</label>' +
         '<input name="AnneAd" id="AnneAd" class="form-control" type="text" placeholder="' + formLang.AnneAd + '">' +
         '</div>' +
@@ -476,10 +484,6 @@ function GetSectionsModalHtml() {
         '<input name="BabaEmail" id="BabaEmail" class="form-control" type="text" placeholder="' + formLang.BabaEmail + '">' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Adres + '</label>' +
-        '<input name="Adres" id="Adres" class="form-control" type="text" placeholder="' + formLang.Adres + '">' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.OOOkul + '</label>' +
         '<input name="OOOkul" id="OOOkul" class="form-control" type="text" placeholder="' + formLang.OOOkul + '">' +
         '</div>' +
@@ -490,10 +494,6 @@ function GetSectionsModalHtml() {
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.Bolum + '</label>' +
         '<input name="Bolum" id="Bolum" class="form-control" type="text" placeholder="' + formLang.Bolum + '">' +
-        '</div>' +
-        '<div class="ajax-group col-sm-12 paddingLR0">' +
-        '<label>' + formLang.Aciklama + '</label>' +
-        '<textarea name="Aciklama" id="Aciklama" class="form-control" placeholder="' + formLang.Aciklama + '" rows="3"></textarea>' +
         '</div>' +
         '<div class="ajax-group col-sm-12 paddingLR0">' +
         '<label>' + formLang.SinavTarihi + '</label>' +
@@ -513,6 +513,15 @@ function GetSectionsModalHtml() {
     $('#' + vars.sectionShowBases.Modal).html(html);
     vars.sectionObjects.Form = $('#' + vars.sectionNames.Lower + '-form');
     vars.sectionObjects.Modal = $('#' + vars.sectionNames.Lower + '-modal');
+}
+
+
+function OutputExcel() {
+    var myUrl = vars.sectionControllers.Portal + vars.sectionFunctions.OutputExcel;
+    $('body').append('<iframe style="display:none" id="excelDownloader" src="' + myUrl + '"></iframe>');
+    setTimeout(function() {
+        $('#excelDownloader').remove();
+    }, 500);
 }
 
 function GetSectionsHtml() {
@@ -538,6 +547,9 @@ function GetSectionsHtml() {
         '<tbody id="show' + vars.sectionNames.Upper + 'Data">' +
         '</tbody>' +
         '</table>' +
+        '</div>' +
+        '<div class="marginT15">' +
+        '<button type="button" onclick="OutputExcel()" class="btn btn-info btn-md">' + formLang.Indir + '</button>' +
         '</div>' +
         '</div>' +
 
@@ -572,7 +584,7 @@ function RefreshData(main = 1, html = 0, side = 0) {
 
     setTimeout(function() {
         if (!isFirst) {
-            ShortenContent6();
+            ShortenContent();
         }
         isFirst = false;
     }, 5);

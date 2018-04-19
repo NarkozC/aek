@@ -47,10 +47,12 @@ function GetYdeData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.Yde;
                 vars.sectionDatas.Yde = cache;
+                vars.sectionDatas.Yde.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.Yde;
                 vars.sectionDatas.Yde = cache;
+                vars.sectionDatas.Yde.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var data = result.data,
@@ -100,10 +102,15 @@ function GetYdeData() {
 
                 $('#' + vars.sectionShowBases.Sections).html(fHtml);
 
-                var theCacheData = {
-                    Yde: vars.sectionDatas.Yde,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.Yde.Data);
+                    vars.sectionDatas.Yde.Data = myJSON;
+                    var theCacheData = {
+                        Yde: vars.sectionDatas.Yde,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.Yde.Data = JSON.parse(myJSON);
                 }
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
 
             GetGallery()
@@ -145,7 +152,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=

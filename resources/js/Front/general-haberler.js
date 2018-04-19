@@ -84,9 +84,15 @@ function AllHaberler() {
                 if (en && result.cachedataEN != "") {
                     var cache = result.cachedataEN.Haberler;
                     vars.sectionDatas.Haberler = cache;
+                    vars.sectionDatas.Haberler.Data = JSON.parse(cache.Data);
+                    vars.sectionDatas.Haberler.FData = JSON.parse(cache.FData);
+                    vars.sectionDatas.Haberler.FHtml = JSON.parse(cache.FHtml);
                 } else if (!en && result.cachedataTR != "") {
                     var cache = result.cachedataTR.Haberler;
                     vars.sectionDatas.Haberler = cache;
+                    vars.sectionDatas.Haberler.Data = JSON.parse(cache.Data);
+                    vars.sectionDatas.Haberler.FData = JSON.parse(cache.FData);
+                    vars.sectionDatas.Haberler.FHtml = JSON.parse(cache.FHtml);
                 } else {
                     var i, j, data = result.data,
                         length, length2, htmls = {},
@@ -160,10 +166,18 @@ function AllHaberler() {
                     vars.sectionDatas.Haberler.Data = htmls;
                     vars.sectionDatas.Haberler.Num = length;
 
-                    var theCacheData = {
-                        Haberler: vars.sectionDatas.Haberler,
+                    if (length < cacheLimit) {
+                        vars.sectionDatas.Haberler.Data = JSON.stringify(vars.sectionDatas.Haberler.Data);
+                        vars.sectionDatas.Haberler.FData = JSON.stringify(vars.sectionDatas.Haberler.FData);
+                        vars.sectionDatas.Haberler.FHtml = JSON.stringify(vars.sectionDatas.Haberler.FHtml);
+                        var theCacheData = {
+                            Haberler: vars.sectionDatas.Haberler,
+                        }
+                        setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                        vars.sectionDatas.Haberler.Data = JSON.parse(vars.sectionDatas.Haberler.Data);
+                        vars.sectionDatas.Haberler.FData = JSON.parse(vars.sectionDatas.Haberler.FData);
+                        vars.sectionDatas.Haberler.FHtml = JSON.parse(vars.sectionDatas.Haberler.FHtml);
                     }
-                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
                 }
             },
             error: function() {
@@ -284,12 +298,14 @@ function AllHaberler() {
             '<div class="col-lg-12 page-header wow ' + AnimationHeader + ' paddingL0" data-wow-delay="' + wowDelay + '">' +
             '<h2>' + curData.Baslik + ' <span class="fSize65per">(' + curData.Tarih + ')</span></h2>' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '</div>' +
+            '<div class="container dark-bg shadow borderRad25 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 padding0">' +
             '<div id="' + vars.sectionNames.Kod + '" style="display:none;position: relative;left: 50%;transform: translate(-50%,0);">' +
             DigerResimlerHtml +
             '</div>' +
             '</div>' +
-            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15 wow ' + AnimationText + '" data-wow-delay="' + wowDelayText + '">' +
+            '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 marginT15">' +
             '<p>' + curData.Yazi + '</p>' +
             '</div>' +
             '</div>' +
@@ -364,9 +380,9 @@ function AllHaberler() {
                 var tarih = data.Tarih.split('-');
                 tarih = tarih[2] + '.' + tarih[1] + '.' + tarih[0];
 
-                newHtml += '<td class="shorten_content6">' + tarih + '</td>';
+                newHtml += '<td class="shorten_content">' + tarih + '</td>';
             } else {
-                newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+                newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
             }
         }
         newHtml +=

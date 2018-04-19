@@ -34,7 +34,6 @@ var vars = {
         KadroData: {
             Grups: {},
             GrupsCounter: {},
-            GrupsName: new Array(),
             SectionID: "kadro",
             ShowID: "#showKadro",
         },
@@ -125,7 +124,7 @@ function GetResimler(who = '') {
                 }
 
                 for (i = 0; i < length; i++) {
-                    html += '<option data-tokens="' + data[i].RKategoriler + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategoriler + '" value="' + data[i].RKategoriler + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategoriler + ')</option>';
+                    html += '<option data-tokens="' + data[i].RKategori + '/' + data[i].RDosya + ' ' + data[i].RIsim + ' ' + data[i].RKategori + '" value="' + data[i].RKategori + '/' + data[i].RDosya + '">' + data[i].RIsim + ' (' + data[i].RKategori + ')</option>';
                 }
                 lastParts += '</select>';
                 html += lastParts;
@@ -394,7 +393,6 @@ function GetKadroData() {
     vars.sectionDatas.KadroData = {
         Grups: {},
         GrupsCounter: {},
-        GrupsName: new Array(),
         SectionID: "kadro",
         ShowID: "#showKadro",
         Html: "",
@@ -415,9 +413,13 @@ function GetKadroData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.KadroData;
                 vars.sectionDatas.KadroData = cache;
+                vars.sectionDatas.KadroData.Grups = JSON.parse(cache.Grups);
+                vars.sectionDatas.KadroData.GrupsCounter = JSON.parse(cache.GrupsCounter);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.KadroData;
                 vars.sectionDatas.KadroData = cache;
+                vars.sectionDatas.KadroData.Grups = JSON.parse(cache.Grups);
+                vars.sectionDatas.KadroData.GrupsCounter = JSON.parse(cache.GrupsCounter);
             } else {
                 var data = result.data;
                 var i, j, k;
@@ -456,10 +458,15 @@ function GetKadroData() {
 
                     }
                 }
+
+                vars.sectionDatas.KadroData.Grups = JSON.stringify(vars.sectionDatas.KadroData.Grups);
+                vars.sectionDatas.KadroData.GrupsCounter = JSON.stringify(vars.sectionDatas.KadroData.GrupsCounter);
                 var theCacheData = {
                     KadroData: vars.sectionDatas.KadroData,
                 }
-                setTimeout(Cache('GetKadro', url, theCacheData), 1);
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.KadroData.Grups = JSON.parse(vars.sectionDatas.KadroData.Grups);
+                vars.sectionDatas.KadroData.GrupsCounter = JSON.parse(vars.sectionDatas.KadroData.GrupsCounter);
             }
 
         },
@@ -498,9 +505,23 @@ function GetKadroGrupData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.KadroGrupData;
                 vars.sectionDatas.KadroGrupData = cache;
+                vars.sectionDatas.KadroGrupData.Mains = JSON.parse(vars.sectionDatas.KadroGrupData.Mains);
+                vars.sectionDatas.KadroGrupData.SubSubs = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubs);
+                vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                vars.sectionDatas.KadroGrupData.Subs = JSON.parse(vars.sectionDatas.KadroGrupData.Subs);
+                vars.sectionDatas.KadroGrupData.SubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubsCounter);
+                vars.sectionDatas.KadroGrupData.Tabs = JSON.parse(vars.sectionDatas.KadroGrupData.Tabs);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.KadroGrupData;
                 vars.sectionDatas.KadroGrupData = cache;
+                vars.sectionDatas.KadroGrupData.Mains = JSON.parse(vars.sectionDatas.KadroGrupData.Mains);
+                vars.sectionDatas.KadroGrupData.SubSubs = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubs);
+                vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                vars.sectionDatas.KadroGrupData.Subs = JSON.parse(vars.sectionDatas.KadroGrupData.Subs);
+                vars.sectionDatas.KadroGrupData.SubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubsCounter);
+                vars.sectionDatas.KadroGrupData.Tabs = JSON.parse(vars.sectionDatas.KadroGrupData.Tabs);
             } else {
                 var data = result.data;
                 var data2;
@@ -556,10 +577,25 @@ function GetKadroGrupData() {
                         }
                     }
                 }
+
+                vars.sectionDatas.KadroGrupData.Mains = JSON.stringify(vars.sectionDatas.KadroGrupData.Mains);
+                vars.sectionDatas.KadroGrupData.SubSubs = JSON.stringify(vars.sectionDatas.KadroGrupData.SubSubs);
+                vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.stringify(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.stringify(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                vars.sectionDatas.KadroGrupData.Subs = JSON.stringify(vars.sectionDatas.KadroGrupData.Subs);
+                vars.sectionDatas.KadroGrupData.SubsCounter = JSON.stringify(vars.sectionDatas.KadroGrupData.SubsCounter);
+                vars.sectionDatas.KadroGrupData.Tabs = JSON.stringify(vars.sectionDatas.KadroGrupData.Tabs);
                 var theCacheData = {
                     KadroGrupData: vars.sectionDatas.KadroGrupData,
                 }
-                setTimeout(Cache("GetKadroGrup", url, theCacheData), 1)
+                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                vars.sectionDatas.KadroGrupData.Mains = JSON.parse(vars.sectionDatas.KadroGrupData.Mains);
+                vars.sectionDatas.KadroGrupData.SubSubs = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubs);
+                vars.sectionDatas.KadroGrupData.SubSubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsCounter);
+                vars.sectionDatas.KadroGrupData.SubSubsTemp = JSON.parse(vars.sectionDatas.KadroGrupData.SubSubsTemp);
+                vars.sectionDatas.KadroGrupData.Subs = JSON.parse(vars.sectionDatas.KadroGrupData.Subs);
+                vars.sectionDatas.KadroGrupData.SubsCounter = JSON.parse(vars.sectionDatas.KadroGrupData.SubsCounter);
+                vars.sectionDatas.KadroGrupData.Tabs = JSON.parse(vars.sectionDatas.KadroGrupData.Tabs);
             }
 
         },
@@ -585,7 +621,7 @@ function GetHtmlTr(data, trArray, mainOrSub = '') {
             var grupName = vars.sectionDatas.KadroGrupData.Subs['kadro'].filter(function(kadroGrup) {
                 return kadroGrup.SubSectionID == data.GrupSectionID
             });
-            newHtml += '<td class="shorten_content6">' + grupName[0].KisaAd + '</td>';
+            newHtml += '<td class="shorten_content">' + grupName[0].KisaAd + '</td>';
         } else if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "Aciklama") {
             var aciklama = '';
             $.each(vars.sectionDatas.KadroGrupData.SubSubs, function(key, element) {
@@ -598,9 +634,9 @@ function GetHtmlTr(data, trArray, mainOrSub = '') {
                 }
             });
             if (aciklama != '') {
-                newHtml += '<td class="shorten_content6">' + aciklama[0].KisaAd + '</td>';
+                newHtml += '<td class="shorten_content">' + aciklama[0].KisaAd + '</td>';
             } else {
-                newHtml += '<td class="shorten_content6">' + aciklama + '</td>';
+                newHtml += '<td class="shorten_content">' + aciklama + '</td>';
             }
         } else if (trArrayTemp[0] == "ozel" && trArrayTemp[1] == "MainSectionID") {
             var mainSectionID = '';
@@ -623,12 +659,12 @@ function GetHtmlTr(data, trArray, mainOrSub = '') {
             }
 
             if (mainSectionID != '') {
-                newHtml += '<td class="shorten_content6">' + mainSectionID[0].KisaAd + '</td>';
+                newHtml += '<td class="shorten_content">' + mainSectionID[0].KisaAd + '</td>';
             } else {
-                newHtml += '<td class="shorten_content6">' + mainSectionID + '</td>';
+                newHtml += '<td class="shorten_content">' + mainSectionID + '</td>';
             }
         } else {
-            newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+            newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
         }
     }
     newHtml +=
@@ -955,34 +991,6 @@ function GetKadroGrupHtml() {
     $('#show' + vars.sectionNameUpper.KadroGrup).html(html);
 }
 
-function Cache(who, url, data) {
-    var theCacheData;
-    if (en) {
-        theCacheData = {
-            CacheEN: data
-        }
-    } else {
-        theCacheData = {
-            CacheTR: data
-        }
-    }
-    theCacheData['English'] = en;
-    $.ajax({
-        type: 'ajax',
-        method: 'post',
-        url: url,
-        data: theCacheData,
-        async: false,
-        dataType: 'json',
-        success: function(response) {
-            console.log('cache success on:' + who)
-        },
-        error: function() {
-            iziError();
-        }
-    });
-}
-
 
 var isFirst = true;
 var isFirst2 = true;
@@ -1000,7 +1008,7 @@ function RefreshKadro(refreshMain = 1, refreshHtmls = 0, refreshSide = 0) {
             setTimeout(GetAddUpdateModalHtmlKadro(), 8)
             setTimeout(RefreshFunctionsKadro(), 9)
             if (!isFirst2) {
-                ShortenContent6();
+                ShortenContent();
             }
             isFirst2 = false;
         }
@@ -1020,7 +1028,7 @@ function RefreshKadroGrup(refreshMain = 1, refreshHtmls = 0, refreshSide = 0) {
             setTimeout(GetAddUpdateModalHtmlKadroGrup(), 8)
             setTimeout(RefreshFunctionsKadroGrup(), 9)
             if (!isFirst) {
-                ShortenContent6();
+                ShortenContent();
             }
             isFirst = false;
         }
@@ -1083,7 +1091,6 @@ function RefreshFunctionsKadro() {
                     name: 'English',
                     value: String(en)
                 });
-                console.log(data);
                 $.ajax({
                     type: 'ajax',
                     method: 'post',
@@ -1116,7 +1123,7 @@ function RefreshFunctionsKadro() {
                                         trArray = new Array('Resim');
                                     }
                                     var trInside = GetHtmlTr(response.data, trArray);
-                                    $('<tr class="shorten_content6">' + trInside + '</tr>')
+                                    $('<tr class="shorten_content">' + trInside + '</tr>')
                                         .hide()
                                         .prependTo('#' + vars.sectionNameLower.Kadro + ' ' + tbodyKadroGrupS)
                                         .fadeIn("slow")
@@ -1342,10 +1349,7 @@ function RefreshFunctionsKadro() {
             if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
                 var No = $(this).attr('data');
                 var ListOrder = $(this).attr('data2');
-                console.log('No:'+No)
-                console.log('ListOrder:'+ListOrder)
                 var url = vars.sectionPortalController + vars.sectionFunctions.KadroUp;
-                console.log('url:'+url);
                 $.ajax({
                     type: 'ajax',
                     method: 'post',
@@ -1357,7 +1361,6 @@ function RefreshFunctionsKadro() {
                     async: false,
                     dataType: 'json',
                     success: function(result) {
-                        console.log(result);
                         if (result.success) {
                             iziSuccess();
                             TargetListOrder = Number(ListOrder) - 1;
@@ -1519,7 +1522,6 @@ function RefreshFunctionsKadroGrup() {
                     async: false,
                     dataType: 'json',
                     success: function(response) {
-                        console.log(response)
                         ResetFormErrors();
                         if (response.success) {
                             var trArray = new Array('ozel-MainSectionID', 'KisaAd', 'Ad');
@@ -1552,7 +1554,7 @@ function RefreshFunctionsKadroGrup() {
                                         RefreshKadroGrup(1, 1);
                                     }, 500);
                                 } else {
-                                    $('<tr class="shorten_content6">' + trInside + '</tr>')
+                                    $('<tr class="shorten_content">' + trInside + '</tr>')
                                         .hide()
                                         .prependTo('#' + vars.sectionNameLower.KadroGrup + ' ' + tbodyKadroGrupS)
                                         .fadeIn("slow")
@@ -1567,8 +1569,6 @@ function RefreshFunctionsKadroGrup() {
                                 } else if (oldSayfa == vars.sectionDatas.KadroGrupData.Tabs[1]) {
                                     oldSayfa = "SubSub"
                                 }
-                                console.log('oldSayfa:' + oldSayfa)
-                                console.log('newSayfa:' + newSayfa)
                                 if (oldSayfa == newSayfa) {
                                     editBtn.parents('tr:first').css('background-color', '#ccc').fadeOut('normal', function() {
                                         editBtn.parents('tr:first').html(trInside);
@@ -1632,7 +1632,6 @@ function RefreshFunctionsKadroGrup() {
                                 GetMainSectionID(curContent.MainOrSub)
                             }, 1)
                             setTimeout(function() {
-                                console.log(curContent);
                                 $('input[name=No]').val(curContent.No);
                                 $(vars.sectionShowBases.KadroGrup + ' #MainOrSubSelect').selectpicker('val', curContent.MainOrSub);
                                 $(vars.sectionShowBases.KadroGrup + ' #MainSectionIDSelect').selectpicker('val', curContent.MainSectionID);
@@ -1744,10 +1743,7 @@ function RefreshFunctionsKadroGrup() {
             if (!$link.data('lockedAt') || +new Date() - $link.data('lockedAt') > 300) {
                 var No = $(this).attr('data');
                 var ListOrder = $(this).attr('data2');
-                console.log('No:'+No)
-                console.log('ListOrder:'+ListOrder)
                 var url = vars.sectionPortalController + vars.sectionFunctions.KadroGrupUp;
-                console.log('url:'+url);
                 $.ajax({
                     type: 'ajax',
                     method: 'post',
@@ -1759,7 +1755,6 @@ function RefreshFunctionsKadroGrup() {
                     async: false,
                     dataType: 'json',
                     success: function(result) {
-                        console.log(result);
                         if (result.success) {
                             iziSuccess();
                             TargetListOrder = Number(ListOrder) - 1;

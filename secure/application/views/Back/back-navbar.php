@@ -27,13 +27,6 @@
 </div>
 
   <div id="page">
-
-
-  <div id="ajax-loader-container">
-    <div id="ajax-loader">
-      <img src="<?php echo base_url(); ?>resources/images/Genel/ajax-loader.gif" class="img-responsive">
-    </div>
-  </div>
   
   <!-- begin AekNavbar           -->
   <nav class="navbar navbar-custom-dek no-active-arrow navbar-fixed-top xs-height75 dropdown-onhover no-fix" role="navigation">

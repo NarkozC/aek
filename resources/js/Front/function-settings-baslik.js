@@ -1,7 +1,9 @@
 $(function() {
-    setTimeout(function() {
-        UpdateBasliks();
-    }, 300);
+    $(function() {
+        setTimeout(function() {
+            UpdateBasliks();
+        }, 500);
+    });
 });
 
 function UpdateBasliks() {

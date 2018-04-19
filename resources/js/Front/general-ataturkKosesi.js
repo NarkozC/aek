@@ -47,10 +47,12 @@ function GetAtaturkKosesiData() {
             if (en && result.cachedataEN != "") {
                 var cache = result.cachedataEN.AtaturkKosesi;
                 vars.sectionDatas.AtaturkKosesi = cache;
+                vars.sectionDatas.AtaturkKosesi.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else if (!en && result.cachedataTR != "") {
                 var cache = result.cachedataTR.AtaturkKosesi;
                 vars.sectionDatas.AtaturkKosesi = cache;
+                vars.sectionDatas.AtaturkKosesi.Data = JSON.parse(cache.Data);
                 $('#' + vars.sectionShowBases.Sections).html(cache.FHtml);
             } else {
                 var bHtml = '',
@@ -72,11 +74,15 @@ function GetAtaturkKosesiData() {
                 vars.sectionDatas.AtaturkKosesi.Num = length;
                 $('#' + vars.sectionShowBases.Sections).html(vars.sectionDatas.AtaturkKosesi.FHtml);
 
-                var theCacheData = {
-                    AtaturkKosesi: vars.sectionDatas.AtaturkKosesi,
+                if (length < cacheLimit) {
+                    var myJSON = JSON.stringify(vars.sectionDatas.AtaturkKosesi.Data);
+                    vars.sectionDatas.AtaturkKosesi.Data = myJSON;
+                    var theCacheData = {
+                        AtaturkKosesi: vars.sectionDatas.AtaturkKosesi,
+                    }
+                    setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
+                    vars.sectionDatas.AtaturkKosesi.Data = JSON.parse(myJSON);
                 }
-                var url = vars.sectionControllers.Normal + vars.sectionFunctions.Get;
-                setTimeout(Cache('GetSectionsData', url, theCacheData), 1);
             }
             setTimeout(function() {
                 GetGAK();
@@ -268,7 +274,8 @@ function ConvertDataToFhtml() {
         }
         html += '</div>' +
             '</div>' +
-            '</div><!-- End container --></section>';
+            '</div>' +
+            '</section>';
 
         vars.sectionDatas.AtaturkKosesi.FHtml = html;
     }
@@ -294,7 +301,7 @@ function GetHtmlTr(data, trArray) {
     var listOrder = data.ListOrder
 
     for (i = 0; i < length; i++) {
-        newHtml += '<td class="shorten_content6">' + data[trArray[i]] + '</td>';
+        newHtml += '<td class="shorten_content">' + data[trArray[i]] + '</td>';
     }
 
     newHtml +=
